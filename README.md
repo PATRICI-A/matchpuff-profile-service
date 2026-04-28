@@ -23,6 +23,11 @@ Este microservicio gestiona la información del perfil de usuario y el flujo de 
 - Diagrama de componentes: [pendiente de agregar]
 - Diagrama de datos: [pendiente de agregar]
 
+### Documentos
+
+- Documento arquitectura del modulo: [Documento](https://pruebacorreoescuelaingeduco-my.sharepoint.com/:w:/g/personal/javier_romero-d_mail_escuelaing_edu_co/IQAKfAM2ZdJsRJ8kEBYsqeImAQPXeqsLfA1y-RIbHioZB2c?e=siijic)
+
+
 ### Funcionalidades
 - Registro y actualización de perfil de usuario
 - Gestión del flujo de onboarding
