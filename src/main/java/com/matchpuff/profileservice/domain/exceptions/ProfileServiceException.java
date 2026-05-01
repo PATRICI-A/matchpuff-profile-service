@@ -3,7 +3,7 @@ package com.matchpuff.profileservice.domain.exceptions;
 import org.springframework.http.HttpStatus;
 
 
-public abstract class ProfileServiceException extends RuntimeException {
+public class ProfileServiceException extends RuntimeException {
     
     private final HttpStatus status;
 
