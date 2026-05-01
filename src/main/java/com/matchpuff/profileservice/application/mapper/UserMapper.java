@@ -6,5 +6,5 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    static UserResponse toResponse(User user);
+     UserResponse toResponse(User user);
 }

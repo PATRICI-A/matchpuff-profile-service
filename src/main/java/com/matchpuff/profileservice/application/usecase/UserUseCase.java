@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserUseCase implements UserServicePort {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     // ── CREATE ───────────────────────────────────────────────────
 
@@ -38,14 +39,14 @@ public class UserUseCase implements UserServicePort {
         if (request.getTags() != null) student.setTags(toTagList(request.getTags()));
         if (request.getSchedules() != null)  student.setSchedules(toScheduleList(request.getSchedules()));
 
-        return UserMapper.toResponse(userRepository.save(student));
+        return userMapper.toResponse(userRepository.save(student));
     }
 
     // ── GET ──────────────────────────────────────────────────────
 
     @Override
     public UserResponse getUser(String userId) {
-        return UserMapper.toResponse(findOrThrow(userId));
+        return userMapper.toResponse(findOrThrow(userId));
     }
 
     // ── UPDATE ───────────────────────────────────────────────────
@@ -60,7 +61,7 @@ public class UserUseCase implements UserServicePort {
         if (request.getTags() != null)    student.setTags(toTagList(request.getTags()));
         if (request.getSchedules() != null)     student.setSchedules(toScheduleList(request.getSchedules()));
 
-        return UserMapper.toResponse(userRepository.save(student));
+        return userMapper.toResponse(userRepository.save(student));
     }
 
     // ── Helpers ──────────────────────────────────────────────────
