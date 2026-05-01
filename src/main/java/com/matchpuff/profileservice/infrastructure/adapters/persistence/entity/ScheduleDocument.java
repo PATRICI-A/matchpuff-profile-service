@@ -1,18 +1,18 @@
-package infrastructure.adapters.persistence.entity;
+package com.matchpuff.profileservice.infrastructure.adapters.persistence.entity;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import com.matchpuff.profileservice.domain.valueobjects.DayOfWeekEnum;
 
 import java.time.LocalTime;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class ScheduleDocument {
     @Field("day_of_week")
-    private DayOfWeek dayOfWeek;
+    private DayOfWeekEnum dayOfWeek;
 
     @Field("name")
     private String name;

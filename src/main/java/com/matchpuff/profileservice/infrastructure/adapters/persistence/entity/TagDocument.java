@@ -9,8 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Setter
 @NoArgsConstructor
 public class TagDocument {
-    @Field("id")
-    private String id;
 
     @Field("name")
     private String name;

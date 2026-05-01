@@ -1,25 +1,32 @@
-package infrastructure.adapters.persistence.entity;
+package com.matchpuff.profileservice.infrastructure.adapters.persistence.entity;
 
-import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.UserDocument;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Getter
-@Setter
+import com.matchpuff.profileservice.domain.valueobjects.CareerEnum;
+import com.matchpuff.profileservice.domain.valueobjects.PrivacyLevelEnum;
+
+import java.util.List;
+
+@Document(collection = "students")
+@Data
 @NoArgsConstructor
 public class StudentProfileDocument extends UserDocument {
-    @Field("carreer")
-    private CarreerEnum carreer;
+    @Field("career")
+    private CareerEnum career;
 
     @Field("semester")
     private Integer semester;
 
+    @Field("photo")
+    private String photo;
+
     @Field("biography")
     private String biography;
 
-    @Field("privacy_level")
+    @Field("privacyLevel")
     private PrivacyLevelEnum privacyLevel;
 
     @Field("interests")
