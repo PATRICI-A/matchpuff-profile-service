@@ -1,19 +1,20 @@
 package com.matchpuff.profileservice.infrastructure.adapters.persistence.entity;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import com.matchpuff.profileservice.domain.valueobjects.CareerEnum;
-import com.matchpuff.profileservice.domain.valueobjects.PrivacyLevelEnum;
+import com.matchpuff.profileservice.domain.model.enums.CareerEnum;
+import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
 
 import java.util.List;
 
-@Document(collection = "students")
 @Data
-@NoArgsConstructor
 public class StudentProfileDocument extends UserDocument {
+    
+    public StudentProfileDocument() {
+        super();
+        this.setUserType(UserType.STUDENT);
+    }
     @Field("career")
     private CareerEnum career;
 

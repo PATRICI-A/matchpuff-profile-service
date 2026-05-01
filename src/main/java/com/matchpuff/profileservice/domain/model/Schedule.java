@@ -2,7 +2,7 @@ package com.matchpuff.profileservice.domain.model;
 
 import java.time.LocalTime;
 
-import com.matchpuff.profileservice.domain.valueobjects.DayOfWeekEnum;
+import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
 
 import lombok.Data;
 

@@ -1,12 +1,13 @@
 package com.matchpuff.profileservice.infrastructure.adapters.persistence.entity;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "admins")
 @Data
-@NoArgsConstructor
 public class AdminProfileDocument extends UserDocument {
+    
+    public AdminProfileDocument() {
+        super();
+        this.setUserType(UserType.ADMIN);
+    }
     // No extra fields for admin profile
 }

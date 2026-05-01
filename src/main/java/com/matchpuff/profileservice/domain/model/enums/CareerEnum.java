@@ -1,4 +1,4 @@
-package com.matchpuff.profileservice.domain.valueobjects;
+package com.matchpuff.profileservice.domain.model.enums;
 
 public enum CareerEnum {
     SYSTEMS_ENGINEERING,

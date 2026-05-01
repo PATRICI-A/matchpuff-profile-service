@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import com.matchpuff.profileservice.domain.valueobjects.DayOfWeekEnum;
+import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
 
 import java.time.LocalTime;
 
