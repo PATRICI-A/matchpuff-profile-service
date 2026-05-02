@@ -1,5 +1,6 @@
 package com.matchpuff.profileservice.infrastructure.adapters.adapter;
 
+import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.UserType;
 import com.matchpuff.profileservice.domain.model.User;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
 import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
@@ -57,6 +58,13 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public List<User> findAll() {
         return userRepository.findAll().stream()
+                .flatMap(doc -> convertDocumentToDomain(doc).stream())
+                .toList();
+    }
+    @Override
+    public List<User> findAllStudents() {
+        return userRepository.findAll().stream()
+                .filter(doc -> doc.getUserType() == UserType.STUDENT)
                 .flatMap(doc -> convertDocumentToDomain(doc).stream())
                 .toList();
     }
