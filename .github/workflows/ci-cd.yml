@@ -83,7 +83,7 @@ jobs:
           MONGO_URI: ${{ secrets.MONGO_URI_TEST }}
         run: |
           mvn clean verify sonar:sonar -B \
-            -Dsonar.projectKey=profile-service \
+            -Dsonar.projectKey=patrici-a \
             -Dsonar.organization=${SONAR_ORGANIZATION} \
             -Dsonar.host.url=${SONAR_HOST_URL} \
             -Dsonar.token=${SONAR_TOKEN} \
