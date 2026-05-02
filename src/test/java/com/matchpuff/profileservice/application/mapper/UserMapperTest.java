@@ -115,8 +115,8 @@ class UserMapperTest {
 
         UserResponseInfo info = mapper.toResponseInfo(student);
 
-        assertNull(info.getSchedules());
-        assertNull(info.getTags());
+        assertTrue(info.getSchedules().isEmpty());
+        assertTrue(info.getTags().isEmpty());
     }
 
     @Test
@@ -131,8 +131,8 @@ class UserMapperTest {
         assertEquals("ADMIN", info.getUserType());
         assertEquals("Admin User", info.getName());
         assertNull(info.getBiography());
-        assertNull(info.getSchedules());
-        assertNull(info.getTags());
+        assertTrue(info.getSchedules().isEmpty());
+        assertTrue(info.getTags().isEmpty());
     }
 
     @Test
@@ -167,7 +167,7 @@ class UserMapperTest {
 
     @Test
     void givenNullList_whenToScheduleResponseList_thenReturnsNull() {
-        assertNull(mapper.toScheduleResponseList(null));
+        assertTrue(mapper.toScheduleResponseList(null).isEmpty());
     }
 
     @Test
@@ -197,7 +197,7 @@ class UserMapperTest {
 
     @Test
     void givenNullList_whenToTagResponseList_thenReturnsNull() {
-        assertNull(mapper.toTagResponseList(null));
+        assertTrue(mapper.toTagResponseList(null).isEmpty());
     }
 
     @Test

@@ -1,8 +1,6 @@
 package com.matchpuff.profileservice.entrypoints.rest.controller;
 
-import com.matchpuff.profileservice.application.dto.request.ScheduleUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.ScheduleRequest;
-import com.matchpuff.profileservice.application.dto.request.TagsUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.TagRequest;
 import com.matchpuff.profileservice.application.dto.request.UserRequest;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;

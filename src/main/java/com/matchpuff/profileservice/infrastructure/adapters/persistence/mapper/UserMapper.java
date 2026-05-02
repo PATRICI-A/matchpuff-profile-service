@@ -1,7 +1,7 @@
 package com.matchpuff.profileservice.infrastructure.adapters.persistence.mapper;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
@@ -66,14 +66,14 @@ public class UserMapper {
 
 	public static List<StudentProfile> toDomainList(List<StudentProfileDocument> docs) {
 		if (docs == null) {
-			return null;
+			return Collections.emptyList();
 		}
-		return docs.stream().map(UserMapper::toDomain).collect(Collectors.toList());
+		return docs.stream().map(UserMapper::toDomain).toList();
 	}
 
 	public static List<Schedule> toScheduleList(List<ScheduleDocument> scheduleDocs) {
 		if (scheduleDocs == null) {
-			return null;
+			return Collections.emptyList();
 		}
 
 		return scheduleDocs.stream().map(doc -> {
@@ -83,12 +83,12 @@ public class UserMapper {
 			schedule.setStartTime(doc.getStartHour());
 			schedule.setEndTime(doc.getFinishHour());
 			return schedule;
-		}).collect(Collectors.toList());
+		}).toList();
 	}
 
 	public static List<Tag> toTagList(List<TagDocument> tagDocs) {
 		if (tagDocs == null) {
-			return null;
+			return Collections.emptyList();
 		}
 
 		return tagDocs.stream().map(doc -> {
@@ -96,12 +96,12 @@ public class UserMapper {
 			tag.setName(doc.getName());
 			tag.setCategory(doc.getCategory());
 			return tag;
-		}).collect(Collectors.toList());
+		}).toList();
 	}
 
 	private static List<ScheduleDocument> toScheduleDocumentList(List<Schedule> schedules) {
 		if (schedules == null) {
-			return null;
+			return Collections.emptyList();
 		}
 
 		return schedules.stream().map(schedule -> {
@@ -111,12 +111,12 @@ public class UserMapper {
 			doc.setStartHour(schedule.getStartTime());
 			doc.setFinishHour(schedule.getEndTime());
 			return doc;
-		}).collect(Collectors.toList());
+		}).toList();
 	}
 
 	private static List<TagDocument> toTagDocumentList(List<Tag> tags) {
 		if (tags == null) {
-			return null;
+			return Collections.emptyList();
 		}
 
 		return tags.stream().map(tag -> {
@@ -124,6 +124,6 @@ public class UserMapper {
 			doc.setName(tag.getName());
 			doc.setCategory(tag.getCategory());
 			return doc;
-		}).collect(Collectors.toList());
+		}).toList();
 	}
 }

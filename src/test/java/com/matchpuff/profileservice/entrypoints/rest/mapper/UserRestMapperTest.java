@@ -95,7 +95,7 @@ class UserRestMapperTest {
 
         StudentProfile result = UserRestMapper.toDomain(request);
 
-        assertNull(result.getTags());
+        assertTrue(result.getTags().isEmpty());
     }
 
     @Test
@@ -107,7 +107,7 @@ class UserRestMapperTest {
 
         StudentProfile result = UserRestMapper.toDomain(request);
 
-        assertNull(result.getSchedules());
+        assertTrue(result.getSchedules().isEmpty());
     }
 
     // ── toDomain(ScheduleRequest) ─────────────────────────────────

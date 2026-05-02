@@ -150,9 +150,11 @@ class UserUseCaseTest {
     void givenNonExistingUser_whenUpdate_thenThrowsProfileServiceException() {
         when(userRepository.findById("ghost")).thenReturn(Optional.empty());
 
+        StudentProfile studentProfile = new StudentProfile();
+
         assertThrows(
                 ProfileServiceException.class,
-                () -> userUseCase.updateStudentUser("ghost", new StudentProfile())
+                () -> userUseCase.updateStudentUser("ghost", studentProfile)
         );
     }
 
@@ -194,9 +196,11 @@ class UserUseCaseTest {
     void givenNonExistingUser_whenAddSchedule_thenThrowsProfileServiceException() {
         when(userRepository.findById("missing")).thenReturn(Optional.empty());
 
+        Schedule schedule = new Schedule();
+
         assertThrows(
                 ProfileServiceException.class,
-                () -> userUseCase.addScheduleToStudent("missing", new Schedule())
+                () -> userUseCase.addScheduleToStudent("missing", schedule)
         );
     }
 
@@ -236,9 +240,11 @@ class UserUseCaseTest {
     void givenNonExistingUser_whenAddTag_thenThrowsProfileServiceException() {
         when(userRepository.findById("nobody")).thenReturn(Optional.empty());
 
+        Tag tag = new Tag();
+
         assertThrows(
                 ProfileServiceException.class,
-                () -> userUseCase.addTagToStudent("nobody", new Tag())
+                () -> userUseCase.addTagToStudent("nobody", tag)
         );
     }
 

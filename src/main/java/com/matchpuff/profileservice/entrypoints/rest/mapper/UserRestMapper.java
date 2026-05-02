@@ -7,6 +7,7 @@ import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.Tag;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
 
+import java.util.Collections;
 import java.util.List;
 
 public class UserRestMapper {
@@ -35,7 +36,7 @@ public class UserRestMapper {
 
     private static List<Tag> toDomainTags(List<TagRequest> tags) {
         if (tags == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         return tags.stream().map(tagRequest -> {
@@ -48,7 +49,7 @@ public class UserRestMapper {
 
     private static List<Schedule> toDomainSchedules(List<ScheduleRequest> schedules) {
         if (schedules == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         return schedules.stream().map(scheduleRequest -> {

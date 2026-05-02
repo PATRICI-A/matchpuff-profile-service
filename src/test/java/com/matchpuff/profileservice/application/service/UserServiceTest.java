@@ -6,7 +6,6 @@ import com.matchpuff.profileservice.application.mapper.UserMapper;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
 import com.matchpuff.profileservice.domain.model.Tag;
-import com.matchpuff.profileservice.domain.model.User;
 import com.matchpuff.profileservice.domain.ports.in.UserUseCasePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

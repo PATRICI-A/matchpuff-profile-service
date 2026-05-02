@@ -1,9 +1,11 @@
 name: CI/CD – Profile Service
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
+    branches: [ develop, main ]
+    types: [ opened, synchronize, reopened ]
+
+  push:
     branches: [ main, develop ]
 
 env:
@@ -11,6 +13,9 @@ env:
 
 jobs:
 
+  # =========================
+  # CI – Build & Test
+  # =========================
   build-and-test:
     name: "CI – Build & Test"
     runs-on: ubuntu-latest
@@ -48,6 +53,9 @@ jobs:
           name: test-reports
           path: target/surefire-reports/
 
+  # =========================
+  # QA – Sonar (EN PR)
+  # =========================
   sonar:
     name: "QA – Sonar Analysis"
     runs-on: ubuntu-latest
@@ -79,6 +87,9 @@ jobs:
             -Dsonar.token=${SONAR_TOKEN} \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
+  # =========================
+  # Docker Build (solo en main)
+  # =========================
   docker-build:
     name: "Docker – Build Image"
     runs-on: ubuntu-latest
@@ -92,6 +103,9 @@ jobs:
         run: docker build -t profile-service:latest .
 
 
+  # =========================
+  # Docker Push
+  # =========================
   docker-push:
     name: "Docker – Push Image"
     runs-on: ubuntu-latest
