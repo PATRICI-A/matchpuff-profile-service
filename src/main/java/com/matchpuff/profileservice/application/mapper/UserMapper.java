@@ -13,6 +13,7 @@ import com.matchpuff.profileservice.domain.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.Collections;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
@@ -26,7 +27,7 @@ public interface UserMapper {
                return null;
           }
 
-          StudentProfile student = (user instanceof StudentProfile) ? (StudentProfile) user : null;
+          StudentProfile student = (user instanceof StudentProfile sp) ? sp : null;
 
           return UserResponseInfo.builder()
                   .id(user.getId())
@@ -44,7 +45,7 @@ public interface UserMapper {
 
      default List<ScheduleResponse> toScheduleResponseList(List<Schedule> schedules) {
           if (schedules == null) {
-               return null;
+          return Collections.emptyList();
           }
 
           return schedules.stream().map(schedule -> {
@@ -59,7 +60,7 @@ public interface UserMapper {
 
      default List<TagResponse> toTagResponseList(List<Tag> tags) {
           if (tags == null) {
-               return null;
+               return Collections.emptyList();
           }
 
           return tags.stream().map(tag -> {

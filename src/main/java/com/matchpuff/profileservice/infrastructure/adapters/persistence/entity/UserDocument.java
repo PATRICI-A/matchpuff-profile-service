@@ -9,8 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
 
-import org.springframework.data.mongodb.core.index.Indexed;
-
 import java.time.LocalDateTime;
 
 @Document(collection = "users")
