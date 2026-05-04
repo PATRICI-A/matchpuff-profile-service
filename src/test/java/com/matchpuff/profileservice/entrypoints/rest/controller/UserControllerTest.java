@@ -3,6 +3,7 @@ package com.matchpuff.profileservice.entrypoints.rest.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
+import com.matchpuff.profileservice.application.dto.response.StudentProfileResponse;
 import com.matchpuff.profileservice.application.service.UserServicePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -348,5 +349,35 @@ class UserControllerTest {
         mockMvc.perform(multipart("/api/users/user-1/profile-image").file(file))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.profileImageUrl").value("http://photo.jpg"));
+    }
+
+    @Test
+    void givenStudentWithPhoto_whenGetProfileImage_thenRedirectsToImageUrl() throws Exception {
+        StudentProfileResponse photoUser = StudentProfileResponse.builder()
+                .id("user-1")
+                .name("Test User")
+                .email("test@escuelaing.edu.co")
+                .photoUrl("http://photo.jpg")
+                .build();
+
+        when(userService.getUser("user-1")).thenReturn(photoUser);
+
+        mockMvc.perform(get("/api/users/user-1/profile-image"))
+                .andExpect(status().isFound())
+                .andExpect(header().string("Location", "http://photo.jpg"));
+    }
+
+    @Test
+    void givenStudentWithoutPhoto_whenGetProfileImage_thenReturns400() throws Exception {
+        StudentProfileResponse photoUser = StudentProfileResponse.builder()
+                .id("user-1")
+                .name("Test User")
+                .email("test@escuelaing.edu.co")
+                .build();
+
+        when(userService.getUser("user-1")).thenReturn(photoUser);
+
+        mockMvc.perform(get("/api/users/user-1/profile-image"))
+                .andExpect(status().isBadRequest());
     }
 }

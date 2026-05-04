@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
 import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
+import com.matchpuff.profileservice.application.dto.response.StudentProfileResponse;
 
 import java.io.IOException;
 
@@ -119,6 +121,20 @@ public class UserController {
         } catch (IOException e) {
             throw new InvalidInputException("It was not possible to read the file. Please try again.");
         }
+    }
+
+    @GetMapping("/{userId}/profile-image")
+    @Operation(summary = "Abrir la imagen de perfil del usuario")
+    public ResponseEntity<Void> getProfileImage(@PathVariable String userId) {
+        UserResponse user = userService.getUser(userId);
+
+        if (!(user instanceof StudentProfileResponse student) || student.getPhotoUrl() == null || student.getPhotoUrl().isBlank()) {
+            throw new InvalidInputException("This user does not have a profile image.");
+        }
+
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(student.getPhotoUrl()))
+                .build();
     }
 
 }
