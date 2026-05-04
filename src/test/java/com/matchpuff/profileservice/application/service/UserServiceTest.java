@@ -1,11 +1,11 @@
 package com.matchpuff.profileservice.application.service;
 
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
-import com.matchpuff.profileservice.application.dto.response.UserResponseInfo;
 import com.matchpuff.profileservice.application.mapper.UserMapper;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
 import com.matchpuff.profileservice.domain.model.Tag;
+import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
 import com.matchpuff.profileservice.domain.ports.in.UserUseCasePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,7 +35,6 @@ class UserServiceTest {
 
     private StudentProfile student;
     private UserResponse userResponse;
-    private UserResponseInfo userResponseInfo;
 
     @BeforeEach
     void setUp() {
@@ -51,12 +51,90 @@ class UserServiceTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        userResponseInfo = UserResponseInfo.builder()
-                .id("user-1")
-                .name("Laura Torres")
-                .email("laura@escuelaing.edu.co")
-                .userType("STUDENT")
-                .build();
+
+    }
+
+    // ── createAdmin / createOrganizer / deleteUser ─────────────────────────
+
+    @Test
+    void givenAdmin_whenCreateAdminUser_thenDelegatesAndReturnsMappedResponse() {
+        var admin = new com.matchpuff.profileservice.domain.model.Admin();
+        admin.setId("admin-1");
+        admin.setName("Admin User");
+
+        when(userUseCase.createAdminUser(admin)).thenReturn(admin);
+        when(userMapper.toResponse(admin)).thenReturn(userResponse);
+
+        UserResponse result = userService.createAdminUser(admin);
+
+        assertNotNull(result);
+        verify(userUseCase).createAdminUser(admin);
+        verify(userMapper).toResponse(admin);
+    }
+
+    @Test
+    void givenOrganizer_whenCreateOrganizerUser_thenDelegatesAndReturnsMappedResponse() {
+        var organizer = new com.matchpuff.profileservice.domain.model.Organizer();
+        organizer.setId("org-1");
+        organizer.setName("Organizer User");
+
+        when(userUseCase.createOrganizerUser(organizer)).thenReturn(organizer);
+        when(userMapper.toResponse(organizer)).thenReturn(userResponse);
+
+        UserResponse result = userService.createOrganizerUser(organizer);
+
+        assertNotNull(result);
+        verify(userUseCase).createOrganizerUser(organizer);
+        verify(userMapper).toResponse(organizer);
+    }
+
+    @Test
+    void whenDeleteUser_thenDelegatesToUseCase() {
+        doNothing().when(userUseCase).deleteUser("user-1");
+
+        userService.deleteUser("user-1");
+
+        verify(userUseCase).deleteUser("user-1");
+    }
+
+    // ── updateProfileImage / getAllStudentProfiles ───────────────────────
+
+    @Test
+    void whenUpdateProfileImage_thenReturnsProfilePhotoResponse() {
+        byte[] file = "bytes".getBytes();
+        when(userUseCase.updateProfileImage("user-1", file, "image/png")).thenReturn(student);
+
+        com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto photoResponse =
+                com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto.builder()
+                        .id("user-1")
+                        .name("Laura Torres")
+                        .email("laura@escuelaing.edu.co")
+                        .profileImageUrl("http://photo.jpg")
+                        .build();
+
+        when(userMapper.toResponseProfilePhoto(student)).thenReturn(photoResponse);
+
+        var result = userService.updateProfileImage("user-1", file, "image/png");
+
+        assertNotNull(result);
+        assertEquals("http://photo.jpg", result.getProfileImageUrl());
+        verify(userUseCase).updateProfileImage("user-1", file, "image/png");
+        verify(userMapper).toResponseProfilePhoto(student);
+    }
+
+    @Test
+    void whenGetAllStudentProfiles_thenReturnsMappedList() {
+        StudentProfile s = new StudentProfile();
+        s.setId("s-1");
+        s.setName("Student One");
+
+        when(userUseCase.getAllStudentProfiles()).thenReturn(List.of(s));
+        when(userMapper.toResponse(s)).thenReturn(userResponse);
+
+        List<UserResponse> result = userService.getAllStudentProfiles();
+
+        assertEquals(1, result.size());
+        verify(userUseCase).getAllStudentProfiles();
     }
 
     // ── createUser ────────────────────────────────────────────────
@@ -66,7 +144,7 @@ class UserServiceTest {
         when(userUseCase.createStudentUser(student)).thenReturn(student);
         when(userMapper.toResponse(student)).thenReturn(userResponse);
 
-        UserResponse result = userService.createUser(student);
+        UserResponse result = userService.createStudentUser(student);
 
         assertNotNull(result);
         assertEquals("Laura Torres", result.getName());
@@ -79,9 +157,9 @@ class UserServiceTest {
     @Test
     void givenUserId_whenGetUser_thenReturnsMappedResponseInfo() {
         when(userUseCase.getUser("user-1")).thenReturn(student);
-        when(userMapper.toResponseInfo(student)).thenReturn(userResponseInfo);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
 
-        UserResponseInfo result = userService.getUser("user-1");
+        UserResponse result = userService.getUser("user-1");
 
         assertNotNull(result);
         assertEquals("user-1", result.getId());
@@ -93,9 +171,9 @@ class UserServiceTest {
     @Test
     void givenUserIdAndStudent_whenUpdateUser_thenReturnsMappedResponseInfo() {
         when(userUseCase.updateStudentUser("user-1", student)).thenReturn(student);
-        when(userMapper.toResponseInfo(student)).thenReturn(userResponseInfo);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
 
-        UserResponseInfo result = userService.updateUser("user-1", student);
+        UserResponse result = userService.updateUser("user-1", student);
 
         assertNotNull(result);
         verify(userUseCase).updateStudentUser("user-1", student);
@@ -105,13 +183,12 @@ class UserServiceTest {
 
     @Test
     void givenUserIdAndSchedule_whenAddSchedule_thenReturnsMappedResponseInfo() {
-        Schedule schedule = new Schedule();
-        schedule.setName("Algebra");
+        Schedule schedule = new Schedule( DayOfWeekEnum.WEDNESDAY, "Algebra", LocalTime.of(12, 0), LocalTime.of(14, 0));
 
         when(userUseCase.addScheduleToStudent("user-1", schedule)).thenReturn(student);
-        when(userMapper.toResponseInfo(student)).thenReturn(userResponseInfo);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
 
-        UserResponseInfo result = userService.addSchedule("user-1", schedule);
+        UserResponse result = userService.addSchedule("user-1", schedule);
 
         assertNotNull(result);
         verify(userUseCase).addScheduleToStudent("user-1", schedule);
@@ -126,9 +203,9 @@ class UserServiceTest {
         tag.setCategory("Programación");
 
         when(userUseCase.addTagToStudent("user-1", tag)).thenReturn(student);
-        when(userMapper.toResponseInfo(student)).thenReturn(userResponseInfo);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
 
-        UserResponseInfo result = userService.addTag("user-1", tag);
+        UserResponse result = userService.addTag("user-1", tag);
 
         assertNotNull(result);
         verify(userUseCase).addTagToStudent("user-1", tag);
@@ -139,9 +216,9 @@ class UserServiceTest {
     @Test
     void whenGetAllUsers_thenReturnsMappedList() {
         when(userUseCase.getAllUsers()).thenReturn(List.of(student));
-        when(userMapper.toResponseInfo(student)).thenReturn(userResponseInfo);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
 
-        List<UserResponseInfo> result = userService.getAllUsers();
+        List<UserResponse> result = userService.getAllUsers();
 
         assertEquals(1, result.size());
         verify(userUseCase).getAllUsers();
@@ -151,7 +228,7 @@ class UserServiceTest {
     void whenGetAllUsersReturnsEmpty_thenResultIsEmpty() {
         when(userUseCase.getAllUsers()).thenReturn(List.of());
 
-        List<UserResponseInfo> result = userService.getAllUsers();
+        List<UserResponse> result = userService.getAllUsers();
 
         assertTrue(result.isEmpty());
     }

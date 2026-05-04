@@ -19,21 +19,17 @@ public abstract class UserDocument {
     @Id
     private String id;
 
-    @Field("userType")
-    private UserType userType;
-
     private String name;
 
     private String email;
 
-    private GenderEnum gender;
-
-    private LocalDateTime birthdate;
-    
     @CreatedDate
     private LocalDateTime createdAt;
-
     
+    private GenderEnum gender;    
+    
+    @Field("userType")
+    private UserType userType;
 
     
 }   

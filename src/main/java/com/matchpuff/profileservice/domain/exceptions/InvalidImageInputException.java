@@ -2,10 +2,9 @@ package com.matchpuff.profileservice.domain.exceptions;
 import org.springframework.http.HttpStatus;
 
 
-public class InvalidInputException extends ProfileServiceException {
+public class InvalidImageInputException extends ProfileServiceException {
 
-    public InvalidInputException(String message) {
+    public InvalidImageInputException(String message) {
         super(message, HttpStatus.BAD_REQUEST);
     }
-
 }

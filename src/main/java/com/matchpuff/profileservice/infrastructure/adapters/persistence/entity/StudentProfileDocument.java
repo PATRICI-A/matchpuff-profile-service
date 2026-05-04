@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import com.matchpuff.profileservice.domain.model.enums.CareerEnum;
 import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -15,6 +16,10 @@ public class StudentProfileDocument extends UserDocument {
         super();
         this.setUserType(UserType.STUDENT);
     }
+
+    @Field("birthdate")
+    private LocalDateTime birthdate;
+
     @Field("career")
     private CareerEnum career;
 
@@ -22,7 +27,7 @@ public class StudentProfileDocument extends UserDocument {
     private Integer semester;
 
     @Field("photo")
-    private String photo;
+    private String photourl;
 
     @Field("biography")
     private String biography;
@@ -30,9 +35,10 @@ public class StudentProfileDocument extends UserDocument {
     @Field("privacyLevel")
     private PrivacyLevelEnum privacyLevel;
 
+    @Field("schedule")
+    private List<ScheduleDocument> schedule;
+    
     @Field("interests")
     private List<TagDocument> interests;
 
-    @Field("schedule")
-    private List<ScheduleDocument> schedule;
 }

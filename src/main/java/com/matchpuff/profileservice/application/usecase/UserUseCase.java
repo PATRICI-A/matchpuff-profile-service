@@ -1,11 +1,13 @@
 package com.matchpuff.profileservice.application.usecase;
 
 import com.matchpuff.profileservice.domain.ports.in.UserUseCasePort;
+import com.matchpuff.profileservice.domain.exceptions.InvalidImageInputException;
 import com.matchpuff.profileservice.domain.exceptions.ProfileServiceException;
 import com.matchpuff.profileservice.domain.model.Schedule;
-import com.matchpuff.profileservice.domain.model.User;
+import com.matchpuff.profileservice.domain.model.*;
 import com.matchpuff.profileservice.domain.model.Tag;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
+import com.matchpuff.profileservice.domain.ports.out.ImageStoragePort;
 import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
 
 import lombok.RequiredArgsConstructor;
@@ -20,12 +22,30 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserUseCase implements UserUseCasePort {
     private final UserRepositoryPort userRepository;
+    private final ImageStoragePort imageStoragePort;
 
     // ── CREATE ───────────────────────────────────────────────────
 
     @Override
     public User createStudentUser(StudentProfile student) {
         return userRepository.save(student);
+    }
+
+    @Override
+    public User createAdminUser(Admin admin) {
+        return userRepository.save(admin);
+    }
+
+    @Override
+    public User createOrganizerUser(Organizer organizer) {
+        return userRepository.save(organizer);
+    }
+
+    // ── DELETE ───────────────────────────────────────────────────
+    @Override
+    public void deleteUser(String userId) {
+        findOrThrow(userId);
+        userRepository.delete(userId);
     }
 
     // ── GET ──────────────────────────────────────────────────────
@@ -50,7 +70,7 @@ public class UserUseCase implements UserUseCasePort {
         if (request.getTags() != null)         student.setTags(request.getTags());
         if (request.getSchedules() != null)    student.setSchedules(request.getSchedules());
 
-        return userRepository.save(student);
+        return userRepository.update(userId, student);
     }
 
     @Override
@@ -60,7 +80,7 @@ public class UserUseCase implements UserUseCasePort {
             student.setSchedules(new java.util.ArrayList<>());
         }
         student.getSchedules().add(schedule);
-        return userRepository.save(student);
+        return userRepository.update(userId, student);
     }
 
     @Override
@@ -70,7 +90,21 @@ public class UserUseCase implements UserUseCasePort {
             student.setTags(new java.util.ArrayList<>());
         }
         student.getTags().add(tag);
-        return userRepository.save(student);
+        return userRepository.update(userId, student);
+    }
+
+    @Override
+    public User updateProfileImage(String userId, byte[] file, String contentType) {
+        if (file == null || file.length == 0) throw new InvalidImageInputException("The file is empty");
+        if (file.length > 5 * 1024 * 1024) throw new InvalidImageInputException("Image exceeds 5MB limit");
+        if (!"image/png".equals(contentType) && !"image/jpeg".equals(contentType)) throw new InvalidImageInputException("Invalid format. Only PNG and JPEG are allowed");
+
+        User user = findOrThrow(userId);
+        if (!(user instanceof StudentProfile student)) throw new ProfileServiceException("Only STUDENT users can update profile images", HttpStatus.BAD_REQUEST);
+
+        String imageUrl = imageStoragePort.uploadProfileImage(file, userId);
+        student.setPhotoUrl(imageUrl);
+        return userRepository.update(userId, student);
     }
 
     // ── GET ALL ─────────────────────────────────────────────────
@@ -79,10 +113,15 @@ public class UserUseCase implements UserUseCasePort {
         return userRepository.findAll();
     }
 
+    @Override
+    public List<StudentProfile> getAllStudentProfiles() {
+        return userRepository.findAllStudents();
+    }
+
     // ── Helpers ──────────────────────────────────────────────────
 
     private User findOrThrow(String userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ProfileServiceException("Usuario no encontrado: " + userId, HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ProfileServiceException("User not found: " + userId, HttpStatus.NOT_FOUND));
     }
 }

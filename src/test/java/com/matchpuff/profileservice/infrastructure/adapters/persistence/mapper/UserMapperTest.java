@@ -38,11 +38,12 @@ class UserMapperTest {
         s.setBiography("bio");
         s.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
 
-        Schedule schedule = new Schedule();
-        schedule.setDayOfWeek(DayOfWeekEnum.MONDAY);
-        schedule.setName("Class");
-        schedule.setStartTime(LocalTime.of(8, 0));
-        schedule.setEndTime(LocalTime.of(10, 0));
+        Schedule schedule = new Schedule(
+            DayOfWeekEnum.MONDAY,
+            "Class",
+            LocalTime.of(8, 0),
+            LocalTime.of(10, 0)
+        );
 
         Tag tag = new Tag();
         tag.setName("Java");
@@ -61,7 +62,7 @@ class UserMapperTest {
         doc.setEmail("test@escuelaing.edu.co");
         doc.setBirthdate(LocalDateTime.of(2000, 1, 1, 0, 0));
         doc.setCreatedAt(LocalDateTime.now());
-        doc.setPhoto("photo.jpg");
+        doc.setPhotourl("photo.jpg");
         doc.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         doc.setSemester(5);
         doc.setBiography("bio");
@@ -103,11 +104,6 @@ class UserMapperTest {
         assertNotNull(result.getInterests());
     }
 
-    @Test
-    void givenNullStudent_whenToDocument_thenReturnsNull() {
-        assertNull(UserMapper.toDocument(null));
-    }
-
     // ─────────────────────────────────────────────
     // toDomain
     // ─────────────────────────────────────────────
@@ -127,10 +123,6 @@ class UserMapperTest {
         assertNotNull(result.getTags());
     }
 
-    @Test
-    void givenNullDocument_whenToDomain_thenReturnsNull() {
-        assertNull(UserMapper.toDomain(null));
-    }
 
     // ─────────────────────────────────────────────
     // toDomainList

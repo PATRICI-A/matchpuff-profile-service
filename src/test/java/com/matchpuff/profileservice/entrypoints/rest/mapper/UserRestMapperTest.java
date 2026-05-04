@@ -2,7 +2,7 @@ package com.matchpuff.profileservice.entrypoints.rest.mapper;
 
 import com.matchpuff.profileservice.application.dto.request.ScheduleRequest;
 import com.matchpuff.profileservice.application.dto.request.TagRequest;
-import com.matchpuff.profileservice.application.dto.request.UserRequest;
+import com.matchpuff.profileservice.application.dto.request.UserStudentRequest;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
 import com.matchpuff.profileservice.domain.model.Tag;
@@ -24,18 +24,18 @@ class UserRestMapperTest {
 
     @Test
     void givenNullUserRequest_whenToDomain_thenReturnsNull() {
-        assertNull(UserRestMapper.toDomain((UserRequest) null));
+        assertNull(UserRestMapper.toDomain((UserStudentRequest) null));
     }
 
     @Test
     void givenValidUserRequest_whenToDomain_thenMapsAllFields() {
-        UserRequest request = new UserRequest();
+        UserStudentRequest request = new UserStudentRequest();
         request.setName("Juan Diaz");
         request.setEmail("juan@escuelaing.edu.co");
         request.setGender(GenderEnum.MALE);
         request.setCarreer(CareerEnum.COMPUTER_SCIENCE);
         request.setSemester(6);
-        request.setPhoto("http://foto.jpg");
+        request.setPhotourl("http://foto.jpg");
         request.setBiography("Bio de Juan");
         request.setPrivacyLevel(PrivacyLevelEnum.PRIVATE);
         request.setDateOfBirth(LocalDate.of(1999, 10, 5));
@@ -76,7 +76,7 @@ class UserRestMapperTest {
 
     @Test
     void givenUserRequestWithNullSemester_whenToDomain_thenSemesterIsZero() {
-        UserRequest request = new UserRequest();
+        UserStudentRequest request = new UserStudentRequest();
         request.setName("Test");
         request.setEmail("test@escuelaing.edu.co");
         request.setSemester(null);
@@ -88,7 +88,7 @@ class UserRestMapperTest {
 
     @Test
     void givenUserRequestWithNullTags_whenToDomain_thenTagsAreNull() {
-        UserRequest request = new UserRequest();
+        UserStudentRequest request = new UserStudentRequest();
         request.setName("Test");
         request.setEmail("test@escuelaing.edu.co");
         request.setTags(null);
@@ -100,7 +100,7 @@ class UserRestMapperTest {
 
     @Test
     void givenUserRequestWithNullSchedules_whenToDomain_thenSchedulesAreNull() {
-        UserRequest request = new UserRequest();
+        UserStudentRequest request = new UserStudentRequest();
         request.setName("Test");
         request.setEmail("test@escuelaing.edu.co");
         request.setSchedules(null);

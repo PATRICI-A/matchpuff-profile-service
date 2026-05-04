@@ -2,9 +2,7 @@ package com.matchpuff.profileservice.application.dto.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,10 +13,8 @@ import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Getter
-@Setter
-@NoArgsConstructor
-public class UserRequest {
+@Data
+public class UserStudentRequest {
     @Size(min = 2, max = 50)
     private String name;
 
@@ -38,7 +34,7 @@ public class UserRequest {
     private Integer semester;
 
     @NotBlank
-    private String photo;
+    private String photourl;
 
     @Size(max = 200, message = "La biografía no puede superar 200 caracteres")
     private String biography;

@@ -3,7 +3,6 @@ package com.matchpuff.profileservice.entrypoints.rest.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
-import com.matchpuff.profileservice.application.dto.response.UserResponseInfo;
 import com.matchpuff.profileservice.application.service.UserServicePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +18,10 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.springframework.mock.web.MockMultipartFile;
 
 @WebMvcTest(UserController.class)
 class UserControllerTest {
@@ -35,7 +36,7 @@ class UserControllerTest {
     private ObjectMapper objectMapper;
 
     private UserResponse mockUserResponse;
-    private UserResponseInfo mockUserResponseInfo;
+    private UserResponse mockUserResponseInfo;
 
     @BeforeEach
     void setUp() {
@@ -49,7 +50,7 @@ class UserControllerTest {
                 .createdAt(LocalDateTime.of(2024, 1, 1, 0, 0))
                 .build();
 
-        mockUserResponseInfo = UserResponseInfo.builder()
+        mockUserResponseInfo = UserResponse.builder()
                 .id("user-1")
                 .name("Test User")
                 .email("test@escuelaing.edu.co")
@@ -66,7 +67,7 @@ class UserControllerTest {
                   "gender": "MALE",
                   "carreer": "SYSTEMS_ENGINEERING",
                   "semester": 5,
-                  "photo": "http://photo.jpg",
+                  "photourl": "http://photo.jpg",
                   "biography": "Una biografía de prueba",
                   "privacyLevel": "PUBLIC",
                   "tags": [
@@ -77,7 +78,7 @@ class UserControllerTest {
                       "dayOfWeek": "MONDAY",
                       "name": "Cálculo I",
                       "startTime": "08:00:00",
-                      "endTime": "00:00:00"
+                      "endTime": "10:00:00"
                     }
                   ],
                   "dateOfBirth": "2000-01-01"
@@ -89,7 +90,7 @@ class UserControllerTest {
 
     @Test
     void givenValidRequest_whenCreateUser_thenReturns201() throws Exception {
-        when(userService.createUser(any())).thenReturn(mockUserResponse);
+        when(userService.createStudentUser(any())).thenReturn(mockUserResponse);
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -123,7 +124,7 @@ class UserControllerTest {
                   "gender": "MALE",
                   "carreer": "SYSTEMS_ENGINEERING",
                   "semester": 5,
-                  "photo": "http://photo.jpg",
+                  "photourl": "http://photo.jpg",
                   "privacyLevel": "PUBLIC",
                   "tags": [],
                   "schedules": [
@@ -131,7 +132,7 @@ class UserControllerTest {
                       "dayOfWeek": "MONDAY",
                       "name": "Clase",
                       "startTime": "08:00:00",
-                      "endTime": "00:00:00"
+                      "endTime": "10:00:00"
                     }
                   ],
                   "dateOfBirth": "2000-01-01"
@@ -202,7 +203,7 @@ class UserControllerTest {
                   "dayOfWeek": "WEDNESDAY",
                   "name": "Programación Avanzada",
                   "startTime": "10:00:00",
-                  "endTime": "00:00:00"
+                  "endTime": "12:00:00"
                 }
                 """;
 
@@ -259,5 +260,93 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidTagJson))
                 .andExpect(status().isBadRequest());
+    }
+
+    // ── POST /api/users/admin ─────────────────────────────────────
+
+    @Test
+    void givenValidAdminRequest_whenCreateAdmin_thenReturns201() throws Exception {
+        when(userService.createAdminUser(any())).thenReturn(mockUserResponse);
+
+                                String adminJson = """
+                                                                {
+                                                                        "name": "Admin User",
+                                                                        "email": "admin@escuelaing.edu.co",
+                                                                        "gender": "MALE"
+                                                                }
+                                                                """;
+
+        mockMvc.perform(post("/api/users/admin")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(adminJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value("user-1"));
+    }
+
+    // ── POST /api/users/organizer ─────────────────────────────────
+
+    @Test
+    void givenValidOrganizerRequest_whenCreateOrganizer_thenReturns201() throws Exception {
+        when(userService.createOrganizerUser(any())).thenReturn(mockUserResponse);
+
+                                String orgJson = """
+                                                                {
+                                                                        "name": "Org User",
+                                                                        "email": "org@escuelaing.edu.co",
+                                                                        "gender": "MALE",
+                                                                        "contactInfo": "contact"
+                                                                }
+                                                                """;
+
+        mockMvc.perform(post("/api/users/organizer")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(orgJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value("user-1"));
+    }
+
+    // ── GET /api/users/student-profiles ───────────────────────────
+
+    @Test
+    void whenGetAllStudentProfiles_thenReturns200WithList() throws Exception {
+        when(userService.getAllStudentProfiles()).thenReturn(List.of(mockUserResponseInfo));
+
+        mockMvc.perform(get("/api/users/student-profiles"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id").value("user-1"));
+    }
+
+    // ── DELETE /api/users/{userId} ─────────────────────────────────
+
+    @Test
+    void whenDeleteUser_thenReturns204() throws Exception {
+        doNothing().when(userService).deleteUser("user-1");
+
+        mockMvc.perform(delete("/api/users/user-1"))
+                .andExpect(status().isNoContent());
+    }
+
+    // ── POST /api/users/{userId}/profile-image ─────────────────────
+
+    @Test
+    void whenUploadProfileImage_thenReturns200WithPhotoInfo() throws Exception {
+        byte[] content = "hello".getBytes();
+        MockMultipartFile file = new MockMultipartFile("file", "photo.png", "image/png", content);
+
+        com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto photo =
+                com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto.builder()
+                        .id("user-1")
+                        .name("Test User")
+                        .email("test@escuelaing.edu.co")
+                        .profileImageUrl("http://photo.jpg")
+                        .build();
+
+        when(userService.updateProfileImage(eq("user-1"), any(byte[].class), eq("image/png")))
+                .thenReturn(photo);
+
+        mockMvc.perform(multipart("/api/users/user-1/profile-image").file(file))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.profileImageUrl").value("http://photo.jpg"));
     }
 }
