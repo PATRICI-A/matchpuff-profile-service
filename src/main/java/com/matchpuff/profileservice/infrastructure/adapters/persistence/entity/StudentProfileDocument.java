@@ -27,7 +27,7 @@ public class StudentProfileDocument extends UserDocument {
     private Integer semester;
 
     @Field("studentCarnet")
-    private Integer studentCarnet;
+    private Long studentCarnet;
 
     @Field("photo")
     private String photourl;

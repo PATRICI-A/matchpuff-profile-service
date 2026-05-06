@@ -3,8 +3,11 @@ package com.matchpuff.profileservice.entrypoints.rest.controller;
 import com.matchpuff.profileservice.application.dto.request.ScheduleRequest;
 import com.matchpuff.profileservice.application.dto.request.ChangePasswordRequest;
 import com.matchpuff.profileservice.application.dto.request.TagRequest;
+import com.matchpuff.profileservice.application.dto.request.UserAdminUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserAdminRequest;
+import com.matchpuff.profileservice.application.dto.request.UserOrganizerUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserOrganizerRequest;
+import com.matchpuff.profileservice.application.dto.request.UserStudentUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserStudentRequest;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto;
@@ -76,7 +79,7 @@ public class UserController {
     @Operation(summary = "Actualizar datos del usuario estudiante")
     public ResponseEntity<UserResponse> updateUserStudent(
             @PathVariable String userId,
-            @Valid @RequestBody UserStudentRequest request) {
+            @Valid @RequestBody UserStudentUpdateRequest request) {
         return ResponseEntity.ok(userService.updateUser(userId, UserRestMapper.toDomain(request)));
     }
 
@@ -84,7 +87,7 @@ public class UserController {
     @Operation(summary = "Actualizar datos del usuario administrador")
     public ResponseEntity<UserResponse> updateUserAdmin(
             @PathVariable String userId,
-            @Valid @RequestBody UserAdminRequest request) {
+            @Valid @RequestBody UserAdminUpdateRequest request) {
         return ResponseEntity.ok(userService.updateUser(userId, UserRestMapper.toDomain(request)));
     }
 
@@ -92,7 +95,7 @@ public class UserController {
     @Operation(summary = "Actualizar datos del usuario organizador")
     public ResponseEntity<UserResponse> updateUserOrganizer(
             @PathVariable String userId,
-            @Valid @RequestBody UserOrganizerRequest request) {
+            @Valid @RequestBody UserOrganizerUpdateRequest request) {
         return ResponseEntity.ok(userService.updateUser(userId, UserRestMapper.toDomain(request)));
     }
 

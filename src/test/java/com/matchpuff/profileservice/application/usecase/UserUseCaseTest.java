@@ -351,6 +351,40 @@ class UserUseCaseTest {
     }
 
     @Test
+    void givenStudentWithImmutableTags_whenAddTag_thenListIsCopiedAndTagIsAdded() {
+        Tag existingTag = new Tag();
+        existingTag.setName("Java");
+        student.setTags(List.of(existingTag));
+
+        Tag newTag = new Tag();
+        newTag.setName("Kotlin");
+
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.update("user-1", student)).thenReturn(student);
+
+        User result = userUseCase.addTagToStudent("user-1", newTag);
+
+        assertEquals(2, ((StudentProfile) result).getTags().size());
+        assertEquals("Kotlin", ((StudentProfile) result).getTags().get(1).getName());
+    }
+
+    @Test
+    void givenStudentWithImmutableSchedules_whenAddSchedule_thenListIsCopiedAndScheduleIsAdded() {
+        Schedule existingSchedule = new Schedule(DayOfWeekEnum.MONDAY, "Base", LocalTime.of(8, 0), LocalTime.of(10, 0));
+        student.setSchedules(List.of(existingSchedule));
+
+        Schedule newSchedule = new Schedule(DayOfWeekEnum.TUESDAY, "Nuevo", LocalTime.of(10, 0), LocalTime.of(12, 0));
+
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.update("user-1", student)).thenReturn(student);
+
+        User result = userUseCase.addScheduleToStudent("user-1", newSchedule);
+
+        assertEquals(2, ((StudentProfile) result).getSchedules().size());
+        assertEquals("Nuevo", ((StudentProfile) result).getSchedules().get(1).getName());
+    }
+
+    @Test
     void givenNonExistingUser_whenAddTag_thenThrowsProfileServiceException() {
         when(userRepository.findById("nobody")).thenReturn(Optional.empty());
 

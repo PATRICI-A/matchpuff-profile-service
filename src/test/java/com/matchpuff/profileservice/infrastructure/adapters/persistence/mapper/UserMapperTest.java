@@ -36,7 +36,7 @@ class UserMapperTest {
         s.setPhotoUrl("photo.jpg");
         s.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         s.setSemester(5);
-        s.setStudentCarnet(20211000);
+        s.setStudentCarnet(Long.valueOf(20211000));
         s.setBiography("bio");
         s.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
 
@@ -68,7 +68,7 @@ class UserMapperTest {
         doc.setPhotourl("photo.jpg");
         doc.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         doc.setSemester(5);
-        doc.setStudentCarnet(20211000);
+        doc.setStudentCarnet(Long.valueOf(20211000));
         doc.setBiography("bio");
         doc.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         doc.setUserType(UserType.STUDENT);

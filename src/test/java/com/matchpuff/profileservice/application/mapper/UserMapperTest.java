@@ -67,6 +67,7 @@ class UserMapperTest {
         student.setEmail("ana@escuelaing.edu.co");
         student.setGender(GenderEnum.FEMALE);
         student.setDateOfBirth(LocalDate.of(1999, 3, 10));
+        student.setStudentCarnet(20211234L);
         student.setBiography("Estudiante apasionada");
         student.setCreatedAt(LocalDateTime.of(2024, 1, 1, 0, 0));
 
@@ -87,6 +88,7 @@ class UserMapperTest {
         assertEquals("ana@escuelaing.edu.co", studentInfo.getEmail());
         assertEquals("STUDENT", studentInfo.getUserType());
         assertEquals("FEMALE", studentInfo.getGender());
+        assertEquals(20211234L, studentInfo.getStudentCarnet());
         assertEquals("Estudiante apasionada", studentInfo.getBiography());
         assertNotNull(studentInfo.getTags());
         assertEquals(1, studentInfo.getTags().size());

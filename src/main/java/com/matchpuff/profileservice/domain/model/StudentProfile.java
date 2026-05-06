@@ -29,7 +29,7 @@ public class StudentProfile extends User {
         return biography != null ? biography.getValue() : null;
     }
 
-    public void setStudentCarnet(Integer studentCarnet) {
+    public void setStudentCarnet(Long studentCarnet) {
         if (studentCarnet != null && studentCarnet > 0) {
             this.studentCarnet = new StudentCarnet(studentCarnet);
         } else {
@@ -37,7 +37,7 @@ public class StudentProfile extends User {
         }
     }
 
-    public Integer getStudentCarnet() {
+    public Long getStudentCarnet() {
         return studentCarnet != null ? studentCarnet.getValue() : null;
     }
 }

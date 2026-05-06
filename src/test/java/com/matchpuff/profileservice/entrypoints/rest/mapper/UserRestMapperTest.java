@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,7 +35,7 @@ class UserRestMapperTest {
         request.setGender(GenderEnum.MALE);
         request.setCarreer(CareerEnum.COMPUTER_SCIENCE);
         request.setSemester(6);
-        request.setStudentCarnet(20211234);
+        request.setStudentCarnet(Long.valueOf(20211234));
         request.setPhotourl("http://foto.jpg");
         request.setBiography("Bio de Juan");
         request.setPrivacyLevel(PrivacyLevelEnum.PRIVATE);
@@ -45,14 +44,12 @@ class UserRestMapperTest {
         TagRequest tagRequest = new TagRequest();
         tagRequest.setName("Python");
         tagRequest.setCategory("IA");
-        request.setTags(List.of(tagRequest));
 
         ScheduleRequest scheduleRequest = new ScheduleRequest();
         scheduleRequest.setDayOfWeek(DayOfWeekEnum.THURSDAY);
         scheduleRequest.setName("Base de Datos");
         scheduleRequest.setStartTime(LocalTime.of(7, 0));
         scheduleRequest.setEndTime(LocalTime.of(9, 0));
-        request.setSchedules(List.of(scheduleRequest));
 
         StudentProfile result = UserRestMapper.toDomain(request);
 
@@ -67,13 +64,9 @@ class UserRestMapperTest {
         assertEquals(PrivacyLevelEnum.PRIVATE, result.getPrivacyLevel());
         assertEquals(LocalDate.of(1999, 10, 5), result.getDateOfBirth());
 
-        assertNotNull(result.getTags());
-        assertEquals(1, result.getTags().size());
-        assertEquals("Python", result.getTags().get(0).getName());
+        assertTrue(result.getTags().isEmpty());
 
-        assertNotNull(result.getSchedules());
-        assertEquals(1, result.getSchedules().size());
-        assertEquals("Base de Datos", result.getSchedules().get(0).getName());
+        assertTrue(result.getSchedules().isEmpty());
     }
 
     @Test
@@ -95,7 +88,6 @@ class UserRestMapperTest {
         request.setName("Test");
         request.setEmail("test@escuelaing.edu.co");
         request.setPassword("TestPassword123");
-        request.setTags(null);
 
         StudentProfile result = UserRestMapper.toDomain(request);
 
@@ -108,7 +100,6 @@ class UserRestMapperTest {
         request.setName("Test");
         request.setEmail("test@escuelaing.edu.co");
         request.setPassword("TestPassword123");
-        request.setSchedules(null);
 
         StudentProfile result = UserRestMapper.toDomain(request);
 

@@ -18,6 +18,8 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 
 @Service
 @RequiredArgsConstructor
@@ -104,6 +106,7 @@ public class UserUseCase implements UserUseCasePort {
         if (request.getPrivacyLevel() != null) student.setPrivacyLevel(request.getPrivacyLevel());
         if (request.getCareer() != null)       student.setCareer(request.getCareer());
         if (request.getSemester() > 0)         student.setSemester(request.getSemester());
+        if (request.getDateOfBirth() != null)  student.setDateOfBirth(request.getDateOfBirth());
         if (request.getTags() != null)         student.setTags(request.getTags());
         if (request.getSchedules() != null)    student.setSchedules(request.getSchedules());
 
@@ -140,8 +143,8 @@ public class UserUseCase implements UserUseCasePort {
     @Override
     public User addScheduleToStudent(String userId, Schedule schedule) {
         StudentProfile student = (StudentProfile) findOrThrow(userId);
-        if (student.getSchedules() == null) {
-            student.setSchedules(new java.util.ArrayList<>());
+        if (student.getSchedules() == null || student.getSchedules().getClass().getName().contains("ImmutableCollections")) {
+            student.setSchedules(student.getSchedules() == null ? new ArrayList<>() : new ArrayList<>(student.getSchedules()));
         }
         student.getSchedules().add(schedule);
         return userRepository.update(userId, student);
@@ -150,8 +153,8 @@ public class UserUseCase implements UserUseCasePort {
     @Override
     public User addTagToStudent(String userId, Tag tag) {
         StudentProfile student = (StudentProfile) findOrThrow(userId);
-        if (student.getTags() == null) {
-            student.setTags(new java.util.ArrayList<>());
+        if (student.getTags() == null || student.getTags().getClass().getName().contains("ImmutableCollections")) {
+            student.setTags(student.getTags() == null ? new ArrayList<>() : new ArrayList<>(student.getTags()));
         }
         student.getTags().add(tag);
         return userRepository.update(userId, student);

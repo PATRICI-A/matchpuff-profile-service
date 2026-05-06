@@ -2,8 +2,11 @@ package com.matchpuff.profileservice.entrypoints.rest.mapper;
 
 import com.matchpuff.profileservice.application.dto.request.ScheduleRequest;
 import com.matchpuff.profileservice.application.dto.request.TagRequest;
+import com.matchpuff.profileservice.application.dto.request.UserAdminUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserAdminRequest;
+import com.matchpuff.profileservice.application.dto.request.UserOrganizerUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserOrganizerRequest;
+import com.matchpuff.profileservice.application.dto.request.UserStudentUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserStudentRequest;
 import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.domain.model.Organizer;
@@ -34,8 +37,10 @@ public class UserRestMapper {
         student.setPhotoUrl(request.getPhotourl());
         student.setBiography(request.getBiography());
         student.setPrivacyLevel(request.getPrivacyLevel());
-        student.setTags(toDomainTags(request.getTags()));
-        student.setSchedules(toDomainSchedules(request.getSchedules()));
+
+        student.setTags(toDomainTags(Collections.emptyList()));
+        student.setSchedules(toDomainSchedules(Collections.emptyList()));
+
         student.setDateOfBirth(request.getDateOfBirth());
         return student;
     }
@@ -49,6 +54,19 @@ public class UserRestMapper {
         admin.setName(request.getName());
         admin.setEmail(request.getEmail());
         admin.setPasswordHash(request.getPassword());
+        admin.setGender(request.getGender());
+
+        return admin;
+    }
+
+    public static Admin toDomain(UserAdminUpdateRequest request) {
+        if (request == null) {
+            return null;
+        }
+
+        Admin admin = new Admin();
+        admin.setName(request.getName());
+        admin.setEmail(request.getEmail());
         admin.setGender(request.getGender());
 
         return admin;
@@ -69,9 +87,41 @@ public class UserRestMapper {
         return organizer;
     }
 
+    public static Organizer toDomain(UserOrganizerUpdateRequest request) {
+        if (request == null) {
+            return null;
+        }
+
+        Organizer organizer = new Organizer();
+        organizer.setName(request.getName());
+        organizer.setEmail(request.getEmail());
+        organizer.setGender(request.getGender());
+        organizer.setContactInfo(request.getContactInfo());
+
+        return organizer;
+    }
+
+    public static StudentProfile toDomain(UserStudentUpdateRequest request) {
+        if (request == null) {
+            return null;
+        }
+
+        StudentProfile student = new StudentProfile();
+        student.setName(request.getName());
+        student.setEmail(request.getEmail());
+        student.setGender(request.getGender());
+        student.setCareer(request.getCarreer());
+        student.setSemester(request.getSemester() == null ? 0 : request.getSemester());
+        student.setStudentCarnet(request.getStudentCarnet());
+        student.setBiography(request.getBiography());
+        student.setPrivacyLevel(request.getPrivacyLevel());
+        student.setDateOfBirth(request.getDateOfBirth());
+        return student;
+    }
+
     private static List<Tag> toDomainTags(List<TagRequest> tags) {
         if (tags == null) {
-            return Collections.emptyList();
+            return new java.util.ArrayList<>();
         }
 
         return tags.stream().map(tagRequest -> {
@@ -84,7 +134,7 @@ public class UserRestMapper {
 
     private static List<Schedule> toDomainSchedules(List<ScheduleRequest> schedules) {
         if (schedules == null) {
-            return Collections.emptyList();
+            return new java.util.ArrayList<>();
         }
 
         return schedules.stream()

@@ -46,7 +46,7 @@ class UserRepositoryAdapterTest {
         s.setDateOfBirth(LocalDate.of(2000, 1, 1));
         s.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         s.setSemester(3);
-        s.setStudentCarnet(20211000);
+        s.setStudentCarnet(Long.valueOf(20211000));
         s.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         return s;
     }
@@ -60,7 +60,7 @@ class UserRepositoryAdapterTest {
         doc.setGender(GenderEnum.MALE);
         doc.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         doc.setSemester(3);
-        doc.setStudentCarnet(20211000);
+        doc.setStudentCarnet(Long.valueOf(20211000));
         doc.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         return doc;
     }
@@ -180,14 +180,16 @@ class UserRepositoryAdapterTest {
     @Test
     void givenStudentProfile_whenUpdate_thenSetsIdAndReturnsUser() {
         StudentProfile student = buildStudent();
+        StudentProfileDocument currentDoc = buildStudentDoc();
         StudentProfileDocument savedDoc = buildStudentDoc();
 
+        when(userRepository.findById("u-1")).thenReturn(Optional.of(currentDoc));
         when(userRepository.save(any())).thenReturn(savedDoc);
 
         User result = adapter.update("u-1", student);
 
         assertNotNull(result);
-        assertEquals("u-1", student.getId());
+        assertEquals("u-1", result.getId());
         verify(userRepository).save(any());
     }
 

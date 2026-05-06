@@ -41,8 +41,6 @@ class UserStudentRequestTest {
         userStudentRequest.setPhotourl("http://example.com/photo.jpg");
         userStudentRequest.setBiography("Student biography");
         userStudentRequest.setPrivacyLevel(PrivacyLevelEnum.PRIVATE);
-        userStudentRequest.setTags(tags);
-        userStudentRequest.setSchedules(schedules);
         userStudentRequest.setDateOfBirth(LocalDate.of(2001, 5, 15));
 
         // Then
@@ -54,8 +52,6 @@ class UserStudentRequestTest {
         assertEquals("http://example.com/photo.jpg", userStudentRequest.getPhotourl());
         assertEquals("Student biography", userStudentRequest.getBiography());
         assertEquals(PrivacyLevelEnum.PRIVATE, userStudentRequest.getPrivacyLevel());
-        assertNotNull(userStudentRequest.getTags());
-        assertNotNull(userStudentRequest.getSchedules());
     }
 
     @Test
@@ -74,24 +70,6 @@ class UserStudentRequestTest {
 
         // Then
         assertEquals(8, userStudentRequest.getSemester());
-    }
-
-    @Test
-    void givenUserStudentRequest_whenSetTags_thenTagsAreSet() {
-        // When
-        userStudentRequest.setTags(tags);
-
-        // Then
-        assertEquals(1, userStudentRequest.getTags().size());
-    }
-
-    @Test
-    void givenUserStudentRequest_whenSetSchedules_thenSchedulesAreSet() {
-        // When
-        userStudentRequest.setSchedules(schedules);
-
-        // Then
-        assertEquals(1, userStudentRequest.getSchedules().size());
     }
 
     @Test

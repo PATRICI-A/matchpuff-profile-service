@@ -41,6 +41,7 @@ public interface UserMapper {
                     .dateOfBirth(dateOfBirthStr)
                     .career(student.getCareer())
                     .semester(student.getSemester())
+                    .studentCarnet(student.getStudentCarnet())
                     .photoUrl(student.getPhotoUrl())
                     .biography(student.getBiography())
                     .privacyLevel(student.getPrivacyLevel())

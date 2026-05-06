@@ -1,11 +1,17 @@
 package com.matchpuff.profileservice.application.dto.request;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import com.matchpuff.profileservice.domain.model.enums.CareerEnum;
 import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
@@ -14,7 +20,7 @@ import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Data
-public class UserStudentRequest {
+public class UserStudentUpdateRequest {
     @Size(min = 2, max = 50)
     private String name;
 
@@ -22,10 +28,6 @@ public class UserStudentRequest {
     @Pattern(regexp = ".*@(mail\\.)?escuelaing\\.edu\\.co$")
     @Schema(example = "usuario@escuelaing.edu.co")
     private String email;
-
-    @Size(min = 8, message = "Password must be at least 8 characters long")
-    @Schema(example = "TestPassword123")
-    private String password;
 
     @NotNull
     private GenderEnum gender;
@@ -40,9 +42,6 @@ public class UserStudentRequest {
     @NotNull
     @Min(value = 10000000, message = "El carnet debe ser un número de al menos 8 dígitos")
     private Long studentCarnet;
-
-    @NotBlank
-    private String photourl;
 
     @Size(max = 200, message = "La biografía no puede superar 200 caracteres")
     private String biography;

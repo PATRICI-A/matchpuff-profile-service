@@ -16,7 +16,7 @@ public class StudentProfileResponse extends UserResponse {
     private String dateOfBirth;
     private CareerEnum career;
     private int semester;
-    private Integer studentCarnet;
+    private Long studentCarnet;
     private String photoUrl;
     private String biography;
     private PrivacyLevelEnum privacyLevel;

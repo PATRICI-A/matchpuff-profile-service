@@ -4,9 +4,9 @@ import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
 
 public class StudentCarnet {
 
-    private final Integer value;
+    private final Long value;
 
-    public StudentCarnet(Integer value) {
+    public StudentCarnet(Long value) {
         if (value == null || value <= 0) {
             throw new InvalidInputException("El carnet del estudiante debe ser un número válido y positivo");
         }
@@ -14,7 +14,7 @@ public class StudentCarnet {
         this.value = value;
     }
 
-    public Integer getValue() {
+    public Long getValue() {
         return value;
     }
 }
