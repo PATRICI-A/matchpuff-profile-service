@@ -202,6 +202,71 @@ class UserMapperTest {
     }
 
     // ─────────────────────────────────────────────
+    // toDocument – null date / null collections
+    // ─────────────────────────────────────────────
+
+    @Test
+    void givenStudentWithNullDateOfBirth_whenToDocument_thenBirthdateIsNull() {
+        StudentProfile student = buildStudent();
+        student.setDateOfBirth(null);
+
+        StudentProfileDocument result = UserMapper.toDocument(student);
+
+        assertNotNull(result);
+        assertNull(result.getBirthdate());
+    }
+
+    @Test
+    void givenStudentWithNullSchedules_whenToDocument_thenScheduleIsEmpty() {
+        StudentProfile student = buildStudent();
+        student.setSchedules(null);
+
+        StudentProfileDocument result = UserMapper.toDocument(student);
+
+        assertNotNull(result);
+        assertNotNull(result.getSchedule());
+        assertTrue(result.getSchedule().isEmpty());
+    }
+
+    @Test
+    void givenStudentWithNullTags_whenToDocument_thenInterestsIsEmpty() {
+        StudentProfile student = buildStudent();
+        student.setTags(null);
+
+        StudentProfileDocument result = UserMapper.toDocument(student);
+
+        assertNotNull(result);
+        assertNotNull(result.getInterests());
+        assertTrue(result.getInterests().isEmpty());
+    }
+
+    // ─────────────────────────────────────────────
+    // toDomain – null date / null semester
+    // ─────────────────────────────────────────────
+
+    @Test
+    void givenDocumentWithNullBirthdate_whenToDomain_thenDateOfBirthIsNull() {
+        StudentProfileDocument doc = buildDocument();
+        doc.setBirthdate(null);
+
+        StudentProfile result = UserMapper.toDomain(doc);
+
+        assertNotNull(result);
+        assertNull(result.getDateOfBirth());
+    }
+
+    @Test
+    void givenDocumentWithNullSemester_whenToDomain_thenSemesterIsZero() {
+        StudentProfileDocument doc = buildDocument();
+        doc.setSemester(null);
+
+        StudentProfile result = UserMapper.toDomain(doc);
+
+        assertNotNull(result);
+        assertEquals(0, result.getSemester());
+    }
+
+    // ─────────────────────────────────────────────
     // Reverse mapping
     // ─────────────────────────────────────────────
 
