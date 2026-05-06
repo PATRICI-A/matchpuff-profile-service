@@ -21,13 +21,17 @@ Este microservicio gestiona la información del perfil de usuario y el flujo de 
 - Otros módulos pueden consumir sus endpoints REST para la gestión de perfiles.
 
 ### Diagramas
-- Diagrama de clases: ![CAPTURA](docs/uml/DiagramaClases.jpg)
+- Diagrama de clases:
+
+![CAPTURA](docs/uml/DiagramaClases.jpg)
+
+
 - Diagrama de componentes: [pendiente de agregar]
 - Diagrama de datos: [pendiente de agregar]
 
 ### Documentos
 
-- Documento arquitectura del modulo: [Documento](https://pruebacorreoescuelaingeduco-my.sharepoint.com/:w:/g/personal/javier_romero-d_mail_escuelaing_edu_co/IQAKfAM2ZdJsRJ8kEBYsqeImAQPXeqsLfA1y-RIbHioZB2c?e=siijic)
+- Documento arquitectura del modulo: [Documento](https://pruebacorreoescuelaingeduco-my.sharepoint.com/:w:/g/personal/sebastian_castillejo_mail_escuelaing_edu_co/IQCPPqZzkTezQrTJagqLVwoMARS8WWGVVkfmjgsj1g04NI0?e=78CM4b)
 
 
 ### Funcionalidades
@@ -162,16 +166,16 @@ Todos los errores devuelven la siguiente estructura:
 }
 ```
 
-| Situación | Código HTTP | Mensaje de ejemplo |
-|---|---|---|
+| Situación                                                       | Código HTTP | Mensaje de ejemplo |
+|-----------------------------------------------------------------|---|---|
 | Campo inválido o faltante (`@NotNull`, `@Email`, `@Size`, etc.) | `400 Bad Request` | `"email: must be a well-formed email address"` |
-| Correo que no pertenece al dominio `@escuelaing.edu.co` | `400 Bad Request` | `"email: must match .*@escuelaing\\.edu\\.co$"` |
-| Semestre fuera del rango 1–10 | `400 Bad Request` | `"semester: El semestre máximo es 10"` |
-| Biografía mayor a 200 caracteres | `400 Bad Request` | `"biography: La biografía no puede superar 200 caracteres"` |
-| Fecha de nacimiento en el futuro | `400 Bad Request` | `"dateOfBirth: must be a past date"` |
-| Usuario no encontrado | `404 Not Found` | `"Usuario no encontrado: <id>"` |
-| Usuario ya existe | `409 Conflict` | `"El usuario ya existe"` |
-| Error interno del servidor | `500 Internal Server Error` | `"Error interno del servidor"` |
+| Correo que no pertenece al dominio `@mail.escuelaing.edu.co`    | `400 Bad Request` | `"email: must match .*@escuelaing\\.edu\\.co$"` |
+| Semestre fuera del rango 1–10                                   | `400 Bad Request` | `"semester: El semestre máximo es 10"` |
+| Biografía mayor a 200 caracteres                                | `400 Bad Request` | `"biography: La biografía no puede superar 200 caracteres"` |
+| Fecha de nacimiento en el futuro                                | `400 Bad Request` | `"dateOfBirth: must be a past date"` |
+| Usuario no encontrado                                           | `404 Not Found` | `"Usuario no encontrado: <id>"` |
+| Usuario ya existe                                               | `409 Conflict` | `"El usuario ya existe"` |
+| Error interno del servidor                                      | `500 Internal Server Error` | `"Error interno del servidor"` |
 
 ### Mensajería
 - Pendiente por hablar
@@ -204,7 +208,14 @@ Todos los errores devuelven la siguiente estructura:
 - MongoDB: base de datos principal para persistencia de perfiles (URI configurada mediante variable de entorno `MONGO_URI`)
 
 ### Pruebas y cobertura
-- 
+
+### JACOCO
+
+![CAPTURA](docs/images/Jacoco.png)
+
+
+### SONAR CUBE
+
 
 ### Pipelines
 - El repositorio debe tener dos pipelines: uno de desarrollo y otro de producción.
