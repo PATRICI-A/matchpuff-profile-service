@@ -236,4 +236,209 @@ class UserRepositoryAdapterTest {
 
         assertEquals(3, result.size());
     }
+
+    // ── save Admin ────────────────────────────────────────────────
+
+    @Test
+    void givenNewEmail_whenSaveAdmin_thenReturnsAdmin() {
+        Admin admin = new Admin();
+        admin.setId("a-1");
+        admin.setName("Root Admin");
+        admin.setEmail(VALID_EMAIL);
+        admin.setGender(GenderEnum.MALE);
+
+        AdminProfileDocument savedDoc = new AdminProfileDocument();
+        savedDoc.setId("a-1");
+        savedDoc.setName("Root Admin");
+        savedDoc.setEmail(VALID_EMAIL);
+        savedDoc.setGender(GenderEnum.MALE);
+
+        when(userRepository.findByEmail(VALID_EMAIL)).thenReturn(Optional.empty());
+        when(userRepository.save(any())).thenReturn(savedDoc);
+
+        User result = adapter.save(admin);
+
+        assertNotNull(result);
+        assertInstanceOf(Admin.class, result);
+        verify(userRepository).save(any());
+    }
+
+    @Test
+    void givenExistingEmail_whenSaveAdmin_thenThrowsInvalidInputException() {
+        Admin admin = new Admin();
+        admin.setEmail(VALID_EMAIL);
+
+        when(userRepository.findByEmail(VALID_EMAIL)).thenReturn(Optional.of(buildStudentDoc()));
+
+        assertThrows(InvalidInputException.class, () -> adapter.save(admin));
+        verify(userRepository, never()).save(any());
+    }
+
+    // ── save Organizer ────────────────────────────────────────────
+
+    @Test
+    void givenNewEmail_whenSaveOrganizer_thenReturnsOrganizer() {
+        Organizer organizer = new Organizer();
+        organizer.setId("o-1");
+        organizer.setName("Club Org");
+        organizer.setEmail(VALID_EMAIL);
+        organizer.setGender(GenderEnum.FEMALE);
+        organizer.setContactInfo("club@evento.co");
+
+        OrganizerProfileDocument savedDoc = new OrganizerProfileDocument();
+        savedDoc.setId("o-1");
+        savedDoc.setName("Club Org");
+        savedDoc.setEmail(VALID_EMAIL);
+        savedDoc.setContact("club@evento.co");
+
+        when(userRepository.findByEmail(VALID_EMAIL)).thenReturn(Optional.empty());
+        when(userRepository.save(any())).thenReturn(savedDoc);
+
+        User result = adapter.save(organizer);
+
+        assertNotNull(result);
+        assertInstanceOf(Organizer.class, result);
+        verify(userRepository).save(any());
+    }
+
+    @Test
+    void givenExistingEmail_whenSaveOrganizer_thenThrowsInvalidInputException() {
+        Organizer organizer = new Organizer();
+        organizer.setEmail(VALID_EMAIL);
+
+        when(userRepository.findByEmail(VALID_EMAIL)).thenReturn(Optional.of(buildStudentDoc()));
+
+        assertThrows(InvalidInputException.class, () -> adapter.save(organizer));
+        verify(userRepository, never()).save(any());
+    }
+
+    // ── delete ────────────────────────────────────────────────────
+
+    @Test
+    void givenUserId_whenDelete_thenCallsDeleteById() {
+        adapter.delete("u-1");
+
+        verify(userRepository).deleteById("u-1");
+    }
+
+    // ── update Admin ──────────────────────────────────────────────
+
+    @Test
+    void givenAdminProfile_whenUpdate_thenReturnsUpdatedAdmin() {
+        Admin admin = new Admin();
+        admin.setId("a-1");
+        admin.setName("Updated Admin");
+        admin.setEmail(VALID_EMAIL);
+        admin.setGender(GenderEnum.MALE);
+
+        AdminProfileDocument currentDoc = new AdminProfileDocument();
+        currentDoc.setId("a-1");
+        currentDoc.setName("Old Admin");
+        currentDoc.setEmail(VALID_EMAIL);
+        currentDoc.setGender(GenderEnum.MALE);
+
+        AdminProfileDocument savedDoc = new AdminProfileDocument();
+        savedDoc.setId("a-1");
+        savedDoc.setName("Updated Admin");
+        savedDoc.setEmail(VALID_EMAIL);
+
+        when(userRepository.findByEmail(VALID_EMAIL)).thenReturn(Optional.of(currentDoc));
+        when(userRepository.findById("a-1")).thenReturn(Optional.of(currentDoc));
+        when(userRepository.save(any())).thenReturn(savedDoc);
+
+        User result = adapter.update("a-1", admin);
+
+        assertNotNull(result);
+        assertInstanceOf(Admin.class, result);
+        verify(userRepository).save(any());
+    }
+
+    // ── update Organizer ──────────────────────────────────────────
+
+    @Test
+    void givenOrganizerProfile_whenUpdate_thenReturnsUpdatedOrganizer() {
+        Organizer organizer = new Organizer();
+        organizer.setId("o-1");
+        organizer.setName("Updated Org");
+        organizer.setEmail(VALID_EMAIL);
+        organizer.setGender(GenderEnum.FEMALE);
+        organizer.setContactInfo("new@evento.co");
+
+        OrganizerProfileDocument currentDoc = new OrganizerProfileDocument();
+        currentDoc.setId("o-1");
+        currentDoc.setName("Old Org");
+        currentDoc.setEmail(VALID_EMAIL);
+        currentDoc.setContact("old@evento.co");
+
+        OrganizerProfileDocument savedDoc = new OrganizerProfileDocument();
+        savedDoc.setId("o-1");
+        savedDoc.setName("Updated Org");
+        savedDoc.setEmail(VALID_EMAIL);
+        savedDoc.setContact("new@evento.co");
+
+        when(userRepository.findByEmail(VALID_EMAIL)).thenReturn(Optional.of(currentDoc));
+        when(userRepository.findById("o-1")).thenReturn(Optional.of(currentDoc));
+        when(userRepository.save(any())).thenReturn(savedDoc);
+
+        User result = adapter.update("o-1", organizer);
+
+        assertNotNull(result);
+        assertInstanceOf(Organizer.class, result);
+        verify(userRepository).save(any());
+    }
+
+    // ── update email conflict ─────────────────────────────────────
+
+    @Test
+    void givenEmailBelongsToAnotherUser_whenUpdate_thenThrowsInvalidInputException() {
+        StudentProfile student = buildStudent();
+        student.setEmail("other@escuelaing.edu.co");
+
+        StudentProfileDocument conflictDoc = buildStudentDoc();
+        conflictDoc.setId("other-user");
+        conflictDoc.setEmail("other@escuelaing.edu.co");
+
+        when(userRepository.findByEmail("other@escuelaing.edu.co")).thenReturn(Optional.of(conflictDoc));
+
+        assertThrows(InvalidInputException.class, () -> adapter.update("u-1", student));
+    }
+
+    // ── update type mismatch ──────────────────────────────────────
+
+    @Test
+    void givenStudentDocumentButAdminRequest_whenUpdate_thenThrowsInvalidInputException() {
+        Admin admin = new Admin();
+        admin.setId("u-1");
+        admin.setName("Admin");
+        // email is null so findByEmail is never called
+
+        StudentProfileDocument studentDoc = buildStudentDoc();
+
+        when(userRepository.findById("u-1")).thenReturn(Optional.of(studentDoc));
+
+        assertThrows(InvalidInputException.class, () -> adapter.update("u-1", admin));
+    }
+
+    // ── findAllStudents ───────────────────────────────────────────
+
+    @Test
+    void whenFindAllStudents_thenReturnsOnlyStudents() {
+        StudentProfileDocument studentDoc = buildStudentDoc();
+
+        when(userRepository.findByUserType(any())).thenReturn(List.of(studentDoc));
+
+        List<StudentProfile> result = adapter.findAllStudents();
+
+        assertEquals(1, result.size());
+        assertInstanceOf(StudentProfile.class, result.get(0));
+    }
+
+    @Test
+    void whenFindAllStudentsReturnsEmpty_thenReturnsEmptyList() {
+        when(userRepository.findByUserType(any())).thenReturn(List.of());
+
+        List<StudentProfile> result = adapter.findAllStudents();
+
+        assertTrue(result.isEmpty());
+    }
 }

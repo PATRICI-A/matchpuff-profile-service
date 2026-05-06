@@ -1,14 +1,21 @@
 package com.matchpuff.profileservice.infrastructure.adapters.persistence.mapper;
 
+import com.matchpuff.profileservice.domain.model.Admin;
+import com.matchpuff.profileservice.domain.model.Organizer;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
 import com.matchpuff.profileservice.domain.model.Tag;
+import com.matchpuff.profileservice.domain.model.User;
 import com.matchpuff.profileservice.domain.model.enums.CareerEnum;
 import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
+import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
 import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
+import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.AdminProfileDocument;
+import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.OrganizerProfileDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.ScheduleDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.StudentProfileDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.TagDocument;
+import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.UserDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.UserType;
 import org.junit.jupiter.api.Test;
 
@@ -16,8 +23,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 class UserMapperTest {
 
@@ -206,5 +215,165 @@ class UserMapperTest {
         assertEquals(original.getId(), mappedBack.getId());
         assertEquals(original.getEmail(), mappedBack.getEmail());
         assertEquals(original.getName(), mappedBack.getName());
+    }
+
+    // ─────────────────────────────────────────────
+    // Admin mapping
+    // ─────────────────────────────────────────────
+
+    @Test
+    void givenAdmin_whenToDocument_thenMapsCorrectly() {
+        Admin admin = new Admin();
+        admin.setId("a-1");
+        admin.setName("Admin User");
+        admin.setEmail("admin@escuelaing.edu.co");
+        admin.setPasswordHash("HashedPass123");
+        admin.setGender(GenderEnum.MALE);
+
+        AdminProfileDocument result = UserMapper.toDocument(admin);
+
+        assertNotNull(result);
+        assertEquals("a-1", result.getId());
+        assertEquals(UserType.ADMIN, result.getUserType());
+        assertEquals("Admin User", result.getName());
+    }
+
+    @Test
+    void givenNullAdmin_whenToDocument_thenReturnsNull() {
+        assertNull(UserMapper.toDocument((Admin) null));
+    }
+
+    @Test
+    void givenAdminDocument_whenToDomain_thenMapsCorrectly() {
+        AdminProfileDocument doc = new AdminProfileDocument();
+        doc.setId("a-1");
+        doc.setName("Admin User");
+        doc.setEmail("admin@escuelaing.edu.co");
+        doc.setPasswordHash("HashedPass123");
+        doc.setGender(GenderEnum.MALE);
+
+        Admin result = UserMapper.toDomain(doc);
+
+        assertNotNull(result);
+        assertEquals("a-1", result.getId());
+        assertEquals("Admin User", result.getName());
+        assertEquals(GenderEnum.MALE, result.getGender());
+    }
+
+    @Test
+    void givenNullAdminDocument_whenToDomain_thenReturnsNull() {
+        assertNull(UserMapper.toDomain((AdminProfileDocument) null));
+    }
+
+    // ─────────────────────────────────────────────
+    // Organizer mapping
+    // ─────────────────────────────────────────────
+
+    @Test
+    void givenOrganizer_whenToDocument_thenMapsCorrectly() {
+        Organizer organizer = new Organizer();
+        organizer.setId("o-1");
+        organizer.setName("Club Org");
+        organizer.setEmail("org@escuelaing.edu.co");
+        organizer.setPasswordHash("HashedPass123");
+        organizer.setGender(GenderEnum.FEMALE);
+        organizer.setContactInfo("contact@evento.co");
+
+        OrganizerProfileDocument result = UserMapper.toDocument(organizer);
+
+        assertNotNull(result);
+        assertEquals("o-1", result.getId());
+        assertEquals(UserType.ORGANIZER, result.getUserType());
+        assertEquals("contact@evento.co", result.getContact());
+    }
+
+    @Test
+    void givenNullOrganizer_whenToDocument_thenReturnsNull() {
+        assertNull(UserMapper.toDocument((Organizer) null));
+    }
+
+    @Test
+    void givenOrganizerDocument_whenToDomain_thenMapsCorrectly() {
+        OrganizerProfileDocument doc = new OrganizerProfileDocument();
+        doc.setId("o-1");
+        doc.setName("Club Org");
+        doc.setEmail("org@escuelaing.edu.co");
+        doc.setContact("contact@evento.co");
+
+        Organizer result = UserMapper.toDomain(doc);
+
+        assertNotNull(result);
+        assertEquals("o-1", result.getId());
+        assertEquals("contact@evento.co", result.getContactInfo());
+    }
+
+    @Test
+    void givenNullOrganizerDocument_whenToDomain_thenReturnsNull() {
+        assertNull(UserMapper.toDomain((OrganizerProfileDocument) null));
+    }
+
+    // ─────────────────────────────────────────────
+    // toDomainByType
+    // ─────────────────────────────────────────────
+
+    @Test
+    void givenNullDocument_whenToDomainByType_thenReturnsEmpty() {
+        Optional<User> result = UserMapper.toDomainByType(null);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void givenDocumentWithNullType_whenToDomainByType_thenReturnsEmpty() {
+        // UserDocument is abstract; mock it so getUserType() returns null
+        UserDocument mockDoc = mock(UserDocument.class);
+
+        Optional<User> result = UserMapper.toDomainByType(mockDoc);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void givenAdminDocument_whenToDomainByType_thenReturnsAdmin() {
+        AdminProfileDocument doc = new AdminProfileDocument();
+        doc.setId("a-1");
+        doc.setName("Admin");
+        doc.setEmail("admin@escuelaing.edu.co");
+
+        Optional<User> result = UserMapper.toDomainByType(doc);
+
+        assertTrue(result.isPresent());
+        assertInstanceOf(Admin.class, result.get());
+    }
+
+    @Test
+    void givenOrganizerDocument_whenToDomainByType_thenReturnsOrganizer() {
+        OrganizerProfileDocument doc = new OrganizerProfileDocument();
+        doc.setId("o-1");
+        doc.setName("Organizer");
+        doc.setEmail("org@escuelaing.edu.co");
+        doc.setContact("contact@evento.co");
+
+        Optional<User> result = UserMapper.toDomainByType(doc);
+
+        assertTrue(result.isPresent());
+        assertInstanceOf(Organizer.class, result.get());
+    }
+
+    // ─────────────────────────────────────────────
+    // Student toDocument with null birthdate
+    // ─────────────────────────────────────────────
+
+    @Test
+    void givenStudentWithNullBirthdate_whenToDocument_thenBirthdateIsNull() {
+        StudentProfile student = buildStudent();
+        student.setDateOfBirth(null);
+
+        StudentProfileDocument result = UserMapper.toDocument(student);
+
+        assertNull(result.getBirthdate());
+    }
+
+    @Test
+    void givenNullStudent_whenToDocument_thenReturnsNull() {
+        assertNull(UserMapper.toDocument((StudentProfile) null));
     }
 }
