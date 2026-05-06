@@ -30,7 +30,11 @@ public class StudentProfile extends User {
     }
 
     public void setStudentCarnet(Integer studentCarnet) {
-        this.studentCarnet = new StudentCarnet(studentCarnet);
+        if (studentCarnet != null && studentCarnet > 0) {
+            this.studentCarnet = new StudentCarnet(studentCarnet);
+        } else {
+            this.studentCarnet = null;
+        }
     }
 
     public Integer getStudentCarnet() {

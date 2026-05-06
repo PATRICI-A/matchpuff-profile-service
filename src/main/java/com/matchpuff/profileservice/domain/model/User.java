@@ -29,7 +29,11 @@ public class User {
     }
 
     public void setPasswordHash(String passwordHash){
-        this.passwordHash = new PasswordHash(passwordHash);
+        if (passwordHash != null && !passwordHash.isEmpty()) {
+            this.passwordHash = new PasswordHash(passwordHash);
+        } else {
+            this.passwordHash = null;
+        }
     }
 
     public String getPasswordHash(){

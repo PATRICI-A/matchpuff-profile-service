@@ -30,11 +30,13 @@ class UserMapperTest {
         s.setId("u-1");
         s.setName("Test User");
         s.setEmail("test@escuelaing.edu.co");
+        s.setPasswordHash("HashedPassword123");
         s.setDateOfBirth(LocalDate.of(2000, 1, 1));
         s.setCreatedAt(LocalDateTime.now());
         s.setPhotoUrl("photo.jpg");
         s.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         s.setSemester(5);
+        s.setStudentCarnet(20211000);
         s.setBiography("bio");
         s.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
 
@@ -60,11 +62,13 @@ class UserMapperTest {
         doc.setId("u-1");
         doc.setName("Test User");
         doc.setEmail("test@escuelaing.edu.co");
+        doc.setPasswordHash("HashedPassword123");
         doc.setBirthdate(LocalDateTime.of(2000, 1, 1, 0, 0));
         doc.setCreatedAt(LocalDateTime.now());
         doc.setPhotourl("photo.jpg");
         doc.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         doc.setSemester(5);
+        doc.setStudentCarnet(20211000);
         doc.setBiography("bio");
         doc.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         doc.setUserType(UserType.STUDENT);

@@ -32,9 +32,11 @@ class UserRestMapperTest {
         UserStudentRequest request = new UserStudentRequest();
         request.setName("Juan Diaz");
         request.setEmail("juan@escuelaing.edu.co");
+        request.setPassword("TestPassword123");
         request.setGender(GenderEnum.MALE);
         request.setCarreer(CareerEnum.COMPUTER_SCIENCE);
         request.setSemester(6);
+        request.setStudentCarnet(20211234);
         request.setPhotourl("http://foto.jpg");
         request.setBiography("Bio de Juan");
         request.setPrivacyLevel(PrivacyLevelEnum.PRIVATE);
@@ -79,6 +81,7 @@ class UserRestMapperTest {
         UserStudentRequest request = new UserStudentRequest();
         request.setName("Test");
         request.setEmail("test@escuelaing.edu.co");
+        request.setPassword("TestPassword123");
         request.setSemester(null);
 
         StudentProfile result = UserRestMapper.toDomain(request);
@@ -91,6 +94,7 @@ class UserRestMapperTest {
         UserStudentRequest request = new UserStudentRequest();
         request.setName("Test");
         request.setEmail("test@escuelaing.edu.co");
+        request.setPassword("TestPassword123");
         request.setTags(null);
 
         StudentProfile result = UserRestMapper.toDomain(request);
@@ -103,6 +107,7 @@ class UserRestMapperTest {
         UserStudentRequest request = new UserStudentRequest();
         request.setName("Test");
         request.setEmail("test@escuelaing.edu.co");
+        request.setPassword("TestPassword123");
         request.setSchedules(null);
 
         StudentProfile result = UserRestMapper.toDomain(request);

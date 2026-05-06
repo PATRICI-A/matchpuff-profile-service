@@ -23,6 +23,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @WebMvcTest(UserController.class)
 class UserControllerTest {
@@ -65,9 +67,11 @@ class UserControllerTest {
                 {
                   "name": "Test User",
                   "email": "test@escuelaing.edu.co",
+                  "password": "TestPassword123",
                   "gender": "MALE",
                   "carreer": "SYSTEMS_ENGINEERING",
                   "semester": 5,
+                  "studentCarnet": 20211234,
                   "photourl": "http://photo.jpg",
                   "biography": "Una biografía de prueba",
                   "privacyLevel": "PUBLIC",
@@ -90,10 +94,12 @@ class UserControllerTest {
     // ── POST /api/users ───────────────────────────────────────────
 
     @Test
+    @WithMockUser
     void givenValidRequest_whenCreateUser_thenReturns201() throws Exception {
         when(userService.createStudentUser(any())).thenReturn(mockUserResponse);
 
         mockMvc.perform(post("/api/users")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(buildValidUserRequestJson()))
                 .andExpect(status().isCreated())
@@ -103,6 +109,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void givenMissingRequiredFields_whenCreateUser_thenReturns400() throws Exception {
         String incompleteJson = """
                 {
@@ -111,12 +118,14 @@ class UserControllerTest {
                 """;
 
         mockMvc.perform(post("/api/users")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(incompleteJson))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
+    @WithMockUser
     void givenEmptyTagsList_whenCreateUser_thenReturns400() throws Exception {
         String jsonWithEmptyTags = """
                 {
@@ -141,6 +150,7 @@ class UserControllerTest {
                 """;
 
         mockMvc.perform(post("/api/users")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonWithEmptyTags))
                 .andExpect(status().isBadRequest());
@@ -149,6 +159,7 @@ class UserControllerTest {
     // ── GET /api/users/{userId} ───────────────────────────────────
 
     @Test
+    @WithMockUser
     void givenExistingId_whenGetUser_thenReturns200() throws Exception {
         when(userService.getUser("user-1")).thenReturn(mockUserResponseInfo);
 
@@ -161,10 +172,12 @@ class UserControllerTest {
     // ── PATCH /api/users/{userId} ─────────────────────────────────
 
     @Test
+    @WithMockUser
     void givenValidRequest_whenUpdateUser_thenReturns200() throws Exception {
         when(userService.updateUser(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
 
         mockMvc.perform(patch("/api/users/user-1")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(buildValidUserRequestJson()))
                 .andExpect(status().isOk())
@@ -174,6 +187,7 @@ class UserControllerTest {
     // ── GET /api/users ────────────────────────────────────────────
 
     @Test
+    @WithMockUser
     void whenGetAllUsers_thenReturns200WithList() throws Exception {
         when(userService.getAllUsers()).thenReturn(List.of(mockUserResponseInfo));
 
@@ -184,6 +198,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void whenGetAllUsersReturnsEmpty_thenReturns200WithEmptyList() throws Exception {
         when(userService.getAllUsers()).thenReturn(List.of());
 
@@ -196,6 +211,7 @@ class UserControllerTest {
     // ── PATCH /api/users/{userId}/schedule ────────────────────────
 
     @Test
+    @WithMockUser
     void givenValidSchedule_whenAddSchedule_thenReturns200() throws Exception {
         when(userService.addSchedule(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
 
@@ -209,6 +225,7 @@ class UserControllerTest {
                 """;
 
         mockMvc.perform(patch("/api/users/user-1/schedule")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(scheduleJson))
                 .andExpect(status().isOk())
@@ -216,6 +233,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void givenInvalidSchedule_whenAddSchedule_thenReturns400() throws Exception {
         String invalidScheduleJson = """
                 {
@@ -224,6 +242,7 @@ class UserControllerTest {
                 """;
 
         mockMvc.perform(patch("/api/users/user-1/schedule")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidScheduleJson))
                 .andExpect(status().isBadRequest());
@@ -232,6 +251,7 @@ class UserControllerTest {
     // ── PATCH /api/users/{userId}/tags ────────────────────────────
 
     @Test
+    @WithMockUser
     void givenValidTag_whenAddTag_thenReturns200() throws Exception {
         when(userService.addTag(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
 
@@ -243,6 +263,7 @@ class UserControllerTest {
                 """;
 
         mockMvc.perform(patch("/api/users/user-1/tags")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tagJson))
                 .andExpect(status().isOk())
@@ -250,6 +271,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void givenInvalidTag_whenAddTag_thenReturns400() throws Exception {
         String invalidTagJson = """
                 {
@@ -258,6 +280,7 @@ class UserControllerTest {
                 """;
 
         mockMvc.perform(patch("/api/users/user-1/tags")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidTagJson))
                 .andExpect(status().isBadRequest());
@@ -266,6 +289,7 @@ class UserControllerTest {
     // ── POST /api/users/admin ─────────────────────────────────────
 
     @Test
+    @WithMockUser
     void givenValidAdminRequest_whenCreateAdmin_thenReturns201() throws Exception {
         when(userService.createAdminUser(any())).thenReturn(mockUserResponse);
 
@@ -278,6 +302,7 @@ class UserControllerTest {
                                                                 """;
 
         mockMvc.perform(post("/api/users/admin")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(adminJson))
                 .andExpect(status().isCreated())
@@ -287,6 +312,7 @@ class UserControllerTest {
     // ── POST /api/users/organizer ─────────────────────────────────
 
     @Test
+    @WithMockUser
     void givenValidOrganizerRequest_whenCreateOrganizer_thenReturns201() throws Exception {
         when(userService.createOrganizerUser(any())).thenReturn(mockUserResponse);
 
@@ -300,6 +326,7 @@ class UserControllerTest {
                                                                 """;
 
         mockMvc.perform(post("/api/users/organizer")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orgJson))
                 .andExpect(status().isCreated())
@@ -309,6 +336,7 @@ class UserControllerTest {
     // ── GET /api/users/student-profiles ───────────────────────────
 
     @Test
+    @WithMockUser
     void whenGetAllStudentProfiles_thenReturns200WithList() throws Exception {
         when(userService.getAllStudentProfiles()).thenReturn(List.of(mockUserResponseInfo));
 
@@ -321,16 +349,19 @@ class UserControllerTest {
     // ── DELETE /api/users/{userId} ─────────────────────────────────
 
     @Test
+    @WithMockUser
     void whenDeleteUser_thenReturns204() throws Exception {
         doNothing().when(userService).deleteUser("user-1");
 
-        mockMvc.perform(delete("/api/users/user-1"))
+        mockMvc.perform(delete("/api/users/user-1")
+                .with(csrf()))
                 .andExpect(status().isNoContent());
     }
 
     // ── POST /api/users/{userId}/profile-image ─────────────────────
 
     @Test
+    @WithMockUser
     void whenUploadProfileImage_thenReturns200WithPhotoInfo() throws Exception {
         byte[] content = "hello".getBytes();
         MockMultipartFile file = new MockMultipartFile("file", "photo.png", "image/png", content);
@@ -346,12 +377,15 @@ class UserControllerTest {
         when(userService.updateProfileImage(eq("user-1"), any(byte[].class), eq("image/png")))
                 .thenReturn(photo);
 
-        mockMvc.perform(multipart("/api/users/user-1/profile-image").file(file))
+        mockMvc.perform(multipart("/api/users/user-1/profile-image")
+                .file(file)
+                .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.profileImageUrl").value("http://photo.jpg"));
     }
 
     @Test
+    @WithMockUser
     void givenStudentWithPhoto_whenGetProfileImage_thenRedirectsToImageUrl() throws Exception {
         StudentProfileResponse photoUser = StudentProfileResponse.builder()
                 .id("user-1")
@@ -368,6 +402,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void givenStudentWithoutPhoto_whenGetProfileImage_thenReturns400() throws Exception {
         StudentProfileResponse photoUser = StudentProfileResponse.builder()
                 .id("user-1")

@@ -46,6 +46,7 @@ class UserRepositoryAdapterTest {
         s.setDateOfBirth(LocalDate.of(2000, 1, 1));
         s.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         s.setSemester(3);
+        s.setStudentCarnet(20211000);
         s.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         return s;
     }
@@ -55,9 +56,11 @@ class UserRepositoryAdapterTest {
         doc.setId("u-1");
         doc.setName("Test User");
         doc.setEmail(VALID_EMAIL);
+        doc.setPasswordHash("HashedPassword123");
         doc.setGender(GenderEnum.MALE);
         doc.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         doc.setSemester(3);
+        doc.setStudentCarnet(20211000);
         doc.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         return doc;
     }
@@ -111,6 +114,7 @@ class UserRepositoryAdapterTest {
         doc.setId("a-1");
         doc.setName("Admin");
         doc.setEmail(VALID_EMAIL);
+        doc.setPasswordHash("HashedPassword123");
         doc.setGender(GenderEnum.MALE);
 
         when(userRepository.findById("a-1")).thenReturn(Optional.of(doc));
@@ -127,6 +131,7 @@ class UserRepositoryAdapterTest {
         doc.setId("o-1");
         doc.setName("Organizer");
         doc.setEmail(VALID_EMAIL);
+        doc.setPasswordHash("HashedPassword123");
         doc.setGender(GenderEnum.FEMALE);
         doc.setContact("contacto@evento.co");
 
