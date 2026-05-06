@@ -2,12 +2,14 @@ package com.matchpuff.profileservice.domain.model;
 
 import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
 import com.matchpuff.profileservice.domain.model.enums.CareerEnum;
+import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
 import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
 import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -69,8 +71,7 @@ class StudentProfileTest {
 
     @Test
     void givenSchedules_whenSet_thenGetSchedulesReturnsThem() {
-        Schedule schedule = new Schedule();
-        schedule.setName("Clase de algoritmos");
+        Schedule schedule = new Schedule( DayOfWeekEnum.MONDAY, "Algoritmos", LocalTime.of(8, 0), LocalTime.of(10, 0));
         student.setSchedules(List.of(schedule));
         assertEquals(1, student.getSchedules().size());
     }

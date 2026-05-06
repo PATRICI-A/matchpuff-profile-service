@@ -1,17 +1,21 @@
 package com.matchpuff.profileservice.application.dto.response;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
+@SuperBuilder
 public class UserResponse {
 
-    private String id;
-    private String name;
-    private String email;
-    private LocalDateTime createdAt;
-    private String userType;
+    protected String id;
+    protected String name;
+    protected String email;
+    protected LocalDateTime createdAt;
+    protected String gender;
+    protected String userType;
+
 }

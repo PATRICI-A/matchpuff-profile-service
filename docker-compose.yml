@@ -9,11 +9,16 @@ services:
       - .env
     environment:
       - SPRING_DATA_MONGODB_URI=${MONGO_URI}
+      - SPRING_DATA_MONGODB_DATABASE=${MONGO_DB:-profileservice}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - APP_STARTUP_FAIL_FAST=true
     networks:
       - backend
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep UP || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5

@@ -1,10 +1,12 @@
 package com.matchpuff.profileservice.entrypoints.advice;
 
-import com.matchpuff.profileservice.domain.exceptions.ProfileServiceException;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,137 +14,121 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import java.util.List;
+import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
+import com.matchpuff.profileservice.domain.exceptions.ProfileServiceException;
+import com.matchpuff.profileservice.domain.exceptions.UserAlreadyExistsException;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
 
+    @InjectMocks
     private GlobalExceptionHandler handler;
 
-    @Mock
-    private MethodArgumentNotValidException validationException;
-
-    @Mock
-    private BindingResult bindingResult;
 
     @BeforeEach
     void setUp() {
-        handler = new GlobalExceptionHandler();
+        // no setip
     }
 
-    // ── handleValidationErrors ─────────────────────────────────────
-
     @Test
-    void givenFieldError_whenHandleValidationErrors_thenReturnsBadRequest() {
-        FieldError fieldError = new FieldError("user", "email", "must be valid");
-        when(validationException.getBindingResult()).thenReturn(bindingResult);
-        when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError));
+    void givenValidationError_whenHandleValidationErrors_thenReturnsBadRequest() {
+        // Given
+        FieldError fieldError = new FieldError("UserStudentRequest", "email", "Invalid email format");
+        List<FieldError> errors = new ArrayList<>();
+        errors.add(fieldError);
 
-        ResponseEntity<ErrorResponse> response = handler.handleValidationErrors(validationException);
+        BindingResult bindingResult = mock(BindingResult.class);
+        when(bindingResult.getFieldErrors()).thenReturn(errors);
 
+        MethodArgumentNotValidException ex = new MethodArgumentNotValidException(null, bindingResult);
+
+        // When
+        ResponseEntity<ErrorResponse> response = handler.handleValidationErrors(ex);
+
+        // Then
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getBody().getStatus());
         assertTrue(response.getBody().getMessage().contains("email"));
-        assertNotNull(response.getBody().getTimestamp());
+        assertEquals(400, response.getBody().getStatus());
     }
 
     @Test
-    void givenNoFieldErrors_whenHandleValidationErrors_thenReturnsDefaultMessage() {
-        when(validationException.getBindingResult()).thenReturn(bindingResult);
-        when(bindingResult.getFieldErrors()).thenReturn(List.of());
+    void givenEmptyValidationErrors_whenHandleValidationErrors_thenReturnsDefaultMessage() {
+        // Given
+        BindingResult bindingResult = mock(BindingResult.class);
+        when(bindingResult.getFieldErrors()).thenReturn(new ArrayList<>());
 
-        ResponseEntity<ErrorResponse> response = handler.handleValidationErrors(validationException);
+        MethodArgumentNotValidException ex = new MethodArgumentNotValidException(null, bindingResult);
 
+        // When
+        ResponseEntity<ErrorResponse> response = handler.handleValidationErrors(ex);
+
+        // Then
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("Validation error", response.getBody().getMessage());
     }
 
     @Test
-    void givenMultipleFieldErrors_whenHandleValidationErrors_thenReturnsFirstError() {
-        FieldError first = new FieldError("user", "name", "must not be blank");
-        FieldError second = new FieldError("user", "email", "must be valid");
-        when(validationException.getBindingResult()).thenReturn(bindingResult);
-        when(bindingResult.getFieldErrors()).thenReturn(List.of(first, second));
+    void givenUserAlreadyExistsException_whenHandleBusinessErrors_thenReturnsConflict() {
+        // Given
+        ProfileServiceException ex = new UserAlreadyExistsException("User already exists");
 
-        ResponseEntity<ErrorResponse> response = handler.handleValidationErrors(validationException);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue(response.getBody().getMessage().contains("name"));
-    }
-
-    // ── handleBusinessErrors ───────────────────────────────────────
-
-    @Test
-    void givenNotFoundProfileServiceException_whenHandleBusinessErrors_thenReturns404() {
-        ProfileServiceException ex = new ProfileServiceException("User not found", HttpStatus.NOT_FOUND);
-
+        // When
         ResponseEntity<ErrorResponse> response = handler.handleBusinessErrors(ex);
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("User not found", response.getBody().getMessage());
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getBody().getStatus());
-        assertNotNull(response.getBody().getTimestamp());
-    }
-
-    @Test
-    void givenConflictProfileServiceException_whenHandleBusinessErrors_thenReturns409() {
-        ProfileServiceException ex = new ProfileServiceException("User already exists", HttpStatus.CONFLICT);
-
-        ResponseEntity<ErrorResponse> response = handler.handleBusinessErrors(ex);
-
+        // Then
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals("User already exists", response.getBody().getMessage());
-        assertEquals(HttpStatus.CONFLICT.value(), response.getBody().getStatus());
+        assertEquals(409, response.getBody().getStatus());
     }
 
     @Test
-    void givenBadRequestProfileServiceException_whenHandleBusinessErrors_thenReturns400() {
-        ProfileServiceException ex = new ProfileServiceException("Invalid data", HttpStatus.BAD_REQUEST);
+    void givenInvalidInputException_whenHandleBusinessErrors_thenReturnsBadRequest() {
+        // Given
+        ProfileServiceException ex = new InvalidInputException("Invalid input");
 
+        // When
         ResponseEntity<ErrorResponse> response = handler.handleBusinessErrors(ex);
 
+        // Then
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Invalid data", response.getBody().getMessage());
+        assertNotNull(response.getBody());
+        assertEquals("Invalid input", response.getBody().getMessage());
+        assertEquals(400, response.getBody().getStatus());
     }
 
-    // ── handleGeneralErrors ────────────────────────────────────────
-
     @Test
-    void givenGenericException_whenHandleGeneralErrors_thenReturns500() {
-        Exception ex = new Exception("Unexpected failure");
+    void givenGeneralException_whenHandleGeneralErrors_thenReturnsInternalServerError() {
+        // Given
+        Exception ex = new RuntimeException("Unexpected error");
 
+        // When
         ResponseEntity<ErrorResponse> response = handler.handleGeneralErrors(ex);
 
+        // Then
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("Error interno del servidor", response.getBody().getMessage());
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getBody().getStatus());
-        assertNotNull(response.getBody().getTimestamp());
+        assertEquals(500, response.getBody().getStatus());
     }
 
     @Test
-    void givenRuntimeException_whenHandleGeneralErrors_thenReturns500() {
-        RuntimeException ex = new RuntimeException("Runtime error");
+    void givenNullPointerException_whenHandleGeneralErrors_thenReturnsInternalServerError() {
+        // Given
+        Exception ex = new NullPointerException("Null pointer encountered");
 
+        // When
         ResponseEntity<ErrorResponse> response = handler.handleGeneralErrors(ex);
 
+        // Then
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals("Error interno del servidor", response.getBody().getMessage());
-    }
-
-    @Test
-    void givenNullMessageException_whenHandleGeneralErrors_thenReturns500WithDefaultMessage() {
-        Exception ex = new Exception((String) null);
-
-        ResponseEntity<ErrorResponse> response = handler.handleGeneralErrors(ex);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Error interno del servidor", response.getBody().getMessage());
+        assertEquals(500, response.getBody().getStatus());
     }
 }

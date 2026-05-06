@@ -1,16 +1,16 @@
 package com.matchpuff.profileservice.infrastructure.adapters.adapter;
 
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.UserType;
-import com.matchpuff.profileservice.domain.model.User;
-import com.matchpuff.profileservice.domain.model.StudentProfile;
-import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
-import com.matchpuff.profileservice.domain.model.Admin;
-import com.matchpuff.profileservice.domain.model.Organizer;
-import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
-import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.UserDocument;
-import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.StudentProfileDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.AdminProfileDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.OrganizerProfileDocument;
+import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.StudentProfileDocument;
+import com.matchpuff.profileservice.domain.model.User;
+import com.matchpuff.profileservice.domain.model.Admin;
+import com.matchpuff.profileservice.domain.model.Organizer;
+import com.matchpuff.profileservice.domain.model.StudentProfile;
+import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
+import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
+import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.UserDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.mapper.UserMapper;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.repository.UserRepository;
 import org.springframework.stereotype.Component;
@@ -36,117 +36,148 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
+    public User save(Admin admin) {
+        mailExistsForException(admin.getEmail());
+        AdminProfileDocument doc = UserMapper.toDocument(admin);
+        AdminProfileDocument saved = userRepository.save(doc);
+        return UserMapper.toDomain(saved);
+    }
+
+    @Override
+    public User save(Organizer organizer) {
+        mailExistsForException(organizer.getEmail());
+        OrganizerProfileDocument doc = UserMapper.toDocument(organizer);
+        OrganizerProfileDocument saved = userRepository.save(doc);
+        return UserMapper.toDomain(saved);
+    }
+
+    @Override
+    public void delete(String userId) {
+        userRepository.deleteById(userId);
+    }
+
+    @Override
     public Optional<User> findById(String id) {
         return userRepository.findById(id)
-                .flatMap(this::convertDocumentToDomain);
+                .flatMap(UserMapper::toDomainByType);
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email)
-                .flatMap(this::convertDocumentToDomain);
+                .flatMap(UserMapper::toDomainByType);
     }
 
     @Override
-    public User update(String id, StudentProfile user) {
-        user.setId(id);
-        StudentProfileDocument doc = UserMapper.toDocument(user);
-        StudentProfileDocument updated = userRepository.save(doc);
-        return UserMapper.toDomain(updated);
+    public User update(String id, User user) {
+        if (user.getEmail() != null) {
+            Optional<UserDocument> existing = userRepository.findByEmail(user.getEmail());
+            if (existing.isPresent() && !existing.get().getId().equals(id)) {
+                throw new InvalidInputException("The email is already in use by another user.");
+            }
+        }
+
+        UserDocument storedUser = userRepository.findById(id)
+                .orElseThrow(() -> new InvalidInputException("User not found: " + id));
+
+        if (user instanceof StudentProfile student) {
+            if (!(storedUser instanceof StudentProfileDocument current)) {
+                throw new InvalidInputException("Unsupported user type for update.");
+            }
+
+            StudentProfileDocument doc = mergeStudentDocument(current, student);
+            StudentProfileDocument updated = userRepository.save(doc);
+            return UserMapper.toDomain(updated);
+        }
+
+        if (user instanceof Admin admin) {
+            if (!(storedUser instanceof AdminProfileDocument current)) {
+                throw new InvalidInputException("Unsupported user type for update.");
+            }
+
+            AdminProfileDocument doc = mergeAdminDocument(current, admin);
+            AdminProfileDocument updated = userRepository.save(doc);
+            return UserMapper.toDomain(updated);
+        }
+
+        if (user instanceof Organizer organizer) {
+            if (!(storedUser instanceof OrganizerProfileDocument current)) {
+                throw new InvalidInputException("Unsupported user type for update.");
+            }
+
+            OrganizerProfileDocument doc = mergeOrganizerDocument(current, organizer);
+            OrganizerProfileDocument updated = userRepository.save(doc);
+            return UserMapper.toDomain(updated);
+        }
+
+        throw new InvalidInputException("Unsupported user type for update.");
+    }
+
+    private StudentProfileDocument mergeStudentDocument(StudentProfileDocument current, StudentProfile incoming) {
+        StudentProfileDocument merged = new StudentProfileDocument();
+        merged.setId(current.getId());
+        merged.setUserType(current.getUserType());
+        merged.setCreatedAt(current.getCreatedAt());
+        merged.setName(incoming.getName() != null ? incoming.getName() : current.getName());
+        merged.setEmail(incoming.getEmail() != null ? incoming.getEmail() : current.getEmail());
+        merged.setPasswordHash(incoming.getPasswordHash() != null ? incoming.getPasswordHash() : current.getPasswordHash());
+        merged.setGender(incoming.getGender() != null ? incoming.getGender() : current.getGender());
+        merged.setBirthdate(incoming.getDateOfBirth() != null ? incoming.getDateOfBirth().atStartOfDay() : current.getBirthdate());
+        merged.setPhotourl(incoming.getPhotoUrl() != null ? incoming.getPhotoUrl() : current.getPhotourl());
+        merged.setCareer(incoming.getCareer() != null ? incoming.getCareer() : current.getCareer());
+        merged.setSemester(incoming.getSemester() > 0 ? incoming.getSemester() : current.getSemester());
+        merged.setStudentCarnet(incoming.getStudentCarnet() != null ? incoming.getStudentCarnet() : current.getStudentCarnet());
+        merged.setBiography(incoming.getBiography() != null ? incoming.getBiography() : current.getBiography());
+        merged.setPrivacyLevel(incoming.getPrivacyLevel() != null ? incoming.getPrivacyLevel() : current.getPrivacyLevel());
+        merged.setSchedule(incoming.getSchedules() != null ? UserMapper.toDocument(incoming).getSchedule() : current.getSchedule());
+        merged.setInterests(incoming.getTags() != null ? UserMapper.toDocument(incoming).getInterests() : current.getInterests());
+        return merged;
+    }
+
+    private AdminProfileDocument mergeAdminDocument(AdminProfileDocument current, Admin incoming) {
+        AdminProfileDocument merged = new AdminProfileDocument();
+        merged.setId(current.getId());
+        merged.setUserType(current.getUserType());
+        merged.setCreatedAt(current.getCreatedAt());
+        merged.setName(incoming.getName() != null ? incoming.getName() : current.getName());
+        merged.setEmail(incoming.getEmail() != null ? incoming.getEmail() : current.getEmail());
+        merged.setPasswordHash(incoming.getPasswordHash() != null ? incoming.getPasswordHash() : current.getPasswordHash());
+        merged.setGender(incoming.getGender() != null ? incoming.getGender() : current.getGender());
+        return merged;
+    }
+
+    private OrganizerProfileDocument mergeOrganizerDocument(OrganizerProfileDocument current, Organizer incoming) {
+        OrganizerProfileDocument merged = new OrganizerProfileDocument();
+        merged.setId(current.getId());
+        merged.setUserType(current.getUserType());
+        merged.setCreatedAt(current.getCreatedAt());
+        merged.setName(incoming.getName() != null ? incoming.getName() : current.getName());
+        merged.setEmail(incoming.getEmail() != null ? incoming.getEmail() : current.getEmail());
+        merged.setPasswordHash(incoming.getPasswordHash() != null ? incoming.getPasswordHash() : current.getPasswordHash());
+        merged.setGender(incoming.getGender() != null ? incoming.getGender() : current.getGender());
+        merged.setContact(incoming.getContactInfo() != null ? incoming.getContactInfo() : current.getContact());
+        return merged;
     }
 
     @Override
     public List<User> findAll() {
         return userRepository.findAll().stream()
-                .flatMap(doc -> convertDocumentToDomain(doc).stream())
+                .flatMap(doc -> UserMapper.toDomainByType(doc).stream())
                 .toList();
     }
+    
     @Override
-    public List<User> findAllStudents() {
-        return userRepository.findAll().stream()
-                .filter(doc -> doc.getUserType() == UserType.STUDENT)
-                .flatMap(doc -> convertDocumentToDomain(doc).stream())
+    public List<StudentProfile> findAllStudents() {
+        return userRepository.findByUserType(UserType.STUDENT).stream()
+                .flatMap(doc -> UserMapper.toDomainByType(doc).stream())
+                .filter(StudentProfile.class::isInstance)
+                .map(StudentProfile.class::cast)
                 .toList();
     }
-
-    // ── Helper methods for type discrimination ──────────────────────────────────
-
-    /**
-     * Convierte un UserDocument al modelo de dominio correspondiente según su tipo.
-     * Maneja los tres tipos de usuarios: STUDENT, ADMIN, ORGANIZER.
-     */
-    private Optional<User> convertDocumentToDomain(UserDocument doc) {
-        if (doc == null || doc.getUserType() == null) {
-            return Optional.empty();
-        }
-
-        return switch (doc.getUserType()) {
-            case STUDENT -> convertStudentDocument((StudentProfileDocument) doc);
-            case ADMIN -> convertAdminDocument((AdminProfileDocument) doc);
-            case ORGANIZER -> convertOrganizerDocument((OrganizerProfileDocument) doc);
-        };
-    }
-
-    /**
-     * Convierte un StudentProfileDocument (tipo STUDENT) al modelo de dominio StudentProfile.
-     */
-    private Optional<User> convertStudentDocument(StudentProfileDocument doc) {
-        try {
-            if (doc instanceof StudentProfileDocument) {
-                StudentProfile profile = UserMapper.toDomain(doc);
-                return Optional.of((User) profile);
-            }
-        } catch (Exception e) {
-            // Log error si es necesario
-        }
-        return Optional.empty();
-    }
-
-    /**
-     * Convierte un AdminProfileDocument (tipo ADMIN) al modelo de dominio Admin.
-     * Actualmente Admin no tiene campos específicos adicionales.
-     */
-    private Optional<User> convertAdminDocument(AdminProfileDocument doc) {
-        try {
-            Admin admin = new Admin();
-            admin.setId(doc.getId());
-            admin.setName(doc.getName());
-            admin.setEmail(doc.getEmail());
-            admin.setGender(doc.getGender());
-            admin.setDateOfBirth(doc.getBirthdate() == null ? null : doc.getBirthdate().toLocalDate());
-            admin.setCreatedAt(doc.getCreatedAt());
-            return Optional.of((User) admin);
-        } catch (Exception e) {
-            // Log error si es necesario
-        }
-        return Optional.empty();
-    }
-
-    /**
-     * Convierte un OrganizerProfileDocument (tipo ORGANIZER) al modelo de dominio Organizer.
-     * Mapea el campo 'contact' del documento al campo 'contactInfo' del modelo.
-     */
-    private Optional<User> convertOrganizerDocument(OrganizerProfileDocument doc) {
-        try {
-            Organizer organizer = new Organizer();
-            organizer.setId(doc.getId());
-            organizer.setName(doc.getName());
-            organizer.setEmail(doc.getEmail());
-            organizer.setGender(doc.getGender());
-            organizer.setDateOfBirth(doc.getBirthdate() == null ? null : doc.getBirthdate().toLocalDate());
-            organizer.setCreatedAt(doc.getCreatedAt());
-            organizer.setContactInfo(doc.getContact());  // Mapear 'contact' → 'contactInfo'
-            return Optional.of((User) organizer);
-        } catch (Exception e) {
-            // Log error si es necesario
-        }
-        return Optional.empty();
-    }
-
 
     private boolean mailExistsForException(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new InvalidInputException("El correo ya está registrado");
+            throw new InvalidInputException("The email is already in use by another user.");
         }
         return false;
     }

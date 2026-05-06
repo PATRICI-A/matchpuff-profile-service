@@ -1,9 +1,6 @@
 package com.matchpuff.profileservice.application.mapper;
 
-import com.matchpuff.profileservice.application.dto.response.ScheduleResponse;
-import com.matchpuff.profileservice.application.dto.response.TagResponse;
-import com.matchpuff.profileservice.application.dto.response.UserResponse;
-import com.matchpuff.profileservice.application.dto.response.UserResponseInfo;
+import com.matchpuff.profileservice.application.dto.response.*;
 import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.domain.model.Organizer;
 import com.matchpuff.profileservice.domain.model.Schedule;
@@ -29,12 +26,7 @@ class UserMapperTest {
     @BeforeEach
     void setUp() {
         // Implementación anónima para testear los métodos default de la interfaz
-        mapper = new UserMapper() {
-            @Override
-            public UserResponse toResponse(User user) {
-                return null;
-            }
-        };
+        mapper = new UserMapper() { };
     }
 
     // ── resolveUserType ───────────────────────────────────────────
@@ -64,7 +56,7 @@ class UserMapperTest {
 
     @Test
     void givenNull_whenToResponseInfo_thenReturnsNull() {
-        assertNull(mapper.toResponseInfo(null));
+        assertNull(mapper.toResponse(null));
     }
 
     @Test
@@ -75,6 +67,7 @@ class UserMapperTest {
         student.setEmail("ana@escuelaing.edu.co");
         student.setGender(GenderEnum.FEMALE);
         student.setDateOfBirth(LocalDate.of(1999, 3, 10));
+        student.setStudentCarnet(20211234L);
         student.setBiography("Estudiante apasionada");
         student.setCreatedAt(LocalDateTime.of(2024, 1, 1, 0, 0));
 
@@ -83,25 +76,24 @@ class UserMapperTest {
         tag.setCategory("Backend");
         student.setTags(List.of(tag));
 
-        Schedule schedule = new Schedule();
-        schedule.setName("Algoritmos");
-        schedule.setDayOfWeek(DayOfWeekEnum.TUESDAY);
-        schedule.setStartTime(LocalTime.of(9, 0));
-        schedule.setEndTime(LocalTime.of(11, 0));
+        Schedule schedule = new Schedule( DayOfWeekEnum.TUESDAY, "Algoritmos", LocalTime.of(9, 0), LocalTime.of(11, 0));
         student.setSchedules(List.of(schedule));
 
-        UserResponseInfo info = mapper.toResponseInfo(student);
+        UserResponse info = mapper.toResponse(student);
+        assertTrue(info instanceof StudentProfileResponse);
+        StudentProfileResponse studentInfo = (StudentProfileResponse) info;
 
-        assertEquals("s-1", info.getId());
-        assertEquals("Ana Ruiz", info.getName());
-        assertEquals("ana@escuelaing.edu.co", info.getEmail());
-        assertEquals("STUDENT", info.getUserType());
-        assertEquals("FEMALE", info.getGender());
-        assertEquals("Estudiante apasionada", info.getBiography());
-        assertNotNull(info.getTags());
-        assertEquals(1, info.getTags().size());
-        assertNotNull(info.getSchedules());
-        assertEquals(1, info.getSchedules().size());
+        assertEquals("s-1", studentInfo.getId());
+        assertEquals("Ana Ruiz", studentInfo.getName());
+        assertEquals("ana@escuelaing.edu.co", studentInfo.getEmail());
+        assertEquals("STUDENT", studentInfo.getUserType());
+        assertEquals("FEMALE", studentInfo.getGender());
+        assertEquals(20211234L, studentInfo.getStudentCarnet());
+        assertEquals("Estudiante apasionada", studentInfo.getBiography());
+        assertNotNull(studentInfo.getTags());
+        assertEquals(1, studentInfo.getTags().size());
+        assertNotNull(studentInfo.getSchedules());
+        assertEquals(1, studentInfo.getSchedules().size());
     }
 
     @Test
@@ -113,10 +105,12 @@ class UserMapperTest {
         student.setSchedules(null);
         student.setTags(null);
 
-        UserResponseInfo info = mapper.toResponseInfo(student);
+        UserResponse info = mapper.toResponse(student);
+        assertTrue(info instanceof StudentProfileResponse);
+        StudentProfileResponse studentInfo = (StudentProfileResponse) info;
 
-        assertTrue(info.getSchedules().isEmpty());
-        assertTrue(info.getTags().isEmpty());
+        assertTrue(studentInfo.getSchedules().isEmpty());
+        assertTrue(studentInfo.getTags().isEmpty());
     }
 
     @Test
@@ -126,13 +120,12 @@ class UserMapperTest {
         admin.setName("Admin User");
         admin.setEmail("admin@escuelaing.edu.co");
 
-        UserResponseInfo info = mapper.toResponseInfo(admin);
+        UserResponse info = mapper.toResponse(admin);
+        assertTrue(info instanceof AdminResponse);
+        AdminResponse adminInfo = (AdminResponse) info;
 
-        assertEquals("ADMIN", info.getUserType());
-        assertEquals("Admin User", info.getName());
-        assertNull(info.getBiography());
-        assertTrue(info.getSchedules().isEmpty());
-        assertTrue(info.getTags().isEmpty());
+        assertEquals("ADMIN", adminInfo.getUserType());
+        assertEquals("Admin User", adminInfo.getName());
     }
 
     @Test
@@ -141,11 +134,15 @@ class UserMapperTest {
         organizer.setId("o-1");
         organizer.setName("Evento Corp");
         organizer.setEmail("org@escuelaing.edu.co");
+        organizer.setContactInfo("contact@example.com");
 
-        UserResponseInfo info = mapper.toResponseInfo(organizer);
+        UserResponse info = mapper.toResponse(organizer);
+        assertTrue(info instanceof OrganizerResponse);
+        OrganizerResponse orgInfo = (OrganizerResponse) info;
 
-        assertEquals("ORGANIZER", info.getUserType());
-        assertEquals("o-1", info.getId());
+        assertEquals("ORGANIZER", orgInfo.getUserType());
+        assertEquals("o-1", orgInfo.getId());
+        assertEquals("contact@example.com", orgInfo.getContactInfo());
     }
 
     @Test
@@ -157,10 +154,11 @@ class UserMapperTest {
         student.setGender(GenderEnum.MALE);
         student.setDateOfBirth(LocalDate.of(2001, 6, 20));
 
-        UserResponseInfo info = mapper.toResponseInfo(student);
+        UserResponse info = mapper.toResponse(student);
+        assertTrue(info instanceof StudentProfileResponse);
+        StudentProfileResponse studentInfo = (StudentProfileResponse) info;
 
-        assertEquals("MALE", info.getGender());
-        assertEquals("2001-06-20", info.getDateOfBirth());
+        assertEquals("MALE", studentInfo.getGender());
     }
 
     // ── toScheduleResponseList ────────────────────────────────────
@@ -178,12 +176,7 @@ class UserMapperTest {
 
     @Test
     void givenScheduleList_whenToScheduleResponseList_thenMapsAllFields() {
-        Schedule s = new Schedule();
-        s.setDayOfWeek(DayOfWeekEnum.FRIDAY);
-        s.setName("Seminario");
-        s.setStartTime(LocalTime.of(14, 0));
-        s.setEndTime(LocalTime.of(16, 0));
-
+        Schedule s = new Schedule( DayOfWeekEnum.FRIDAY, "Seminario", LocalTime.of(14, 0), LocalTime.of(16, 0));
         List<ScheduleResponse> result = mapper.toScheduleResponseList(List.of(s));
 
         assertEquals(1, result.size());
@@ -232,5 +225,27 @@ class UserMapperTest {
         List<TagResponse> result = mapper.toTagResponseList(List.of(t1, t2));
 
         assertEquals(2, result.size());
+    }
+
+    // ── toResponseProfilePhoto ───────────────────────────────────
+
+    @Test
+    void givenStudentWithPhoto_whenToResponseProfilePhoto_thenReturnsPhotoInfo() {
+        StudentProfile s = new StudentProfile();
+        s.setId("s-photo");
+        s.setName("Photo User");
+        s.setEmail("photo@escuelaing.edu.co");
+        s.setPhotoUrl("http://photo.png");
+
+        UserResponseProfilePhoto p = mapper.toResponseProfilePhoto(s);
+        assertNotNull(p);
+        assertEquals("http://photo.png", p.getProfileImageUrl());
+    }
+
+    @Test
+    void givenNonStudent_whenToResponseProfilePhoto_thenReturnsNull() {
+        Admin a = new Admin();
+        a.setId("a-1");
+        assertNull(mapper.toResponseProfilePhoto(a));
     }
 }

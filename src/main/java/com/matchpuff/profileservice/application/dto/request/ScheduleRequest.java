@@ -2,7 +2,6 @@ package com.matchpuff.profileservice.application.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
 
 import java.time.LocalTime;
@@ -22,6 +21,5 @@ public class ScheduleRequest {
 	private LocalTime startTime;
 
 	@NotNull
-	@PastOrPresent
 	private LocalTime endTime;
 }

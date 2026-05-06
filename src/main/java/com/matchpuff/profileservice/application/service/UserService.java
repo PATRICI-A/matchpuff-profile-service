@@ -2,12 +2,9 @@ package com.matchpuff.profileservice.application.service;
 
 import java.util.List;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
-import com.matchpuff.profileservice.application.dto.response.UserResponseInfo;
+import com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto;
 import com.matchpuff.profileservice.application.mapper.UserMapper;
-import com.matchpuff.profileservice.domain.model.Schedule;
-import com.matchpuff.profileservice.domain.model.Tag;
-import com.matchpuff.profileservice.domain.model.StudentProfile;
-import com.matchpuff.profileservice.domain.model.User;
+import com.matchpuff.profileservice.domain.model.*;
 import com.matchpuff.profileservice.domain.ports.in.UserUseCasePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,38 +16,72 @@ public class UserService implements UserServicePort {
     private final UserMapper userMapper;
 
     @Override
-    public UserResponse createUser(StudentProfile user) {
+    public UserResponse createStudentUser(StudentProfile user) {
         User created = userUseCase.createStudentUser(user);
         return userMapper.toResponse(created);
     }
 
     @Override
-    public UserResponseInfo getUser(String userId) {
+    public UserResponse createAdminUser(Admin user) {
+        User created = userUseCase.createAdminUser(user);
+        return userMapper.toResponse(created);
+    }
+
+    @Override
+    public UserResponse createOrganizerUser(Organizer user) {
+        User created = userUseCase.createOrganizerUser(user);
+        return userMapper.toResponse(created);
+    }
+
+    @Override
+    public void deleteUser(String userId) {
+        userUseCase.deleteUser(userId);
+    }
+
+    @Override
+    public UserResponse getUser(String userId) {
         User u = userUseCase.getUser(userId);
-        return userMapper.toResponseInfo(u);
+        return userMapper.toResponse(u);
     }
 
     @Override
-    public UserResponseInfo updateUser(String userId, StudentProfile user) {
-        User updated = userUseCase.updateStudentUser(userId, user);
-        return userMapper.toResponseInfo(updated);
+    public UserResponse updateUser(String userId, User user) {
+        User updated = userUseCase.updateUser(userId, user);
+        return userMapper.toResponse(updated);
     }
 
     @Override
-    public UserResponseInfo addSchedule(String userId, Schedule schedule) {
+    public void changePassword(String userId, String currentPassword, String newPassword) {
+        userUseCase.changePassword(userId, currentPassword, newPassword);
+    }
+
+    @Override
+    public UserResponse addSchedule(String userId, Schedule schedule) {
         User updated = userUseCase.addScheduleToStudent(userId, schedule);
-        return userMapper.toResponseInfo(updated);
+        return userMapper.toResponse(updated);
     }
 
     @Override
-    public UserResponseInfo addTag(String userId, Tag tag) {
+    public UserResponse addTag(String userId, Tag tag) {
         User updated = userUseCase.addTagToStudent(userId, tag);
-        return userMapper.toResponseInfo(updated);
+        return userMapper.toResponse(updated);
     }
 
     @Override
-    public List<UserResponseInfo> getAllUsers() {
+    public List<UserResponse> getAllUsers() {
         List<User> users = userUseCase.getAllUsers();
-        return users.stream().map(userMapper::toResponseInfo).toList();
+        return users.stream().map(userMapper::toResponse).toList();
+    }
+
+    @Override
+    public UserResponseProfilePhoto updateProfileImage(String userId, byte[] file, String contentType) {
+        User updated = userUseCase.updateProfileImage(userId, file, contentType);
+        return userMapper.toResponseProfilePhoto(updated);
+    }
+
+    @Override
+    public List<UserResponse> getAllStudentProfiles() {
+        List<StudentProfile> profiles = userUseCase.getAllStudentProfiles();
+        return profiles.stream().map(userMapper::toResponse).toList();
     }
 }

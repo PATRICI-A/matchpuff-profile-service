@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
 import com.matchpuff.profileservice.domain.valueobjects.Email;
+import com.matchpuff.profileservice.domain.valueobjects.PasswordHash;
 
 import lombok.Data;
 
@@ -13,6 +14,7 @@ public class User {
     private String id;
     private String name;
     private Email email;
+    private PasswordHash passwordHash;
     private GenderEnum gender;
     private LocalDate dateOfBirth;
     private LocalDateTime createdAt;
@@ -24,5 +26,17 @@ public class User {
 
     public String getEmail(){
         return email != null ? email.getValue() : null;
+    }
+
+    public void setPasswordHash(String passwordHash){
+        if (passwordHash != null && !passwordHash.isEmpty()) {
+            this.passwordHash = new PasswordHash(passwordHash);
+        } else {
+            this.passwordHash = null;
+        }
+    }
+
+    public String getPasswordHash(){
+        return passwordHash != null ? passwordHash.getValue() : null;
     }
 }

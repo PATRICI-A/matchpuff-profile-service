@@ -1,9 +1,12 @@
 package com.matchpuff.profileservice.application.mapper;
 
+import com.matchpuff.profileservice.application.dto.response.AdminResponse;
+import com.matchpuff.profileservice.application.dto.response.OrganizerResponse;
 import com.matchpuff.profileservice.application.dto.response.ScheduleResponse;
+import com.matchpuff.profileservice.application.dto.response.StudentProfileResponse;
 import com.matchpuff.profileservice.application.dto.response.TagResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
-import com.matchpuff.profileservice.application.dto.response.UserResponseInfo;
+import com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto;
 import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.domain.model.Organizer;
 import com.matchpuff.profileservice.domain.model.Schedule;
@@ -20,27 +23,64 @@ import java.util.List;
 public interface UserMapper {
 
      @Mapping(target = "userType", expression = "java(resolveUserType(user))")
-     UserResponse toResponse(User user);
-
-     default UserResponseInfo toResponseInfo(User user) {
+     default UserResponse toResponse(User user) {
           if (user == null) {
                return null;
           }
 
-          StudentProfile student = (user instanceof StudentProfile sp) ? sp : null;
+          if (user instanceof StudentProfile student) {
+               String dateOfBirthStr = student.getDateOfBirth() != null ? student.getDateOfBirth().toString() : null;
+               String genderStr = student.getGender() != null ? student.getGender().toString() : null;
+               return StudentProfileResponse.builder()
+                    .id(student.getId())
+                    .name(student.getName())
+                    .email(student.getEmail())
+                    .createdAt(student.getCreatedAt())
+                    .userType(resolveUserType(student))
+                    .gender(genderStr)
+                    .dateOfBirth(dateOfBirthStr)
+                    .career(student.getCareer())
+                    .semester(student.getSemester())
+                    .studentCarnet(student.getStudentCarnet())
+                    .photoUrl(student.getPhotoUrl())
+                    .biography(student.getBiography())
+                    .privacyLevel(student.getPrivacyLevel())
+                    .schedules(toScheduleResponseList(student.getSchedules()))
+                    .tags(toTagResponseList(student.getTags()))
+                    .build();
+          }
 
-          return UserResponseInfo.builder()
-                  .id(user.getId())
-                  .name(user.getName())
-                  .email(user.getEmail())
-                  .createdAt(user.getCreatedAt())
-                  .userType(resolveUserType(user))
-                  .gender(user.getGender() == null ? null : user.getGender().name())
-                  .dateOfBirth(user.getDateOfBirth() == null ? null : user.getDateOfBirth().toString())
-                  .biography(student == null ? null : student.getBiography())
-                  .schedules(toScheduleResponseList(student == null ? null : student.getSchedules()))
-                  .tags(toTagResponseList(student == null ? null : student.getTags()))
-                  .build();
+          if (user instanceof Organizer organizer) {
+               return OrganizerResponse.builder()
+                    .id(organizer.getId())
+                    .name(organizer.getName())
+                    .email(organizer.getEmail())
+                    .createdAt(organizer.getCreatedAt())
+                    .gender(organizer.getGender() != null ? organizer.getGender().toString() : null)
+                    .userType(resolveUserType(organizer))
+                    .contactInfo(organizer.getContactInfo())
+                    .build();
+          }
+
+          if (user instanceof Admin admin) {
+               return AdminResponse.builder()
+                    .id(admin.getId())
+                    .name(admin.getName())
+                    .email(admin.getEmail())
+                    .createdAt(admin.getCreatedAt())
+                    .gender(admin.getGender() != null ? admin.getGender().toString() : null)
+                    .userType(resolveUserType(admin))
+                    .build();
+          }
+
+          return UserResponse.builder()
+               .id(user.getId())
+               .name(user.getName())
+               .email(user.getEmail())
+               .createdAt(user.getCreatedAt())
+               .gender(user.getGender() != null ? user.getGender().toString() : null)
+               .userType(resolveUserType(user))
+               .build();
      }
 
      default List<ScheduleResponse> toScheduleResponseList(List<Schedule> schedules) {
@@ -82,5 +122,18 @@ public interface UserMapper {
                return "ORGANIZER";
           }
           return null;
+     }
+
+     default UserResponseProfilePhoto toResponseProfilePhoto(User user) {
+          if (!(user instanceof StudentProfile student)) {
+               return null;
+          }
+
+          return UserResponseProfilePhoto.builder()
+                  .id(student.getId())
+                  .name(student.getName())
+                  .email(student.getEmail())
+                  .profileImageUrl(student.getPhotoUrl())
+                  .build();
      }
 }
