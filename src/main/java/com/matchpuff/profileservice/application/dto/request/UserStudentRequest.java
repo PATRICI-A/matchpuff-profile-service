@@ -19,9 +19,12 @@ public class UserStudentRequest {
     private String name;
 
     @Email
-    @Pattern(regexp = ".*@escuelaing\\.edu\\.co$")
+    @Pattern(regexp = ".*@(mail\\.)?escuelaing\\.edu\\.co$")
     @Schema(example = "usuario@escuelaing.edu.co")
     private String email;
+
+    @Size(min = 8, message = "Password must be at least 8 characters long")
+    private String password;
 
     @NotNull
     private GenderEnum gender;
@@ -32,6 +35,9 @@ public class UserStudentRequest {
     @Min(value = 1, message = "El semestre mínimo es 1")
     @Max(value = 10, message = "El semestre máximo es 10")
     private Integer semester;
+
+    @NotNull
+    private Integer studentCarnet;
 
     @NotBlank
     private String photourl;

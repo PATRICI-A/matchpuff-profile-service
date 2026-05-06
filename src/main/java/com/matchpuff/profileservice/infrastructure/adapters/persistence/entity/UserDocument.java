@@ -23,6 +23,9 @@ public abstract class UserDocument {
 
     private String email;
 
+    @Field("passwordHash")
+    private String passwordHash;
+
     @CreatedDate
     private LocalDateTime createdAt;
     
@@ -30,6 +33,5 @@ public abstract class UserDocument {
     
     @Field("userType")
     private UserType userType;
-
     
-}   
+}

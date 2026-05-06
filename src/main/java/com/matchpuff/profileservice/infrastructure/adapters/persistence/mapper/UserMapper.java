@@ -33,13 +33,15 @@ public class UserMapper {
 		doc.setId(profile.getId());
 		doc.setUserType(UserType.STUDENT);
 		doc.setName(profile.getName());
-		doc.setEmail(profile.getEmail()); 
+		doc.setEmail(profile.getEmail());
+		doc.setPasswordHash(profile.getPasswordHash());
 		doc.setGender(profile.getGender());
 		doc.setBirthdate(profile.getDateOfBirth() == null ? null : profile.getDateOfBirth().atStartOfDay());
 		doc.setCreatedAt(profile.getCreatedAt());
 		doc.setPhotourl(profile.getPhotoUrl());
 		doc.setCareer(profile.getCareer());
 		doc.setSemester(profile.getSemester());
+		doc.setStudentCarnet(profile.getStudentCarnet());
 		doc.setBiography(profile.getBiography());
 		doc.setPrivacyLevel(profile.getPrivacyLevel());
 		doc.setSchedule(toScheduleDocumentList(profile.getSchedules()));
@@ -58,6 +60,7 @@ public class UserMapper {
 		doc.setUserType(UserType.ADMIN);
 		doc.setName(admin.getName());
 		doc.setEmail(admin.getEmail());
+		doc.setPasswordHash(admin.getPasswordHash());
 		doc.setGender(admin.getGender());
 		doc.setCreatedAt(admin.getCreatedAt());
 
@@ -74,6 +77,7 @@ public class UserMapper {
 		doc.setUserType(UserType.ORGANIZER);
 		doc.setName(organizer.getName());
 		doc.setEmail(organizer.getEmail());
+		doc.setPasswordHash(organizer.getPasswordHash());
 		doc.setGender(organizer.getGender());
 		doc.setCreatedAt(organizer.getCreatedAt());
 		doc.setContact(organizer.getContactInfo());
@@ -92,6 +96,7 @@ public class UserMapper {
 		profile.setPhotoUrl(doc.getPhotourl());
 		profile.setCareer(doc.getCareer());
 		profile.setSemester(doc.getSemester() == null ? 0 : doc.getSemester());
+		profile.setStudentCarnet(doc.getStudentCarnet());
 		profile.setBiography(doc.getBiography());
 		profile.setPrivacyLevel(doc.getPrivacyLevel());
 		profile.setSchedules(toScheduleList(doc.getSchedule()));
@@ -226,6 +231,7 @@ public class UserMapper {
 		user.setId(doc.getId());
 		user.setName(doc.getName());
 		user.setEmail(doc.getEmail());
+		user.setPasswordHash(doc.getPasswordHash());
 		user.setGender(doc.getGender());
 		user.setCreatedAt(doc.getCreatedAt());
 	}

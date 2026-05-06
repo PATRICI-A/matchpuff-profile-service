@@ -9,6 +9,7 @@ import com.matchpuff.profileservice.domain.model.Tag;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
 import com.matchpuff.profileservice.domain.ports.out.ImageStoragePort;
 import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
+import com.matchpuff.profileservice.application.service.PasswordHashingService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,21 +24,25 @@ import org.springframework.stereotype.Service;
 public class UserUseCase implements UserUseCasePort {
     private final UserRepositoryPort userRepository;
     private final ImageStoragePort imageStoragePort;
+    private final PasswordHashingService passwordHashingService;
 
     // ── CREATE ───────────────────────────────────────────────────
 
     @Override
     public User createStudentUser(StudentProfile student) {
+        hashPasswordIfPresent(student);
         return userRepository.save(student);
     }
 
     @Override
     public User createAdminUser(Admin admin) {
+        hashPasswordIfPresent(admin);
         return userRepository.save(admin);
     }
 
     @Override
     public User createOrganizerUser(Organizer organizer) {
+        hashPasswordIfPresent(organizer);
         return userRepository.save(organizer);
     }
 
@@ -64,6 +69,7 @@ public class UserUseCase implements UserUseCasePort {
         if (request.getName() != null)         student.setName(request.getName());
         if (request.getEmail() != null)        student.setEmail(request.getEmail());
         if (request.getBiography() != null)    student.setBiography(request.getBiography());
+        if (request.getStudentCarnet() != null) student.setStudentCarnet(request.getStudentCarnet());
         if (request.getPrivacyLevel() != null) student.setPrivacyLevel(request.getPrivacyLevel());
         if (request.getCareer() != null)       student.setCareer(request.getCareer());
         if (request.getSemester() > 0)         student.setSemester(request.getSemester());
@@ -119,6 +125,13 @@ public class UserUseCase implements UserUseCasePort {
     }
 
     // ── Helpers ──────────────────────────────────────────────────
+
+    private void hashPasswordIfPresent(User user) {
+        if (user.getPasswordHash() != null && !user.getPasswordHash().isEmpty()) {
+            String hashedPassword = passwordHashingService.hashPassword(user.getPasswordHash());
+            user.setPasswordHash(hashedPassword);
+        }
+    }
 
     private User findOrThrow(String userId) {
         return userRepository.findById(userId)

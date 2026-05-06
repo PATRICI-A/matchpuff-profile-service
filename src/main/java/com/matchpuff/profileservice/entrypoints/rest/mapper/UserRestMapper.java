@@ -26,9 +26,11 @@ public class UserRestMapper {
         StudentProfile student = new StudentProfile();
         student.setName(request.getName());
         student.setEmail(request.getEmail());
+        student.setPasswordHash(request.getPassword());
         student.setGender(request.getGender());
         student.setCareer(request.getCarreer());
         student.setSemester(request.getSemester() == null ? 0 : request.getSemester());
+        student.setStudentCarnet(request.getStudentCarnet());
         student.setPhotoUrl(request.getPhotourl());
         student.setBiography(request.getBiography());
         student.setPrivacyLevel(request.getPrivacyLevel());
@@ -46,6 +48,7 @@ public class UserRestMapper {
         Admin admin = new Admin();
         admin.setName(request.getName());
         admin.setEmail(request.getEmail());
+        admin.setPasswordHash(request.getPassword());
         admin.setGender(request.getGender());
 
         return admin;
@@ -59,6 +62,7 @@ public class UserRestMapper {
         Organizer organizer = new Organizer();
         organizer.setName(request.getName());
         organizer.setEmail(request.getEmail());
+        organizer.setPasswordHash(request.getPassword());
         organizer.setGender(request.getGender());
         organizer.setContactInfo(request.getContactInfo());
 
