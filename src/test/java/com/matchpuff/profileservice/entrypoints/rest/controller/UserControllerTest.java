@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -46,7 +47,7 @@ class UserControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
 
         mockUserResponse = UserResponse.builder()
-                .id("user-1")
+                .id(UUID.randomUUID())
                 .name("Test User")
                 .email("test@escuelaing.edu.co")
                 .userType("STUDENT")
@@ -54,7 +55,7 @@ class UserControllerTest {
                 .build();
 
         mockUserResponseInfo = UserResponse.builder()
-                .id("user-1")
+                .id(UUID.randomUUID())
                 .name("Test User")
                 .email("test@escuelaing.edu.co")
                 .userType("STUDENT")
@@ -71,7 +72,7 @@ class UserControllerTest {
                   "gender": "MALE",
                   "carreer": "SYSTEMS_ENGINEERING",
                   "semester": 5,
-                  "studentCarnet": 20211234,
+                  "studentCarnet": 2021123411,
                   "photourl": "http://photo.jpg",
                   "biography": "Una biografía de prueba",
                   "privacyLevel": "PUBLIC",
@@ -103,7 +104,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(buildValidUserRequestJson()))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value("user-1"))
+                .andExpect(jsonPath("$.id").value(mockUserResponse.getId().toString()))
                 .andExpect(jsonPath("$.name").value("Test User"))
                 .andExpect(jsonPath("$.userType").value("STUDENT"));
     }
@@ -165,7 +166,7 @@ class UserControllerTest {
 
         mockMvc.perform(get("/api/users/user-1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("user-1"))
+                .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()))
                 .andExpect(jsonPath("$.name").value("Test User"));
     }
 
@@ -181,7 +182,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(buildValidUserRequestJson()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("user-1"));
+                .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()));
     }
 
     @Test
@@ -213,7 +214,7 @@ class UserControllerTest {
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].id").value("user-1"));
+                .andExpect(jsonPath("$[0].id").value(mockUserResponseInfo.getId().toString()));
     }
 
     @Test
@@ -248,7 +249,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(scheduleJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("user-1"));
+                .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()));
     }
 
     @Test
@@ -286,7 +287,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tagJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("user-1"));
+                .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()));
     }
 
     @Test
@@ -325,7 +326,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(adminJson))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value("user-1"));
+                .andExpect(jsonPath("$.id").value(mockUserResponse.getId().toString()));
     }
 
     // ── POST /api/users/organizer ─────────────────────────────────
@@ -349,7 +350,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orgJson))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value("user-1"));
+                .andExpect(jsonPath("$.id").value(mockUserResponse.getId().toString()));
     }
 
     // ── GET /api/users/student-profiles ───────────────────────────
@@ -362,7 +363,7 @@ class UserControllerTest {
         mockMvc.perform(get("/api/users/student-profiles"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].id").value("user-1"));
+                .andExpect(jsonPath("$[0].id").value(mockUserResponseInfo.getId().toString()));
     }
 
     // ── DELETE /api/users/{userId} ─────────────────────────────────
@@ -387,16 +388,16 @@ class UserControllerTest {
 
         com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto photo =
                 com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto.builder()
-                        .id("user-1")
+                        .id(mockUserResponse.getId())
                         .name("Test User")
                         .email("test@escuelaing.edu.co")
                         .profileImageUrl("http://photo.jpg")
                         .build();
 
-        when(userService.updateProfileImage(eq("user-1"), any(byte[].class), eq("image/png")))
+        when(userService.updateProfileImage(eq(mockUserResponse.getId().toString()), any(byte[].class), eq("image/png")))
                 .thenReturn(photo);
 
-        mockMvc.perform(multipart("/api/users/user-1/profile-image")
+        mockMvc.perform(multipart("/api/users/" + mockUserResponse.getId().toString() + "/profile-image")
                 .file(file)
                 .with(csrf()))
                 .andExpect(status().isOk())
@@ -407,15 +408,15 @@ class UserControllerTest {
     @WithMockUser
     void givenStudentWithPhoto_whenGetProfileImage_thenRedirectsToImageUrl() throws Exception {
         StudentProfileResponse photoUser = StudentProfileResponse.builder()
-                .id("user-1")
+                .id(mockUserResponse.getId())
                 .name("Test User")
                 .email("test@escuelaing.edu.co")
                 .photoUrl("http://photo.jpg")
                 .build();
 
-        when(userService.getUser("user-1")).thenReturn(photoUser);
+        when(userService.getUser(mockUserResponse.getId().toString())).thenReturn(photoUser);
 
-        mockMvc.perform(get("/api/users/user-1/profile-image"))
+        mockMvc.perform(get("/api/users/" + mockUserResponse.getId().toString() + "/profile-image"))
                 .andExpect(status().isFound())
                 .andExpect(header().string("Location", "http://photo.jpg"));
     }
@@ -424,14 +425,14 @@ class UserControllerTest {
     @WithMockUser
     void givenStudentWithoutPhoto_whenGetProfileImage_thenReturns400() throws Exception {
         StudentProfileResponse photoUser = StudentProfileResponse.builder()
-                .id("user-1")
+                .id(mockUserResponse.getId())
                 .name("Test User")
                 .email("test@escuelaing.edu.co")
                 .build();
 
-        when(userService.getUser("user-1")).thenReturn(photoUser);
+        when(userService.getUser(mockUserResponse.getId().toString())).thenReturn(photoUser);
 
-        mockMvc.perform(get("/api/users/user-1/profile-image"))
+        mockMvc.perform(get("/api/users/" + mockUserResponse.getId().toString() + "/profile-image"))
                 .andExpect(status().isBadRequest());
     }
 }

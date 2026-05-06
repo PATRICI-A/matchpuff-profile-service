@@ -25,6 +25,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -50,7 +51,7 @@ class UserUseCaseTest {
     @BeforeEach
     void setUp() {
         student = new StudentProfile();
-        student.setId("user-1");
+        student.setId(UUID.randomUUID());
         student.setName("Carlos Perez");
         student.setEmail("carlos@escuelaing.edu.co");
         student.setSemester(4);
@@ -84,26 +85,26 @@ class UserUseCaseTest {
     @Test
     void givenValidAdmin_whenCreateAdminUser_thenRepositorySaveIsCalled() {
         Admin admin = new Admin();
-        admin.setId("admin-1");
+        admin.setId(UUID.randomUUID());
         admin.setName("Root Admin");
         when(userRepository.save(admin)).thenReturn(admin);
 
         User result = userUseCase.createAdminUser(admin);
 
-        assertEquals("admin-1", result.getId());
+        assertEquals(admin.getId(), result.getId());
         verify(userRepository).save(admin);
     }
 
     @Test
     void givenValidOrganizer_whenCreateOrganizerUser_thenRepositorySaveIsCalled() {
         Organizer organizer = new Organizer();
-        organizer.setId("org-1");
+        organizer.setId(UUID.randomUUID());
         organizer.setName("Club Organizers");
         when(userRepository.save(organizer)).thenReturn(organizer);
 
         User result = userUseCase.createOrganizerUser(organizer);
 
-        assertEquals("org-1", result.getId());
+        assertEquals(organizer.getId(), result.getId());
         verify(userRepository).save(organizer);
     }
 
@@ -111,12 +112,12 @@ class UserUseCaseTest {
 
     @Test
     void givenExistingId_whenGetUser_thenReturnsUser() {
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.findById(student.getId().toString())).thenReturn(Optional.of(student));
 
-        User result = userUseCase.getUser("user-1");
+        User result = userUseCase.getUser(student.getId().toString());
 
         assertNotNull(result);
-        assertEquals("user-1", result.getId());
+        assertEquals(student.getId(), result.getId());
     }
 
     @Test
@@ -201,7 +202,7 @@ class UserUseCaseTest {
     @Test
     void givenAdmin_whenUpdateUser_thenDelegatesToAdminUpdate() {
         Admin admin = new Admin();
-        admin.setId("admin-1");
+        admin.setId(UUID.randomUUID());
         admin.setName("Admin Original");
 
         Admin request = new Admin();
@@ -219,7 +220,7 @@ class UserUseCaseTest {
     @Test
     void givenOrganizer_whenUpdateUser_thenDelegatesToOrganizerUpdate() {
         Organizer organizer = new Organizer();
-        organizer.setId("org-1");
+        organizer.setId(UUID.randomUUID());
         organizer.setName("Organizer Original");
 
         Organizer request = new Organizer();
@@ -508,12 +509,12 @@ class UserUseCaseTest {
     @Test
     void givenNonStudentUser_whenUpdateProfileImage_thenThrowsProfileServiceExceptionBadRequest() {
         Admin admin = new Admin();
-        admin.setId("admin-1");
-        when(userRepository.findById("admin-1")).thenReturn(Optional.of(admin));
+        admin.setId(UUID.randomUUID());
+        when(userRepository.findById(admin.getId().toString())).thenReturn(Optional.of(admin));
 
         ProfileServiceException ex = assertThrows(
                 ProfileServiceException.class,
-                () -> userUseCase.updateProfileImage("admin-1", new byte[100], "image/jpeg")
+                () -> userUseCase.updateProfileImage(admin.getId().toString(), new byte[100], "image/jpeg")
         );
 
         assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
@@ -522,14 +523,14 @@ class UserUseCaseTest {
 
     @Test
     void givenStudentAndValidImage_whenUpdateProfileImage_thenUploadsAndPersistsPhotoUrl() {
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(imageStoragePort.uploadProfileImage(any(), eq("user-1"))).thenReturn("https://cdn/new-photo.jpg");
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId().toString())).thenReturn(Optional.of(student));
+        when(imageStoragePort.uploadProfileImage(any(), eq(student.getId().toString()))).thenReturn("https://cdn/new-photo.jpg");
+        when(userRepository.update(student.getId().toString(), student)).thenReturn(student);
 
-        User result = userUseCase.updateProfileImage("user-1", new byte[256], "image/jpeg");
+        User result = userUseCase.updateProfileImage(student.getId().toString(), new byte[256], "image/jpeg");
 
         assertEquals("https://cdn/new-photo.jpg", ((StudentProfile) result).getPhotoUrl());
-        verify(imageStoragePort).uploadProfileImage(any(), eq("user-1"));
-        verify(userRepository).update("user-1", student);
+        verify(imageStoragePort).uploadProfileImage(any(), eq(student.getId().toString()));
+        verify(userRepository).update(student.getId().toString(), student);
     }
 }

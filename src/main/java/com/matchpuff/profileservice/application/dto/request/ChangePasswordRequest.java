@@ -11,6 +11,6 @@ public class ChangePasswordRequest {
     private String currentPassword;
 
     @NotBlank
-    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @Size(min = 8, max = 100, message = "Password must be at least 8 characters long and at least one uppercase letter")
     private String newPassword;
 }

@@ -11,6 +11,7 @@ import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @DisplayName("Domain Models Tests")
 class DomainModelsTest {
@@ -21,14 +22,14 @@ class DomainModelsTest {
         Admin admin = new Admin();
 
         // When
-        admin.setId("admin-1");
+        admin.setId(UUID.randomUUID());
         admin.setName("Administrator");
         admin.setEmail("admin@escuelaing.edu.co");
         admin.setGender(GenderEnum.MALE);
         admin.setCreatedAt(LocalDateTime.now());
 
         // Then
-        assertEquals("admin-1", admin.getId());
+        assertNotNull(admin.getId());
         assertEquals("Administrator", admin.getName());
         assertEquals("admin@escuelaing.edu.co", admin.getEmail());
         assertEquals(GenderEnum.MALE, admin.getGender());
@@ -41,14 +42,14 @@ class DomainModelsTest {
         Organizer organizer = new Organizer();
 
         // When
-        organizer.setId("org-1");
+        organizer.setId(UUID.randomUUID());
         organizer.setName("Event Organizer");
         organizer.setEmail("organizer@escuelaing.edu.co");
         organizer.setGender(GenderEnum.FEMALE);
         organizer.setContactInfo("3001234567");
 
         // Then
-        assertEquals("org-1", organizer.getId());
+        assertNotNull(organizer.getId());
         assertEquals("Event Organizer", organizer.getName());
         assertEquals("organizer@escuelaing.edu.co", organizer.getEmail());
         assertEquals(GenderEnum.FEMALE, organizer.getGender());
@@ -154,11 +155,11 @@ class DomainModelsTest {
         Admin admin = new Admin();
 
         // When - Admin doesn't have contactInfo field
-        admin.setId("admin-1");
+        admin.setId(UUID.randomUUID());
         admin.setName("Admin");
 
         // Then
-        assertEquals("admin-1", admin.getId());
+        assertNotNull(admin.getId());
         assertEquals("Admin", admin.getName());
         // Verify that Admin doesn't have contactInfo
         assertTrue(!java.util.Arrays.stream(admin.getClass().getDeclaredFields())

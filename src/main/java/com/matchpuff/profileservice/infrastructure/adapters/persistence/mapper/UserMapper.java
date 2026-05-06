@@ -3,6 +3,7 @@ package com.matchpuff.profileservice.infrastructure.adapters.persistence.mapper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.domain.model.Organizer;
@@ -30,7 +31,7 @@ public class UserMapper {
 		}
 
 		StudentProfileDocument doc = new StudentProfileDocument();
-		doc.setId(profile.getId());
+		doc.setId(profile.getId() != null ? profile.getId() : UUID.randomUUID());
 		doc.setUserType(UserType.STUDENT);
 		doc.setName(profile.getName());
 		doc.setEmail(profile.getEmail());
@@ -56,7 +57,7 @@ public class UserMapper {
 		}
 
 		AdminProfileDocument doc = new AdminProfileDocument();
-		doc.setId(admin.getId());
+		doc.setId(admin.getId() != null ? admin.getId() : UUID.randomUUID());
 		doc.setUserType(UserType.ADMIN);
 		doc.setName(admin.getName());
 		doc.setEmail(admin.getEmail());
@@ -73,7 +74,7 @@ public class UserMapper {
 		}
 
 		OrganizerProfileDocument doc = new OrganizerProfileDocument();
-		doc.setId(organizer.getId());
+		doc.setId(organizer.getId() != null ? organizer.getId() : UUID.randomUUID());
 		doc.setUserType(UserType.ORGANIZER);
 		doc.setName(organizer.getName());
 		doc.setEmail(organizer.getEmail());

@@ -29,15 +29,15 @@ public class StudentProfile extends User {
         return biography != null ? biography.getValue() : null;
     }
 
-    public void setStudentCarnet(Long studentCarnet) {
-        if (studentCarnet != null && studentCarnet > 0) {
+    public void setStudentCarnet(String studentCarnet) {
+        if (studentCarnet != null && !studentCarnet.trim().isEmpty()) {
             this.studentCarnet = new StudentCarnet(studentCarnet);
         } else {
             this.studentCarnet = null;
         }
     }
 
-    public Long getStudentCarnet() {
+    public String getStudentCarnet() {
         return studentCarnet != null ? studentCarnet.getValue() : null;
     }
 }

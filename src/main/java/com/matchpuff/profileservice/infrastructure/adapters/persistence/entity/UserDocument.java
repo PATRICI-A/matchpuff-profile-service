@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Document(collection = "users")
 @Data
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 public abstract class UserDocument {
 
     @Id
-    private String id;
+    private UUID id;
 
     private String name;
 

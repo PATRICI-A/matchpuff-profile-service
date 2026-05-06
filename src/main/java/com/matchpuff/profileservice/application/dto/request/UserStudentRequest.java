@@ -1,11 +1,9 @@
 package com.matchpuff.profileservice.application.dto.request;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import com.matchpuff.profileservice.domain.model.enums.CareerEnum;
 import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
@@ -23,7 +21,7 @@ public class UserStudentRequest {
     @Schema(example = "usuario@escuelaing.edu.co")
     private String email;
 
-    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @Size(min = 8, max = 100, message = "Password must be at least 8 characters long")
     @Schema(example = "TestPassword123")
     private String password;
 
@@ -38,13 +36,13 @@ public class UserStudentRequest {
     private Integer semester;
 
     @NotNull
-    @Min(value = 10000000, message = "El carnet debe ser un número de al menos 8 dígitos")
-    private Long studentCarnet;
+    @Pattern(regexp = "\\d{10}", message = "The carnet must have exactly 10 digits")
+    private String studentCarnet;
 
     @NotBlank
     private String photourl;
 
-    @Size(max = 200, message = "La biografía no puede superar 200 caracteres")
+    @Size(max = 200, message = "The biography cannot exceed 200 characters")
     private String biography;
 
     @NotNull

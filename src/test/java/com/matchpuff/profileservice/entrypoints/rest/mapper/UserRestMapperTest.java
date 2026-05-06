@@ -42,7 +42,7 @@ class UserRestMapperTest {
         request.setGender(GenderEnum.MALE);
         request.setCarreer(CareerEnum.COMPUTER_SCIENCE);
         request.setSemester(6);
-        request.setStudentCarnet(Long.valueOf(20211234));
+        request.setStudentCarnet("2021123431");
         request.setPhotourl("http://foto.jpg");
         request.setBiography("Bio de Juan");
         request.setPrivacyLevel(PrivacyLevelEnum.PRIVATE);
@@ -265,7 +265,7 @@ class UserRestMapperTest {
         request.setGender(GenderEnum.MALE);
         request.setCarreer(CareerEnum.SYSTEMS_ENGINEERING);
         request.setSemester(5);
-        request.setStudentCarnet(20211234L);
+        request.setStudentCarnet("2021123411");
         request.setBiography("Nueva bio");
         request.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         request.setDateOfBirth(LocalDate.of(2000, 1, 1));

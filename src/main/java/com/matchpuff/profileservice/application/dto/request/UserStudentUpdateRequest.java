@@ -1,10 +1,8 @@
 package com.matchpuff.profileservice.application.dto.request;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
@@ -40,10 +38,10 @@ public class UserStudentUpdateRequest {
     private Integer semester;
 
     @NotNull
-    @Min(value = 10000000, message = "El carnet debe ser un número de al menos 8 dígitos")
-    private Long studentCarnet;
+    @Pattern(regexp = "\\d{10}", message = "The carnet must have exactly 10 digits")
+    private String studentCarnet;
 
-    @Size(max = 200, message = "La biografía no puede superar 200 caracteres")
+    @Size(max = 200, message = "The biography cannot exceed 200 characters")
     private String biography;
 
     @NotNull

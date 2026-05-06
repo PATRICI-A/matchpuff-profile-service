@@ -4,17 +4,20 @@ import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
 
 public class StudentCarnet {
 
-    private final Long value;
+    private final String value;
 
-    public StudentCarnet(Long value) {
-        if (value == null || value <= 0) {
-            throw new InvalidInputException("El carnet del estudiante debe ser un número válido y positivo");
+    public StudentCarnet(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new InvalidInputException("The carnet cannot be null or empty");
         }
-
+        if (!value.matches("\\d{10}")) {
+            throw new InvalidInputException("The carnet must have exactly 10 digits");
+        }
+        
         this.value = value;
     }
 
-    public Long getValue() {
+    public String getValue() {
         return value;
     }
 }

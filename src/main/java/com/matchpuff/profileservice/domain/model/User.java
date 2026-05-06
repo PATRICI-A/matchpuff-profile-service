@@ -2,6 +2,7 @@ package com.matchpuff.profileservice.domain.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
 import com.matchpuff.profileservice.domain.valueobjects.Email;
@@ -11,7 +12,7 @@ import lombok.Data;
 
 @Data
 public class User {
-    private String id;
+    private UUID id;
     private String name;
     private Email email;
     private PasswordHash passwordHash;
