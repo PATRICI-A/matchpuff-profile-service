@@ -45,9 +45,14 @@ public class UserService implements UserServicePort {
     }
 
     @Override
-    public UserResponse updateUser(String userId, StudentProfile user) {
-        User updated = userUseCase.updateStudentUser(userId, user);
+    public UserResponse updateUser(String userId, User user) {
+        User updated = userUseCase.updateUser(userId, user);
         return userMapper.toResponse(updated);
+    }
+
+    @Override
+    public void changePassword(String userId, String currentPassword, String newPassword) {
+        userUseCase.changePassword(userId, currentPassword, newPassword);
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.domain.model.Organizer;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.Tag;
+import com.matchpuff.profileservice.domain.model.User;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
 
 public interface UserServicePort {
@@ -16,7 +17,8 @@ public interface UserServicePort {
     UserResponse createOrganizerUser(Organizer user);
     void deleteUser(String userId);
 	UserResponse getUser(String userId);
-	UserResponse updateUser(String userId, StudentProfile user);
+	UserResponse updateUser(String userId, User user);
+    void changePassword(String userId, String currentPassword, String newPassword);
     UserResponse addSchedule(String userId, Schedule schedule);
     UserResponse addTag(String userId, Tag tag);
     UserResponseProfilePhoto updateProfileImage(String userId, byte[] file, String contentType);

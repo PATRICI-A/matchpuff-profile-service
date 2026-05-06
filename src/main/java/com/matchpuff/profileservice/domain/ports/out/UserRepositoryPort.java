@@ -13,7 +13,7 @@ public interface UserRepositoryPort {
 	void delete(String userId);
 	Optional<User> findById(String id);
 	Optional<User> findByEmail(String email);
-	User update(String id, StudentProfile user);
+	User update(String id, User user);
     List<User> findAll();
 
 	List<StudentProfile> findAllStudents();

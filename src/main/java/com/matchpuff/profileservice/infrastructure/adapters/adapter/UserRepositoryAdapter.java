@@ -1,15 +1,15 @@
 package com.matchpuff.profileservice.infrastructure.adapters.adapter;
 
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.UserType;
+import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.AdminProfileDocument;
+import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.OrganizerProfileDocument;
+import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.StudentProfileDocument;
 import com.matchpuff.profileservice.domain.model.User;
 import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.domain.model.Organizer;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
 import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
 import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
-import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.AdminProfileDocument;
-import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.OrganizerProfileDocument;
-import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.StudentProfileDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.UserDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.mapper.UserMapper;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.repository.UserRepository;
@@ -69,7 +69,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public User update(String id, StudentProfile user) {
+    public User update(String id, User user) {
         if (user.getEmail() != null) {
             Optional<UserDocument> existing = userRepository.findByEmail(user.getEmail());
             if (existing.isPresent() && !existing.get().getId().equals(id)) {
@@ -78,9 +78,26 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         }
 
         user.setId(id);
-        StudentProfileDocument doc = UserMapper.toDocument(user);
-        StudentProfileDocument updated = userRepository.save(doc);
-        return UserMapper.toDomain(updated);
+
+        if (user instanceof StudentProfile student) {
+            StudentProfileDocument doc = UserMapper.toDocument(student);
+            StudentProfileDocument updated = userRepository.save(doc);
+            return UserMapper.toDomain(updated);
+        }
+
+        if (user instanceof Admin admin) {
+            AdminProfileDocument doc = UserMapper.toDocument(admin);
+            AdminProfileDocument updated = userRepository.save(doc);
+            return UserMapper.toDomain(updated);
+        }
+
+        if (user instanceof Organizer organizer) {
+            OrganizerProfileDocument doc = UserMapper.toDocument(organizer);
+            OrganizerProfileDocument updated = userRepository.save(doc);
+            return UserMapper.toDomain(updated);
+        }
+
+        throw new InvalidInputException("Unsupported user type for update.");
     }
 
     @Override

@@ -184,6 +184,25 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id").value("user-1"));
     }
 
+    @Test
+    @WithMockUser
+    void givenValidPasswordChangeRequest_whenChangePassword_thenReturns204() throws Exception {
+        doNothing().when(userService).changePassword("user-1", "CurrentPassword123", "NewPassword123");
+
+        String passwordJson = """
+                {
+                  "currentPassword": "CurrentPassword123",
+                  "newPassword": "NewPassword123"
+                }
+                """;
+
+        mockMvc.perform(patch("/api/users/user-1/password")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(passwordJson))
+                .andExpect(status().isNoContent());
+    }
+
     // ── GET /api/users ────────────────────────────────────────────
 
     @Test

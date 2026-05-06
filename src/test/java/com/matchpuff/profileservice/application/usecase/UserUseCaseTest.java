@@ -11,6 +11,7 @@ import com.matchpuff.profileservice.domain.model.User;
 import com.matchpuff.profileservice.domain.model.enums.CareerEnum;
 import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
 import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
+import com.matchpuff.profileservice.application.service.PasswordHashingService;
 import com.matchpuff.profileservice.domain.ports.out.ImageStoragePort;
 import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +38,9 @@ class UserUseCaseTest {
 
     @Mock
     private ImageStoragePort imageStoragePort;
+
+    @Mock
+    private PasswordHashingService passwordHashingService;
 
     @InjectMocks
     private UserUseCase userUseCase;
@@ -181,6 +185,56 @@ class UserUseCaseTest {
     }
 
     @Test
+    void givenStudent_whenUpdateUser_thenDelegatesToStudentUpdate() {
+        StudentProfile request = new StudentProfile();
+        request.setName("Nuevo Nombre");
+
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.update("user-1", student)).thenReturn(student);
+
+        User result = userUseCase.updateUser("user-1", request);
+
+        assertEquals("Nuevo Nombre", result.getName());
+        verify(userRepository).update("user-1", student);
+    }
+
+    @Test
+    void givenAdmin_whenUpdateUser_thenDelegatesToAdminUpdate() {
+        Admin admin = new Admin();
+        admin.setId("admin-1");
+        admin.setName("Admin Original");
+
+        Admin request = new Admin();
+        request.setName("Admin Nuevo");
+
+        when(userRepository.findById("admin-1")).thenReturn(Optional.of(admin));
+        when(userRepository.update("admin-1", admin)).thenReturn(admin);
+
+        User result = userUseCase.updateUser("admin-1", request);
+
+        assertEquals("Admin Nuevo", result.getName());
+        verify(userRepository).update("admin-1", admin);
+    }
+
+    @Test
+    void givenOrganizer_whenUpdateUser_thenDelegatesToOrganizerUpdate() {
+        Organizer organizer = new Organizer();
+        organizer.setId("org-1");
+        organizer.setName("Organizer Original");
+
+        Organizer request = new Organizer();
+        request.setName("Organizer Nuevo");
+
+        when(userRepository.findById("org-1")).thenReturn(Optional.of(organizer));
+        when(userRepository.update("org-1", organizer)).thenReturn(organizer);
+
+        User result = userUseCase.updateUser("org-1", request);
+
+        assertEquals("Organizer Nuevo", result.getName());
+        verify(userRepository).update("org-1", organizer);
+    }
+
+    @Test
     void givenNonExistingUser_whenUpdate_thenThrowsProfileServiceException() {
         when(userRepository.findById("ghost")).thenReturn(Optional.empty());
 
@@ -190,6 +244,36 @@ class UserUseCaseTest {
                 ProfileServiceException.class,
                 () -> userUseCase.updateStudentUser("ghost", studentProfile)
         );
+    }
+
+    @Test
+    void givenValidCurrentPassword_whenChangePassword_thenHashesAndUpdatesUser() {
+        student.setPasswordHash("CurrentPassword123");
+
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(passwordHashingService.verifyPassword("CurrentPassword123", "CurrentPassword123")).thenReturn(true);
+        when(passwordHashingService.hashPassword("NewPassword123")).thenReturn("HashedNewPassword123");
+        when(userRepository.update("user-1", student)).thenReturn(student);
+
+        userUseCase.changePassword("user-1", "CurrentPassword123", "NewPassword123");
+
+        assertEquals("HashedNewPassword123", student.getPasswordHash());
+        verify(userRepository).update("user-1", student);
+    }
+
+    @Test
+    void givenWrongCurrentPassword_whenChangePassword_thenThrowsProfileServiceException() {
+        student.setPasswordHash("CurrentPassword123");
+
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(passwordHashingService.verifyPassword("BadPassword123", "CurrentPassword123")).thenReturn(false);
+
+        assertThrows(
+                ProfileServiceException.class,
+                () -> userUseCase.changePassword("user-1", "BadPassword123", "NewPassword123")
+        );
+
+        verify(userRepository, never()).update(anyString(), any());
     }
 
     // ── addScheduleToStudent ──────────────────────────────────────

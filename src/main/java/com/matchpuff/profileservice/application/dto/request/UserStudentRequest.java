@@ -24,6 +24,7 @@ public class UserStudentRequest {
     private String email;
 
     @Size(min = 8, message = "Password must be at least 8 characters long")
+    @Schema(example = "TestPassword123")
     private String password;
 
     @NotNull

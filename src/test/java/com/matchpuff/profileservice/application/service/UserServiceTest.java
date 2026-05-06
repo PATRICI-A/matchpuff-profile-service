@@ -170,13 +170,22 @@ class UserServiceTest {
 
     @Test
     void givenUserIdAndStudent_whenUpdateUser_thenReturnsMappedResponseInfo() {
-        when(userUseCase.updateStudentUser("user-1", student)).thenReturn(student);
+        when(userUseCase.updateUser("user-1", student)).thenReturn(student);
         when(userMapper.toResponse(student)).thenReturn(userResponse);
 
         UserResponse result = userService.updateUser("user-1", student);
 
         assertNotNull(result);
-        verify(userUseCase).updateStudentUser("user-1", student);
+        verify(userUseCase).updateUser("user-1", student);
+    }
+
+    @Test
+    void givenPasswordChangeRequest_whenChangePassword_thenDelegatesToUseCase() {
+        doNothing().when(userUseCase).changePassword("user-1", "CurrentPassword123", "NewPassword123");
+
+        userService.changePassword("user-1", "CurrentPassword123", "NewPassword123");
+
+        verify(userUseCase).changePassword("user-1", "CurrentPassword123", "NewPassword123");
     }
 
     // ── addSchedule ───────────────────────────────────────────────

@@ -1,6 +1,7 @@
 package com.matchpuff.profileservice.entrypoints.rest.controller;
 
 import com.matchpuff.profileservice.application.dto.request.ScheduleRequest;
+import com.matchpuff.profileservice.application.dto.request.ChangePasswordRequest;
 import com.matchpuff.profileservice.application.dto.request.TagRequest;
 import com.matchpuff.profileservice.application.dto.request.UserAdminRequest;
 import com.matchpuff.profileservice.application.dto.request.UserOrganizerRequest;
@@ -72,11 +73,36 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    @Operation(summary = "Actualizar datos del usuario")
-    public ResponseEntity<UserResponse> updateUser(
+    @Operation(summary = "Actualizar datos del usuario estudiante")
+    public ResponseEntity<UserResponse> updateUserStudent(
             @PathVariable String userId,
             @Valid @RequestBody UserStudentRequest request) {
         return ResponseEntity.ok(userService.updateUser(userId, UserRestMapper.toDomain(request)));
+    }
+
+    @PatchMapping("/admin/{userId}")
+    @Operation(summary = "Actualizar datos del usuario administrador")
+    public ResponseEntity<UserResponse> updateUserAdmin(
+            @PathVariable String userId,
+            @Valid @RequestBody UserAdminRequest request) {
+        return ResponseEntity.ok(userService.updateUser(userId, UserRestMapper.toDomain(request)));
+    }
+
+    @PatchMapping("/organizer/{userId}")
+    @Operation(summary = "Actualizar datos del usuario organizador")
+    public ResponseEntity<UserResponse> updateUserOrganizer(
+            @PathVariable String userId,
+            @Valid @RequestBody UserOrganizerRequest request) {
+        return ResponseEntity.ok(userService.updateUser(userId, UserRestMapper.toDomain(request)));
+    }
+
+    @PatchMapping("/{userId}/password")
+    @Operation(summary = "Cambiar la contraseña de un usuario")
+    public ResponseEntity<Void> changePassword(
+            @PathVariable String userId,
+            @Valid @RequestBody ChangePasswordRequest request) {
+        userService.changePassword(userId, request.getCurrentPassword(), request.getNewPassword());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
@@ -86,7 +112,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/schedule")
-    @Operation(summary = "Agregar un horario al usuario")
+    @Operation(summary = "Agregar un horario al usuario estudiante")
     public ResponseEntity<UserResponse> updateUserSchedule(
             @PathVariable String userId,
             @Valid @RequestBody ScheduleRequest request) {
@@ -94,7 +120,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/tags")
-    @Operation(summary = "Agregar un tag/interés al usuario")
+    @Operation(summary = "Agregar un tag/interés al usuario estudiante")
     public ResponseEntity<UserResponse> updateUserTags(
             @PathVariable String userId,
             @Valid @RequestBody TagRequest request) {

@@ -63,11 +63,42 @@ public class UserUseCase implements UserUseCasePort {
     // ── UPDATE ───────────────────────────────────────────────────
 
     @Override
+    public User updateUser(String userId, User user) {
+        if (user instanceof StudentProfile student) {
+            return updateStudentUser(userId, student);
+        }
+
+        if (user instanceof Admin admin) {
+            return updateAdminUser(userId, admin);
+        }
+
+        if (user instanceof Organizer organizer) {
+            return updateOrganizerUser(userId, organizer);
+        }
+
+        throw new ProfileServiceException("Unsupported user type for update", HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    public void changePassword(String userId, String currentPassword, String newPassword) {
+        User user = findOrThrow(userId);
+
+        if (user.getPasswordHash() == null || !passwordHashingService.verifyPassword(currentPassword, user.getPasswordHash())) {
+            throw new ProfileServiceException("Current password is invalid", HttpStatus.BAD_REQUEST);
+        }
+
+        user.setPasswordHash(passwordHashingService.hashPassword(newPassword));
+        userRepository.update(userId, user);
+    }
+
     public User updateStudentUser(String userId, StudentProfile request) {
         StudentProfile student = (StudentProfile) findOrThrow(userId);
 
         if (request.getName() != null)         student.setName(request.getName());
         if (request.getEmail() != null)        student.setEmail(request.getEmail());
+        if (request.getPasswordHash() != null && !request.getPasswordHash().isEmpty()) {
+            student.setPasswordHash(passwordHashingService.hashPassword(request.getPasswordHash()));
+        }
         if (request.getBiography() != null)    student.setBiography(request.getBiography());
         if (request.getStudentCarnet() != null) student.setStudentCarnet(request.getStudentCarnet());
         if (request.getPrivacyLevel() != null) student.setPrivacyLevel(request.getPrivacyLevel());
@@ -77,6 +108,33 @@ public class UserUseCase implements UserUseCasePort {
         if (request.getSchedules() != null)    student.setSchedules(request.getSchedules());
 
         return userRepository.update(userId, student);
+    }
+
+    public User updateAdminUser(String userId, Admin request) {
+        Admin admin = (Admin) findOrThrow(userId);
+
+        if (request.getName() != null)         admin.setName(request.getName());
+        if (request.getEmail() != null)        admin.setEmail(request.getEmail());
+        if (request.getPasswordHash() != null && !request.getPasswordHash().isEmpty()) {
+            admin.setPasswordHash(passwordHashingService.hashPassword(request.getPasswordHash()));
+        }
+        if (request.getGender() != null)       admin.setGender(request.getGender());
+
+        return userRepository.update(userId, admin);
+    }
+
+    public User updateOrganizerUser(String userId, Organizer request) {
+        Organizer organizer = (Organizer) findOrThrow(userId);
+
+        if (request.getName() != null)         organizer.setName(request.getName());
+        if (request.getEmail() != null)        organizer.setEmail(request.getEmail());
+        if (request.getPasswordHash() != null && !request.getPasswordHash().isEmpty()) {
+            organizer.setPasswordHash(passwordHashingService.hashPassword(request.getPasswordHash()));
+        }
+        if (request.getGender() != null)       organizer.setGender(request.getGender());
+        if (request.getContactInfo() != null)  organizer.setContactInfo(request.getContactInfo());
+
+        return userRepository.update(userId, organizer);
     }
 
     @Override
