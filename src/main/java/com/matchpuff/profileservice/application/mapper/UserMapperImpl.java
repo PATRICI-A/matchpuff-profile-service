@@ -8,6 +8,7 @@ import com.matchpuff.profileservice.application.dto.response.OrganizerResponse;
 import com.matchpuff.profileservice.application.dto.response.ScheduleResponse;
 import com.matchpuff.profileservice.application.dto.response.StudentProfileResponse;
 import com.matchpuff.profileservice.application.dto.response.TagResponse;
+import com.matchpuff.profileservice.application.dto.response.UserAuthResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto;
 import com.matchpuff.profileservice.domain.model.Admin;
@@ -142,4 +143,18 @@ public class UserMapperImpl implements UserMapper {
                   .build();
      }
     
+     @Override
+     public UserAuthResponse toAuthResponse(User user) {
+          if (user == null) {
+               return null;
+          }
+
+          return UserAuthResponse.builder()
+               .id(user.getId())
+               .email(user.getEmail())
+               .userType(resolveUserType(user))
+               .verified(user.isVerified())
+               .passwordHash(user.getPasswordHash())
+               .build();
+     }
 }

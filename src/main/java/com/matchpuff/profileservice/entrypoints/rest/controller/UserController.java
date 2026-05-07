@@ -32,7 +32,7 @@ import com.matchpuff.profileservice.application.dto.response.StudentProfileRespo
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserServicePort userService;
@@ -72,13 +72,14 @@ public class UserController {
         return ResponseEntity.ok(userService.getUser(userId));
     }
 
-    @GetMapping("/mail")
+    @GetMapping("/mail/{email}")
     @Tag(name = "Users - Lectura", description = "Obtener información de usuarios")
     @Operation(summary = "Obtener usuario por mail")
     public ResponseEntity<UserResponse> getUserByEmail(
-            @RequestParam String email) {
+            @PathVariable String email) {
         return ResponseEntity.ok(userService.getUserByEmail(email));
     }
+
 
     @GetMapping("/student-profiles")
     @Tag(name = "Users - Lectura", description = "Obtener información de usuarios")

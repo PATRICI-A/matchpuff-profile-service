@@ -69,6 +69,15 @@ public class UserUseCase implements UserUseCasePort {
     }
 
     // ── UPDATE ───────────────────────────────────────────────────
+    @Override
+    public void verifyUser(String userId) {
+        User user = findOrThrow(userId);
+        if (user.isVerified()) {
+            throw new ProfileServiceException("User is already verified", HttpStatus.BAD_REQUEST);
+        }
+        user.setVerified(true);
+        userRepository.update(userId, user);
+    }
 
     @Override
     public User updateUser(String userId, User user) {
