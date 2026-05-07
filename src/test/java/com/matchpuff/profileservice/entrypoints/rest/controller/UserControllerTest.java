@@ -99,7 +99,7 @@ class UserControllerTest {
     void givenValidRequest_whenCreateUser_thenReturns201() throws Exception {
         when(userService.createStudentUser(any())).thenReturn(mockUserResponse);
 
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/v1/users/student")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(buildValidUserRequestJson()))
@@ -118,7 +118,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/v1/users/student")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(incompleteJson))
@@ -150,34 +150,34 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/v1/users/student")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonWithEmptyTags))
                 .andExpect(status().isBadRequest());
     }
 
-    // ── GET /api/users/{userId} ───────────────────────────────────
+    // ── GET /api/v1/users/{userId} ───────────────────────────────────
 
     @Test
     @WithMockUser
     void givenExistingId_whenGetUser_thenReturns200() throws Exception {
         when(userService.getUser("user-1")).thenReturn(mockUserResponseInfo);
 
-        mockMvc.perform(get("/api/users/user-1"))
+        mockMvc.perform(get("/api/v1/users/user-1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()))
                 .andExpect(jsonPath("$.name").value("Test User"));
     }
 
-    // ── PATCH /api/users/{userId} ─────────────────────────────────
+    // ── PATCH /api/v1/users/{userId} ─────────────────────────────────
 
     @Test
     @WithMockUser
     void givenValidRequest_whenUpdateUser_thenReturns200() throws Exception {
         when(userService.updateUser(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
 
-        mockMvc.perform(patch("/api/users/user-1")
+        mockMvc.perform(patch("/api/v1/users/student/user-1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(buildValidUserRequestJson()))
@@ -197,21 +197,21 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/users/user-1/password")
+        mockMvc.perform(patch("/api/v1/users/user-1/password")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(passwordJson))
                 .andExpect(status().isNoContent());
     }
 
-    // ── GET /api/users ────────────────────────────────────────────
+    // ── GET /api/v1/users ────────────────────────────────────────────
 
     @Test
     @WithMockUser
     void whenGetAllUsers_thenReturns200WithList() throws Exception {
         when(userService.getAllUsers()).thenReturn(List.of(mockUserResponseInfo));
 
-        mockMvc.perform(get("/api/users"))
+        mockMvc.perform(get("/api/v1/users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id").value(mockUserResponseInfo.getId().toString()));
@@ -222,13 +222,13 @@ class UserControllerTest {
     void whenGetAllUsersReturnsEmpty_thenReturns200WithEmptyList() throws Exception {
         when(userService.getAllUsers()).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/users"))
+        mockMvc.perform(get("/api/v1/users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
     }
 
-    // ── PATCH /api/users/{userId}/schedule ────────────────────────
+    // ── PATCH /api/v1/users/{userId}/schedule ────────────────────────
 
     @Test
     @WithMockUser
@@ -244,7 +244,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/users/user-1/schedule")
+        mockMvc.perform(patch("/api/v1/users/user-1/schedule")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(scheduleJson))
@@ -261,14 +261,14 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/users/user-1/schedule")
+        mockMvc.perform(patch("/api/v1/users/user-1/schedule")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidScheduleJson))
                 .andExpect(status().isBadRequest());
     }
 
-    // ── PATCH /api/users/{userId}/tags ────────────────────────────
+    // ── PATCH /api/v1/users/{userId}/tags ────────────────────────────
 
     @Test
     @WithMockUser
@@ -282,7 +282,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/users/user-1/tags")
+        mockMvc.perform(patch("/api/v1/users/user-1/tags")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tagJson))
@@ -299,14 +299,14 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/users/user-1/tags")
+        mockMvc.perform(patch("/api/v1/users/user-1/tags")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidTagJson))
                 .andExpect(status().isBadRequest());
     }
 
-    // ── POST /api/users/admin ─────────────────────────────────────
+    // ── POST /api/v1/users/admin ─────────────────────────────────────
 
     @Test
     @WithMockUser
@@ -322,7 +322,7 @@ class UserControllerTest {
                                                                 }
                                                                 """;
 
-        mockMvc.perform(post("/api/users/admin")
+        mockMvc.perform(post("/api/v1/users/admin")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(adminJson))
@@ -330,7 +330,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(mockUserResponse.getId().toString()));
     }
 
-    // ── POST /api/users/organizer ─────────────────────────────────
+    // ── POST /api/v1/users/organizer ─────────────────────────────────
 
     @Test
     @WithMockUser
@@ -347,7 +347,7 @@ class UserControllerTest {
                                                                 }
                                                                 """;
 
-        mockMvc.perform(post("/api/users/organizer")
+        mockMvc.perform(post("/api/v1/users/organizer")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orgJson))
@@ -355,32 +355,32 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(mockUserResponse.getId().toString()));
     }
 
-    // ── GET /api/users/student-profiles ───────────────────────────
+    // ── GET /api/v1/users/student-profiles ───────────────────────────
 
     @Test
     @WithMockUser
     void whenGetAllStudentProfiles_thenReturns200WithList() throws Exception {
         when(userService.getAllStudentProfiles()).thenReturn(List.of(mockUserResponseInfo));
 
-        mockMvc.perform(get("/api/users/student-profiles"))
+        mockMvc.perform(get("/api/v1/users/student-profiles"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id").value(mockUserResponseInfo.getId().toString()));
     }
 
-    // ── DELETE /api/users/{userId} ─────────────────────────────────
+    // ── DELETE /api/v1/users/{userId} ─────────────────────────────────
 
     @Test
     @WithMockUser
     void whenDeleteUser_thenReturns204() throws Exception {
         doNothing().when(userService).deleteUser("user-1");
 
-        mockMvc.perform(delete("/api/users/user-1")
+        mockMvc.perform(delete("/api/v1/users/user-1")
                 .with(csrf()))
                 .andExpect(status().isNoContent());
     }
 
-    // ── POST /api/users/{userId}/profile-image ─────────────────────
+    // ── POST /api/v1/users/{userId}/profile-image ─────────────────────
 
     @Test
     @WithMockUser
@@ -399,7 +399,7 @@ class UserControllerTest {
         when(userService.updateProfileImage(eq(mockUserResponse.getId().toString()), any(byte[].class), eq("image/png")))
                 .thenReturn(photo);
 
-        mockMvc.perform(multipart("/api/users/" + mockUserResponse.getId().toString() + "/profile-image")
+        mockMvc.perform(multipart("/api/v1/users/" + mockUserResponse.getId().toString() + "/profile-image")
                 .file(file)
                 .with(csrf()))
                 .andExpect(status().isOk())
@@ -418,7 +418,7 @@ class UserControllerTest {
 
         when(userService.getUser(mockUserResponse.getId().toString())).thenReturn(photoUser);
 
-        mockMvc.perform(get("/api/users/" + mockUserResponse.getId().toString() + "/profile-image"))
+        mockMvc.perform(get("/api/v1/users/" + mockUserResponse.getId().toString() + "/profile-image"))
                 .andExpect(status().isFound())
                 .andExpect(header().string("Location", "http://photo.jpg"));
     }
@@ -434,7 +434,7 @@ class UserControllerTest {
 
         when(userService.getUser(mockUserResponse.getId().toString())).thenReturn(photoUser);
 
-        mockMvc.perform(get("/api/users/" + mockUserResponse.getId().toString() + "/profile-image"))
+        mockMvc.perform(get("/api/v1/users/" + mockUserResponse.getId().toString() + "/profile-image"))
                 .andExpect(status().isBadRequest());
     }
 }

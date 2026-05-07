@@ -2,6 +2,7 @@ package com.matchpuff.profileservice.application.mapper;
 
 import com.matchpuff.profileservice.application.dto.response.ScheduleResponse;
 import com.matchpuff.profileservice.application.dto.response.TagResponse;
+import com.matchpuff.profileservice.application.dto.response.UserAuthResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto;
 import com.matchpuff.profileservice.domain.model.Schedule;
@@ -21,4 +22,6 @@ public interface UserMapper {
      String resolveUserType(User user);
 
      UserResponseProfilePhoto toResponseProfilePhoto(User user);
+
+     UserAuthResponse toAuthResponse(User user);
 }

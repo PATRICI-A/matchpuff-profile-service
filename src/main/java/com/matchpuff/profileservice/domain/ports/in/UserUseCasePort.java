@@ -14,8 +14,10 @@ public interface UserUseCasePort {
     User createOrganizerUser(Organizer organizer);
     void deleteUser(String userId);
     User getUser(String userId);
+    User getUserByEmail(String email);
     User updateUser(String userId, User user);
     void changePassword(String userId, String currentPassword, String newPassword);
+    void verifyUser(String userId);
     User addScheduleToStudent(String userId, Schedule schedule);
     User addTagToStudent(String userId, Tag tag);
     User updateProfileImage(String userId, byte[] file, String contentType);

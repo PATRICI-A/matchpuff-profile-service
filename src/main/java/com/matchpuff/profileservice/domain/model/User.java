@@ -21,6 +21,7 @@ public class User {
     private LocalDate dateOfBirth;
     private LocalDateTime createdAt;
 
+    private boolean verified = false;
 
     public void setEmail(String email){
         this.email = new Email(email);
@@ -62,4 +63,5 @@ public class User {
         }
         this.dateOfBirth = dateOfBirth;
     }
+    
 }
