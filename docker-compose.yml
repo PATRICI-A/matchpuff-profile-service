@@ -4,7 +4,7 @@ services:
     build:
       context: .
       args:
-        SSL_KEY_STORE_PASSWORD: ${SSL_KEY_STORE_PASSWORD:-changeit}
+        SSL_KEY_STORE_PASSWORD: ${SSL_KEY_STORE_PASSWORD}
     container_name: profile-service
     ports:
       - "8443:8443"
@@ -17,7 +17,7 @@ services:
       - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
       - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
       - APP_STARTUP_FAIL_FAST=true
-      - SSL_KEY_STORE_PASSWORD=${SSL_KEY_STORE_PASSWORD:-changeit}
+      - SSL_KEY_STORE_PASSWORD=${SSL_KEY_STORE_PASSWORD}
     networks:
       - backend
     restart: always
