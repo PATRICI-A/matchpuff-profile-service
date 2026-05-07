@@ -15,7 +15,7 @@ RUN keytool -genkeypair \
     -storetype PKCS12 \
     -keystore src/main/resources/keystore.p12 \
     -validity 3650 \
-    -storepass ${SSL_KEY_STORE_PASSWORD} \
+    -storepass "${SSL_KEY_STORE_PASSWORD}" \
     -dname "CN=profile-service,OU=MatchPuff,O=MatchPuff,L=Unknown,S=Unknown,C=CO" \
     -noprompt
 
