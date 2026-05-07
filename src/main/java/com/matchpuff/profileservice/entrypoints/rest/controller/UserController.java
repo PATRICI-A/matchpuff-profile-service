@@ -37,7 +37,7 @@ import java.io.IOException;
 public class UserController {
     private final UserServicePort userService;
 
-    @PostMapping
+    @PostMapping("/student")
     @Tag(name = "Users - Creación", description = "Crear nuevos usuarios")
     @Operation(summary = "Crear usuario — STUDENT")
     public ResponseEntity<UserResponse> createStudentUser(
@@ -79,7 +79,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllStudentProfiles());
     }
 
-    @PatchMapping("/{userId}")
+    @PatchMapping("/student/{userId}")
     @Tag(name = "Users - Actualización", description = "Actualizar información de usuarios")
     @Operation(summary = "Actualizar datos del usuario estudiante")
     public ResponseEntity<UserResponse> updateUserStudent(
