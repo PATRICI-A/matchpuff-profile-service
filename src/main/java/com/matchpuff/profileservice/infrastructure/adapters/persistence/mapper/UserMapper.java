@@ -1,5 +1,6 @@
 package com.matchpuff.profileservice.infrastructure.adapters.persistence.mapper;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +39,7 @@ public class UserMapper {
 		doc.setPasswordHash(profile.getPasswordHash());
 		doc.setGender(profile.getGender());
 		doc.setBirthdate(profile.getDateOfBirth() == null ? null : profile.getDateOfBirth().atStartOfDay());
-		doc.setCreatedAt(profile.getCreatedAt());
+		doc.setCreatedAt(profile.getCreatedAt() != null ? profile.getCreatedAt() : LocalDateTime.now());
 		doc.setPhotourl(profile.getPhotoUrl());
 		doc.setCareer(profile.getCareer());
 		doc.setSemester(profile.getSemester());
@@ -63,7 +64,7 @@ public class UserMapper {
 		doc.setEmail(admin.getEmail());
 		doc.setPasswordHash(admin.getPasswordHash());
 		doc.setGender(admin.getGender());
-		doc.setCreatedAt(admin.getCreatedAt());
+		doc.setCreatedAt(admin.getCreatedAt() != null ? admin.getCreatedAt() : LocalDateTime.now());
 
 		return doc;
 	}
@@ -82,6 +83,7 @@ public class UserMapper {
 		doc.setGender(organizer.getGender());
 		doc.setCreatedAt(organizer.getCreatedAt());
 		doc.setContact(organizer.getContactInfo());
+		doc.setCreatedAt(organizer.getCreatedAt() != null ? organizer.getCreatedAt() : LocalDateTime.now());
 
 		return doc;
 	}
@@ -93,13 +95,23 @@ public class UserMapper {
 
 		StudentProfile profile = new StudentProfile();
 		fillCommonUserFields(profile, doc);
-		profile.setDateOfBirth(doc.getBirthdate() == null ? null : doc.getBirthdate().toLocalDate());
-		profile.setPhotoUrl(doc.getPhotourl());
-		profile.setCareer(doc.getCareer());
-		profile.setSemester(doc.getSemester() == null ? 0 : doc.getSemester());
+		if (doc.getBirthdate() != null) {
+			profile.setDateOfBirth(doc.getBirthdate().toLocalDate());
+		}
+		if (doc.getPhotourl() != null) {
+			profile.setPhotoUrl(doc.getPhotourl());
+		}
+		if (doc.getCareer() != null) {
+			profile.setCareer(doc.getCareer());
+		}
+		if (doc.getSemester() != null) {
+			profile.setSemester(doc.getSemester());
+		}
 		profile.setStudentCarnet(doc.getStudentCarnet());
 		profile.setBiography(doc.getBiography());
-		profile.setPrivacyLevel(doc.getPrivacyLevel());
+		if (doc.getPrivacyLevel() != null) {
+			profile.setPrivacyLevel(doc.getPrivacyLevel());
+		}
 		profile.setSchedules(toScheduleList(doc.getSchedule()));
 		profile.setTags(toTagList(doc.getInterests()));
 
@@ -149,12 +161,8 @@ public class UserMapper {
 			return Collections.emptyList();
 		}
 
-		return tagDocs.stream().map(doc -> {
-			Tag tag = new Tag();
-			tag.setName(doc.getName());
-			tag.setCategory(doc.getCategory());
-			return tag;
-		}).toList();
+		return tagDocs.stream()
+        .map(doc -> new Tag(doc.getName(), doc.getCategory())).toList();
 	}
 
 	private static List<ScheduleDocument> toScheduleDocumentList(List<Schedule> schedules) {
@@ -230,10 +238,20 @@ public class UserMapper {
 
 	private static void fillCommonUserFields(User user, UserDocument doc) {
 		user.setId(doc.getId());
-		user.setName(doc.getName());
-		user.setEmail(doc.getEmail());
-		user.setPasswordHash(doc.getPasswordHash());
-		user.setGender(doc.getGender());
-		user.setCreatedAt(doc.getCreatedAt());
+		if (doc.getName() != null) {
+			user.setName(doc.getName());
+		}
+		if (doc.getEmail() != null) {
+			user.setEmail(doc.getEmail());
+		}
+		if (doc.getPasswordHash() != null) {
+			user.setPasswordHash(doc.getPasswordHash());
+		}
+		if (doc.getGender() != null) {
+			user.setGender(doc.getGender());
+		}
+		if (doc.getCreatedAt() != null) {
+			user.setCreatedAt(doc.getCreatedAt());
+		}
 	}
 }

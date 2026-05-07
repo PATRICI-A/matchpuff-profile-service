@@ -95,11 +95,7 @@ class DomainModelsTest {
     @Test
     void givenTag_whenCreated_thenCanSetNameAndCategory() {
         // Given
-        Tag tag = new Tag();
-
-        // When
-        tag.setName("Java");
-        tag.setCategory("Programming Languages");
+        Tag tag = new Tag("Java", "Programming Languages");
 
         // Then
         assertEquals("Java", tag.getName());
@@ -109,13 +105,8 @@ class DomainModelsTest {
     @Test
     void givenMultipleTags_whenCreated_thenEachHasOwnState() {
         // When
-        Tag tag1 = new Tag();
-        tag1.setName("Python");
-        tag1.setCategory("Programming");
-
-        Tag tag2 = new Tag();
-        tag2.setName("Leadership");
-        tag2.setCategory("Soft Skills");
+        Tag tag1 = new Tag("Python", "Programming");
+        Tag tag2 = new Tag("Leadership", "Soft Skills");
 
         // Then
         assertEquals("Python", tag1.getName());

@@ -70,7 +70,7 @@ class UserControllerTest {
                   "email": "test@escuelaing.edu.co",
                   "password": "TestPassword123",
                   "gender": "MALE",
-                  "carreer": "SYSTEMS_ENGINEERING",
+                  "career": "SYSTEMS_ENGINEERING",
                   "semester": 5,
                   "studentCarnet": 2021123411,
                   "photourl": "http://photo.jpg",
@@ -133,7 +133,7 @@ class UserControllerTest {
                   "name": "Test User",
                   "email": "test@escuelaing.edu.co",
                   "gender": "MALE",
-                  "carreer": "SYSTEMS_ENGINEERING",
+                  "career": "SYSTEMS_ENGINEERING",
                   "semester": 5,
                   "photourl": "http://photo.jpg",
                   "privacyLevel": "PUBLIC",
@@ -317,6 +317,7 @@ class UserControllerTest {
                                                                 {
                                                                         "name": "Admin User",
                                                                         "email": "admin@escuelaing.edu.co",
+                                                                        "password": "AdminPass123",
                                                                         "gender": "MALE"
                                                                 }
                                                                 """;
@@ -340,6 +341,7 @@ class UserControllerTest {
                                                                 {
                                                                         "name": "Org User",
                                                                         "email": "org@escuelaing.edu.co",
+                                                                        "password": "OrgPass123",
                                                                         "gender": "MALE",
                                                                         "contactInfo": "contact"
                                                                 }

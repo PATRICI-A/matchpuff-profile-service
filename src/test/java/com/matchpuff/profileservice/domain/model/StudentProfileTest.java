@@ -78,9 +78,7 @@ class StudentProfileTest {
 
     @Test
     void givenTags_whenSet_thenGetTagsReturnsThem() {
-        Tag tag = new Tag();
-        tag.setName("Java");
-        tag.setCategory("Programación");
+        Tag tag = new Tag( "Java", "Programming");
         student.setTags(List.of(tag));
         assertEquals(1, student.getTags().size());
         assertEquals("Java", student.getTags().get(0).getName());
@@ -89,5 +87,42 @@ class StudentProfileTest {
     @Test
     void givenInheritedEmailField_whenSet_thenGetEmailReturnsString() {
         assertEquals("maria@escuelaing.edu.co", student.getEmail());
+    }
+
+    @Test
+    void givenInvalidName_whenSet_thenThrowsInvalidInputException() {
+        assertThrows(InvalidInputException.class,
+                () -> student.setName("A"));
+    }
+
+    @Test
+    void givenFutureDateOfBirth_whenSet_thenThrowsInvalidInputException() {
+        assertThrows(InvalidInputException.class,
+                () -> student.setDateOfBirth(LocalDate.now().plusDays(1)));
+    }
+
+    @Test
+    void givenNullCareer_whenSet_thenThrowsInvalidInputException() {
+        assertThrows(InvalidInputException.class,
+                () -> student.setCareer(null));
+    }
+
+    @Test
+    void givenInvalidSemester_whenSet_thenThrowsInvalidInputException() {
+        assertDoesNotThrow(() -> student.setSemester(0));
+        assertThrows(InvalidInputException.class,
+            () -> student.setSemester(11));
+    }
+
+    @Test
+    void givenBlankPhotoUrl_whenSet_thenThrowsInvalidInputException() {
+        assertThrows(InvalidInputException.class,
+                () -> student.setPhotoUrl("   "));
+    }
+
+    @Test
+    void givenNullPrivacyLevel_whenSet_thenThrowsInvalidInputException() {
+        assertThrows(InvalidInputException.class,
+                () -> student.setPrivacyLevel(null));
     }
 }

@@ -64,9 +64,7 @@ class UserMapperTest {
         student.setBiography("Estudiante apasionada");
         student.setCreatedAt(LocalDateTime.of(2024, 1, 1, 0, 0));
 
-        Tag tag = new Tag();
-        tag.setName("Spring Boot");
-        tag.setCategory("Backend");
+        Tag tag = new Tag("Spring Boot", "Backend");
         student.setTags(List.of(tag));
 
         Schedule schedule = new Schedule( DayOfWeekEnum.TUESDAY, "Algoritmos", LocalTime.of(9, 0), LocalTime.of(11, 0));
@@ -194,10 +192,7 @@ class UserMapperTest {
 
     @Test
     void givenTagList_whenToTagResponseList_thenMapsAllFields() {
-        Tag tag = new Tag();
-        tag.setName("Docker");
-        tag.setCategory("DevOps");
-
+        Tag tag = new Tag("Docker", "DevOps");
         List<TagResponse> result = mapper.toTagResponseList(List.of(tag));
 
         assertEquals(1, result.size());
@@ -207,12 +202,10 @@ class UserMapperTest {
 
     @Test
     void givenMultipleTags_whenToTagResponseList_thenMapsAll() {
-        Tag t1 = new Tag();
-        t1.setName("Java");
+        Tag t1 = new Tag("Java", "Backend");
         t1.setCategory("Backend");
 
-        Tag t2 = new Tag();
-        t2.setName("React");
+        Tag t2 = new Tag("React", "Frontend");
         t2.setCategory("Frontend");
 
         List<TagResponse> result = mapper.toTagResponseList(List.of(t1, t2));

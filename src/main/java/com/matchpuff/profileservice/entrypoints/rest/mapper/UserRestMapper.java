@@ -27,21 +27,21 @@ public class UserRestMapper {
         }
 
         StudentProfile student = new StudentProfile();
-        student.setName(request.getName());
-        student.setEmail(request.getEmail());
-        student.setPasswordHash(request.getPassword());
-        student.setGender(request.getGender());
-        student.setCareer(request.getCarreer());
-        student.setSemester(request.getSemester() == null ? 0 : request.getSemester());
-        student.setStudentCarnet(request.getStudentCarnet());
-        student.setPhotoUrl(request.getPhotourl());
-        student.setBiography(request.getBiography());
-        student.setPrivacyLevel(request.getPrivacyLevel());
+        if (request.getName() != null) student.setName(request.getName());
+        if (request.getEmail() != null) student.setEmail(request.getEmail());
+        if (request.getPassword() != null) student.setPasswordHash(request.getPassword());
+        if (request.getGender() != null) student.setGender(request.getGender());
+        if (request.getCareer() != null) student.setCareer(request.getCareer());
+        if (request.getSemester() != null) student.setSemester(request.getSemester());
+        if (request.getStudentCarnet() != null) student.setStudentCarnet(request.getStudentCarnet());
+        if (request.getPhotourl() != null) student.setPhotoUrl(request.getPhotourl());
+        if (request.getBiography() != null) student.setBiography(request.getBiography());
+        if (request.getPrivacyLevel() != null) student.setPrivacyLevel(request.getPrivacyLevel());
 
         student.setTags(toDomainTags(Collections.emptyList()));
         student.setSchedules(toDomainSchedules(Collections.emptyList()));
 
-        student.setDateOfBirth(request.getDateOfBirth());
+        if (request.getDateOfBirth() != null) student.setDateOfBirth(request.getDateOfBirth());
         return student;
     }
 
@@ -51,10 +51,10 @@ public class UserRestMapper {
         }
 
         Admin admin = new Admin();
-        admin.setName(request.getName());
-        admin.setEmail(request.getEmail());
-        admin.setPasswordHash(request.getPassword());
-        admin.setGender(request.getGender());
+        if (request.getName() != null) admin.setName(request.getName());
+        if (request.getEmail() != null) admin.setEmail(request.getEmail());
+        if (request.getPassword() != null) admin.setPasswordHash(request.getPassword());
+        if (request.getGender() != null) admin.setGender(request.getGender());
 
         return admin;
     }
@@ -65,9 +65,9 @@ public class UserRestMapper {
         }
 
         Admin admin = new Admin();
-        admin.setName(request.getName());
-        admin.setEmail(request.getEmail());
-        admin.setGender(request.getGender());
+        if (request.getName() != null) admin.setName(request.getName());
+        if (request.getEmail() != null) admin.setEmail(request.getEmail());
+        if (request.getGender() != null) admin.setGender(request.getGender());
 
         return admin;
     }
@@ -78,11 +78,11 @@ public class UserRestMapper {
         }
 
         Organizer organizer = new Organizer();
-        organizer.setName(request.getName());
-        organizer.setEmail(request.getEmail());
-        organizer.setPasswordHash(request.getPassword());
-        organizer.setGender(request.getGender());
-        organizer.setContactInfo(request.getContactInfo());
+        if (request.getName() != null) organizer.setName(request.getName());
+        if (request.getEmail() != null) organizer.setEmail(request.getEmail());
+        if (request.getPassword() != null) organizer.setPasswordHash(request.getPassword());
+        if (request.getGender() != null) organizer.setGender(request.getGender());
+        if (request.getContactInfo() != null) organizer.setContactInfo(request.getContactInfo());
 
         return organizer;
     }
@@ -93,10 +93,10 @@ public class UserRestMapper {
         }
 
         Organizer organizer = new Organizer();
-        organizer.setName(request.getName());
-        organizer.setEmail(request.getEmail());
-        organizer.setGender(request.getGender());
-        organizer.setContactInfo(request.getContactInfo());
+        if (request.getName() != null) organizer.setName(request.getName());
+        if (request.getEmail() != null) organizer.setEmail(request.getEmail());
+        if (request.getGender() != null) organizer.setGender(request.getGender());
+        if (request.getContactInfo() != null) organizer.setContactInfo(request.getContactInfo());
 
         return organizer;
     }
@@ -107,15 +107,15 @@ public class UserRestMapper {
         }
 
         StudentProfile student = new StudentProfile();
-        student.setName(request.getName());
-        student.setEmail(request.getEmail());
-        student.setGender(request.getGender());
-        student.setCareer(request.getCarreer());
-        student.setSemester(request.getSemester() == null ? 0 : request.getSemester());
-        student.setStudentCarnet(request.getStudentCarnet());
-        student.setBiography(request.getBiography());
-        student.setPrivacyLevel(request.getPrivacyLevel());
-        student.setDateOfBirth(request.getDateOfBirth());
+        if (request.getName() != null) student.setName(request.getName());
+        if (request.getEmail() != null) student.setEmail(request.getEmail());
+        if (request.getGender() != null) student.setGender(request.getGender());
+        if (request.getCareer() != null) student.setCareer(request.getCareer());
+        if (request.getSemester() != null && request.getSemester() > 0) student.setSemester(request.getSemester());
+        if (request.getStudentCarnet() != null) student.setStudentCarnet(request.getStudentCarnet());
+        if (request.getBiography() != null) student.setBiography(request.getBiography());
+        if (request.getPrivacyLevel() != null) student.setPrivacyLevel(request.getPrivacyLevel());
+        if (request.getDateOfBirth() != null) student.setDateOfBirth(request.getDateOfBirth());
         return student;
     }
 
@@ -124,12 +124,9 @@ public class UserRestMapper {
             return new java.util.ArrayList<>();
         }
 
-        return tags.stream().map(tagRequest -> {
-            Tag tag = new Tag();
-            tag.setName(tagRequest.getName());
-            tag.setCategory(tagRequest.getCategory());
-            return tag;
-        }).toList();
+        return tags.stream()
+        .map(t -> new Tag(t.getName(), t.getCategory()))
+        .toList();
     }
 
     private static List<Schedule> toDomainSchedules(List<ScheduleRequest> schedules) {
@@ -165,9 +162,6 @@ public class UserRestMapper {
             return null;
         }
 
-        Tag tag = new Tag();
-        tag.setName(request.getName());
-        tag.setCategory(request.getCategory());
-        return tag;
+        return new Tag(request.getName(), request.getCategory());
     }
 }

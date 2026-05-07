@@ -7,21 +7,24 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Data
 public class UserOrganizerRequest {
-    @Size(min = 2, max = 50)
+    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
+    @NotBlank(message = "Name is required")
     private String name;
 
     @Email
+    @NotBlank(message = "Email is required")
     @Pattern(regexp = ".*@(mail\\.)?escuelaing\\.edu\\.co$")
     @Schema(example = "usuario@escuelaing.edu.co")
     private String email;
 
-    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, max = 100, message = "Password must be at least 8 characters long")
     @Schema(example = "TestPassword123")
     private String password;
 
-    @NotNull
+    @NotNull(message = "Gender is required")
     private GenderEnum gender;
 
-    @NotBlank
+    @NotBlank(message = "Contact information is required")
     private String contactInfo;
 }

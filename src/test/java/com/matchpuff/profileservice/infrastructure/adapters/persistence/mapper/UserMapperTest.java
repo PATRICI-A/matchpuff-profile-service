@@ -57,10 +57,7 @@ class UserMapperTest {
             LocalTime.of(10, 0)
         );
 
-        Tag tag = new Tag();
-        tag.setName("Java");
-        tag.setCategory("TECH");
-
+        Tag tag = new Tag( "Java", "TECH" );
         s.setSchedules(List.of(schedule));
         s.setTags(List.of(tag));
 

@@ -31,7 +31,7 @@ public class UserStudentUpdateRequest {
     private GenderEnum gender;
 
     @NotNull
-    private CareerEnum carreer;
+    private CareerEnum career;
 
     @Min(value = 1, message = "El semestre mínimo es 1")
     @Max(value = 10, message = "El semestre máximo es 10")

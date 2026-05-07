@@ -208,9 +208,7 @@ class UserServiceTest {
 
     @Test
     void givenUserIdAndTag_whenAddTag_thenReturnsMappedResponseInfo() {
-        Tag tag = new Tag();
-        tag.setName("Python");
-        tag.setCategory("Programación");
+        Tag tag = new Tag("Python", "Programación");
 
         when(userUseCase.addTagToStudent("user-1", tag)).thenReturn(student);
         when(userMapper.toResponse(student)).thenReturn(userResponse);

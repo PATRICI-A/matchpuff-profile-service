@@ -323,9 +323,7 @@ class UserUseCaseTest {
 
     @Test
     void givenExistingStudent_whenAddTag_thenTagIsAdded() {
-        Tag tag = new Tag();
-        tag.setName("Machine Learning");
-        tag.setCategory("IA");
+        Tag tag = new Tag("Machine Learning", "IA");
 
         when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
         when(userRepository.update("user-1", student)).thenReturn(student);
@@ -339,8 +337,7 @@ class UserUseCaseTest {
     @Test
     void givenStudentWithNullTags_whenAddTag_thenListIsInitialized() {
         student.setTags(null);
-        Tag tag = new Tag();
-        tag.setName("Kotlin");
+        Tag tag = new Tag("Kotlin", "Mobile Development");
 
         when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
         when(userRepository.update("user-1", student)).thenReturn(student);
@@ -353,12 +350,10 @@ class UserUseCaseTest {
 
     @Test
     void givenStudentWithImmutableTags_whenAddTag_thenListIsCopiedAndTagIsAdded() {
-        Tag existingTag = new Tag();
-        existingTag.setName("Java");
+        Tag existingTag = new Tag("Java", "Backend");
         student.setTags(List.of(existingTag));
 
-        Tag newTag = new Tag();
-        newTag.setName("Kotlin");
+        Tag newTag = new Tag("Kotlin", "Mobile Development");
 
         when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
         when(userRepository.update("user-1", student)).thenReturn(student);
@@ -389,7 +384,7 @@ class UserUseCaseTest {
     void givenNonExistingUser_whenAddTag_thenThrowsProfileServiceException() {
         when(userRepository.findById("nobody")).thenReturn(Optional.empty());
 
-        Tag tag = new Tag();
+        Tag tag = new Tag("Python", "Programación");
 
         assertThrows(
                 ProfileServiceException.class,
