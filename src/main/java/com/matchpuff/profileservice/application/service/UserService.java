@@ -45,6 +45,12 @@ public class UserService implements UserServicePort {
     }
 
     @Override
+    public UserResponse getUserByEmail(String email) {
+        User u = userUseCase.getUserByEmail(email);
+        return userMapper.toResponse(u);
+    }
+
+    @Override
     public UserResponse updateUser(String userId, User user) {
         User updated = userUseCase.updateUser(userId, user);
         return userMapper.toResponse(updated);

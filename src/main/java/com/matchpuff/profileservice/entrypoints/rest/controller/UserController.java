@@ -72,6 +72,14 @@ public class UserController {
         return ResponseEntity.ok(userService.getUser(userId));
     }
 
+    @GetMapping("/mail")
+    @Tag(name = "Users - Lectura", description = "Obtener información de usuarios")
+    @Operation(summary = "Obtener usuario por mail")
+    public ResponseEntity<UserResponse> getUserByEmail(
+            @RequestParam String email) {
+        return ResponseEntity.ok(userService.getUserByEmail(email));
+    }
+
     @GetMapping("/student-profiles")
     @Tag(name = "Users - Lectura", description = "Obtener información de usuarios")
     @Operation(summary = "Obtener todos los perfiles de estudiantes")

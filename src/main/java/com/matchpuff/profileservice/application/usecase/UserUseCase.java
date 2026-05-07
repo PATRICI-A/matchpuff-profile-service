@@ -62,6 +62,12 @@ public class UserUseCase implements UserUseCasePort {
         return findOrThrow(userId);
     }
 
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ProfileServiceException("User not found with email: " + email, HttpStatus.NOT_FOUND));
+    }
+
     // ── UPDATE ───────────────────────────────────────────────────
 
     @Override

@@ -17,6 +17,7 @@ public interface UserServicePort {
     UserResponse createOrganizerUser(Organizer user);
     void deleteUser(String userId);
 	UserResponse getUser(String userId);
+    UserResponse getUserByEmail(String email);
 	UserResponse updateUser(String userId, User user);
     void changePassword(String userId, String currentPassword, String newPassword);
     UserResponse addSchedule(String userId, Schedule schedule);

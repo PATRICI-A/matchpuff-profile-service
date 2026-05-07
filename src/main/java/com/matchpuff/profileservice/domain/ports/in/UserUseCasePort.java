@@ -14,6 +14,7 @@ public interface UserUseCasePort {
     User createOrganizerUser(Organizer organizer);
     void deleteUser(String userId);
     User getUser(String userId);
+    User getUserByEmail(String email);
     User updateUser(String userId, User user);
     void changePassword(String userId, String currentPassword, String newPassword);
     User addScheduleToStudent(String userId, Schedule schedule);
