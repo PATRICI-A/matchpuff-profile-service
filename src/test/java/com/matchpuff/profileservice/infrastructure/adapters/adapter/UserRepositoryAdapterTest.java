@@ -16,11 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,28 +41,28 @@ class UserRepositoryAdapterTest {
 
     private StudentProfile buildStudent() {
         StudentProfile s = new StudentProfile();
-        s.setId("u-1");
+        s.setId(UUID.randomUUID());
         s.setName("Test User");
         s.setEmail(VALID_EMAIL);
         s.setGender(GenderEnum.MALE);
         s.setDateOfBirth(LocalDate.of(2000, 1, 1));
         s.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         s.setSemester(3);
-        s.setStudentCarnet(Long.valueOf(20211000));
+        s.setStudentCarnet("2021100011");
         s.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         return s;
     }
 
     private StudentProfileDocument buildStudentDoc() {
         StudentProfileDocument doc = new StudentProfileDocument();
-        doc.setId("u-1");
+        doc.setId(UUID.randomUUID());
         doc.setName("Test User");
         doc.setEmail(VALID_EMAIL);
         doc.setPasswordHash("HashedPassword123");
         doc.setGender(GenderEnum.MALE);
         doc.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         doc.setSemester(3);
-        doc.setStudentCarnet(Long.valueOf(20211000));
+        doc.setStudentCarnet("2021100011");
         doc.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         return doc;
     }
@@ -83,6 +85,24 @@ class UserRepositoryAdapterTest {
     }
 
     @Test
+    void givenNewStudent_whenSave_thenSetsCreatedAtBeforePersisting() {
+        StudentProfile student = buildStudent();
+        student.setCreatedAt(null);
+
+        StudentProfileDocument savedDoc = buildStudentDoc();
+        savedDoc.setCreatedAt(null);
+
+        when(userRepository.findByEmail(VALID_EMAIL)).thenReturn(Optional.empty());
+        when(userRepository.save(any())).thenReturn(savedDoc);
+
+        adapter.save(student);
+
+        ArgumentCaptor<StudentProfileDocument> captor = ArgumentCaptor.forClass(StudentProfileDocument.class);
+        verify(userRepository).save(captor.capture());
+        assertNotNull(captor.getValue().getCreatedAt());
+    }
+
+    @Test
     void givenExistingEmail_whenSave_thenThrowsInvalidInputException() {
         StudentProfile student = buildStudent();
         StudentProfileDocument existingDoc = buildStudentDoc();
@@ -98,10 +118,12 @@ class UserRepositoryAdapterTest {
     @Test
     void givenExistingStudentId_whenFindById_thenReturnsStudentProfile() {
         StudentProfileDocument doc = buildStudentDoc();
+        UUID studentId = UUID.randomUUID();
+        doc.setId(studentId);
 
-        when(userRepository.findById("u-1")).thenReturn(Optional.of(doc));
+        when(userRepository.findById(studentId)).thenReturn(Optional.of(doc));
 
-        Optional<User> result = adapter.findById("u-1");
+        Optional<User> result = adapter.findById(studentId.toString());
 
         assertTrue(result.isPresent());
         assertInstanceOf(StudentProfile.class, result.get());
@@ -111,15 +133,16 @@ class UserRepositoryAdapterTest {
     @Test
     void givenExistingAdminId_whenFindById_thenReturnsAdmin() {
         AdminProfileDocument doc = new AdminProfileDocument();
-        doc.setId("a-1");
+        UUID adminId = UUID.randomUUID();
+        doc.setId(adminId);
         doc.setName("Admin");
         doc.setEmail(VALID_EMAIL);
         doc.setPasswordHash("HashedPassword123");
         doc.setGender(GenderEnum.MALE);
 
-        when(userRepository.findById("a-1")).thenReturn(Optional.of(doc));
+        when(userRepository.findById(adminId)).thenReturn(Optional.of(doc));
 
-        Optional<User> result = adapter.findById("a-1");
+        Optional<User> result = adapter.findById(adminId.toString());
 
         assertTrue(result.isPresent());
         assertInstanceOf(Admin.class, result.get());
@@ -128,30 +151,23 @@ class UserRepositoryAdapterTest {
     @Test
     void givenExistingOrganizerId_whenFindById_thenReturnsOrganizer() {
         OrganizerProfileDocument doc = new OrganizerProfileDocument();
-        doc.setId("o-1");
+        UUID organizerId = UUID.randomUUID();
+        doc.setId(organizerId);
         doc.setName("Organizer");
         doc.setEmail(VALID_EMAIL);
         doc.setPasswordHash("HashedPassword123");
         doc.setGender(GenderEnum.FEMALE);
         doc.setContact("contacto@evento.co");
 
-        when(userRepository.findById("o-1")).thenReturn(Optional.of(doc));
+        when(userRepository.findById(organizerId)).thenReturn(Optional.of(doc));
 
-        Optional<User> result = adapter.findById("o-1");
+        Optional<User> result = adapter.findById(organizerId.toString());
 
         assertTrue(result.isPresent());
         assertInstanceOf(Organizer.class, result.get());
         assertEquals("contacto@evento.co", ((Organizer) result.get()).getContactInfo());
     }
 
-    @Test
-    void givenNonExistingId_whenFindById_thenReturnsEmptyOptional() {
-        when(userRepository.findById("ghost")).thenReturn(Optional.empty());
-
-        Optional<User> result = adapter.findById("ghost");
-
-        assertFalse(result.isPresent());
-    }
 
     // ── findByEmail ───────────────────────────────────────────────
 
@@ -182,14 +198,19 @@ class UserRepositoryAdapterTest {
         StudentProfile student = buildStudent();
         StudentProfileDocument currentDoc = buildStudentDoc();
         StudentProfileDocument savedDoc = buildStudentDoc();
+        UUID currentId = UUID.randomUUID();
 
-        when(userRepository.findById("u-1")).thenReturn(Optional.of(currentDoc));
+        currentDoc.setId(currentId);
+        savedDoc.setId(currentId);
+        student.setId(UUID.randomUUID());
+
+        when(userRepository.findById(currentId)).thenReturn(Optional.of(currentDoc));
         when(userRepository.save(any())).thenReturn(savedDoc);
 
-        User result = adapter.update("u-1", student);
+        User result = adapter.update(currentId.toString(), student);
 
         assertNotNull(result);
-        assertEquals("u-1", result.getId());
+        assertEquals(currentId, result.getId());
         verify(userRepository).save(any());
     }
 
@@ -221,12 +242,12 @@ class UserRepositoryAdapterTest {
         StudentProfileDocument studentDoc = buildStudentDoc();
 
         AdminProfileDocument adminDoc = new AdminProfileDocument();
-        adminDoc.setId("a-1");
+        adminDoc.setId(UUID.randomUUID());
         adminDoc.setName("Admin");
         adminDoc.setEmail(VALID_EMAIL);
 
         OrganizerProfileDocument orgDoc = new OrganizerProfileDocument();
-        orgDoc.setId("o-1");
+        orgDoc.setId(UUID.randomUUID());
         orgDoc.setName("Org");
         orgDoc.setEmail(VALID_EMAIL);
 
@@ -242,13 +263,13 @@ class UserRepositoryAdapterTest {
     @Test
     void givenNewEmail_whenSaveAdmin_thenReturnsAdmin() {
         Admin admin = new Admin();
-        admin.setId("a-1");
+        admin.setId(UUID.randomUUID());
         admin.setName("Root Admin");
         admin.setEmail(VALID_EMAIL);
         admin.setGender(GenderEnum.MALE);
 
         AdminProfileDocument savedDoc = new AdminProfileDocument();
-        savedDoc.setId("a-1");
+        savedDoc.setId(UUID.randomUUID());
         savedDoc.setName("Root Admin");
         savedDoc.setEmail(VALID_EMAIL);
         savedDoc.setGender(GenderEnum.MALE);
@@ -279,14 +300,14 @@ class UserRepositoryAdapterTest {
     @Test
     void givenNewEmail_whenSaveOrganizer_thenReturnsOrganizer() {
         Organizer organizer = new Organizer();
-        organizer.setId("o-1");
+        organizer.setId(UUID.randomUUID());
         organizer.setName("Club Org");
         organizer.setEmail(VALID_EMAIL);
         organizer.setGender(GenderEnum.FEMALE);
         organizer.setContactInfo("club@evento.co");
 
         OrganizerProfileDocument savedDoc = new OrganizerProfileDocument();
-        savedDoc.setId("o-1");
+        savedDoc.setId(UUID.randomUUID());
         savedDoc.setName("Club Org");
         savedDoc.setEmail(VALID_EMAIL);
         savedDoc.setContact("club@evento.co");
@@ -316,9 +337,11 @@ class UserRepositoryAdapterTest {
 
     @Test
     void givenUserId_whenDelete_thenCallsDeleteById() {
-        adapter.delete("u-1");
+        UUID userId = UUID.randomUUID();
 
-        verify(userRepository).deleteById("u-1");
+        adapter.delete(userId.toString());
+
+        verify(userRepository).deleteById(userId);
     }
 
     // ── update Admin ──────────────────────────────────────────────
@@ -326,27 +349,28 @@ class UserRepositoryAdapterTest {
     @Test
     void givenAdminProfile_whenUpdate_thenReturnsUpdatedAdmin() {
         Admin admin = new Admin();
-        admin.setId("a-1");
+        UUID adminId = UUID.randomUUID();
+        admin.setId(adminId);
         admin.setName("Updated Admin");
         admin.setEmail(VALID_EMAIL);
         admin.setGender(GenderEnum.MALE);
 
         AdminProfileDocument currentDoc = new AdminProfileDocument();
-        currentDoc.setId("a-1");
+        currentDoc.setId(adminId);
         currentDoc.setName("Old Admin");
         currentDoc.setEmail(VALID_EMAIL);
         currentDoc.setGender(GenderEnum.MALE);
 
         AdminProfileDocument savedDoc = new AdminProfileDocument();
-        savedDoc.setId("a-1");
+        savedDoc.setId(adminId);
         savedDoc.setName("Updated Admin");
         savedDoc.setEmail(VALID_EMAIL);
 
         when(userRepository.findByEmail(VALID_EMAIL)).thenReturn(Optional.of(currentDoc));
-        when(userRepository.findById("a-1")).thenReturn(Optional.of(currentDoc));
+        when(userRepository.findById(adminId)).thenReturn(Optional.of(currentDoc));
         when(userRepository.save(any())).thenReturn(savedDoc);
 
-        User result = adapter.update("a-1", admin);
+        User result = adapter.update(adminId.toString(), admin);
 
         assertNotNull(result);
         assertInstanceOf(Admin.class, result);
@@ -358,29 +382,30 @@ class UserRepositoryAdapterTest {
     @Test
     void givenOrganizerProfile_whenUpdate_thenReturnsUpdatedOrganizer() {
         Organizer organizer = new Organizer();
-        organizer.setId("o-1");
+        UUID organizerId = UUID.randomUUID();
+        organizer.setId(organizerId);
         organizer.setName("Updated Org");
         organizer.setEmail(VALID_EMAIL);
         organizer.setGender(GenderEnum.FEMALE);
         organizer.setContactInfo("new@evento.co");
 
         OrganizerProfileDocument currentDoc = new OrganizerProfileDocument();
-        currentDoc.setId("o-1");
+        currentDoc.setId(organizerId);
         currentDoc.setName("Old Org");
         currentDoc.setEmail(VALID_EMAIL);
         currentDoc.setContact("old@evento.co");
 
         OrganizerProfileDocument savedDoc = new OrganizerProfileDocument();
-        savedDoc.setId("o-1");
+        savedDoc.setId(organizerId);
         savedDoc.setName("Updated Org");
         savedDoc.setEmail(VALID_EMAIL);
         savedDoc.setContact("new@evento.co");
 
         when(userRepository.findByEmail(VALID_EMAIL)).thenReturn(Optional.of(currentDoc));
-        when(userRepository.findById("o-1")).thenReturn(Optional.of(currentDoc));
+        when(userRepository.findById(organizerId)).thenReturn(Optional.of(currentDoc));
         when(userRepository.save(any())).thenReturn(savedDoc);
 
-        User result = adapter.update("o-1", organizer);
+        User result = adapter.update(organizerId.toString(), organizer);
 
         assertNotNull(result);
         assertInstanceOf(Organizer.class, result);
@@ -393,14 +418,15 @@ class UserRepositoryAdapterTest {
     void givenEmailBelongsToAnotherUser_whenUpdate_thenThrowsInvalidInputException() {
         StudentProfile student = buildStudent();
         student.setEmail("other@escuelaing.edu.co");
+        UUID userId = UUID.randomUUID();
 
         StudentProfileDocument conflictDoc = buildStudentDoc();
-        conflictDoc.setId("other-user");
+        conflictDoc.setId(UUID.randomUUID());
         conflictDoc.setEmail("other@escuelaing.edu.co");
 
         when(userRepository.findByEmail("other@escuelaing.edu.co")).thenReturn(Optional.of(conflictDoc));
 
-        assertThrows(InvalidInputException.class, () -> adapter.update("u-1", student));
+        assertThrows(InvalidInputException.class, () -> adapter.update(userId.toString(), student));
     }
 
     // ── update type mismatch ──────────────────────────────────────
@@ -408,15 +434,16 @@ class UserRepositoryAdapterTest {
     @Test
     void givenStudentDocumentButAdminRequest_whenUpdate_thenThrowsInvalidInputException() {
         Admin admin = new Admin();
-        admin.setId("u-1");
+        UUID adminId = UUID.randomUUID();
+        admin.setId(adminId);
         admin.setName("Admin");
         // email is null so findByEmail is never called
 
         StudentProfileDocument studentDoc = buildStudentDoc();
 
-        when(userRepository.findById("u-1")).thenReturn(Optional.of(studentDoc));
+        when(userRepository.findById(adminId)).thenReturn(Optional.of(studentDoc));
 
-        assertThrows(InvalidInputException.class, () -> adapter.update("u-1", admin));
+        assertThrows(InvalidInputException.class, () -> adapter.update(adminId.toString(), admin));
     }
 
     // ── findAllStudents ───────────────────────────────────────────

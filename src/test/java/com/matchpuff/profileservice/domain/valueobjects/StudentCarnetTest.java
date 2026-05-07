@@ -9,8 +9,8 @@ class StudentCarnetTest {
 
     @Test
     void givenValidCarnet_whenCreated_thenGetValueReturnsIt() {
-        StudentCarnet carnet = new StudentCarnet(20211234L);
-        assertEquals(20211234L, carnet.getValue());
+        StudentCarnet carnet = new StudentCarnet("2021123411");
+        assertEquals("2021123411", carnet.getValue());
     }
 
     @Test
@@ -20,11 +20,11 @@ class StudentCarnetTest {
 
     @Test
     void givenZeroCarnet_whenCreated_thenThrowsInvalidInputException() {
-        assertThrows(InvalidInputException.class, () -> new StudentCarnet(0L));
+        assertThrows(InvalidInputException.class, () -> new StudentCarnet("0"));
     }
 
     @Test
     void givenNegativeCarnet_whenCreated_thenThrowsInvalidInputException() {
-        assertThrows(InvalidInputException.class, () -> new StudentCarnet(-1L));
+        assertThrows(InvalidInputException.class, () -> new StudentCarnet("-1"));
     }
 }

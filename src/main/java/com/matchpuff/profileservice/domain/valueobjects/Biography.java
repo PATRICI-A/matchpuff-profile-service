@@ -9,7 +9,7 @@ public class Biography {
     public Biography(String value) {
         if (value != null && value.length() > 200) {
             throw new InvalidInputException(
-                "La biografía no puede superar los 200 caracteres"
+                "The biography cannot exceed 200 characters"
             );
         }
         this.value = value;

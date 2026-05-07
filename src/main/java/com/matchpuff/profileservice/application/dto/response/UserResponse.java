@@ -5,13 +5,14 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @SuperBuilder
 public class UserResponse {
 
-    protected String id;
+    protected UUID id;
     protected String name;
     protected String email;
     protected LocalDateTime createdAt;

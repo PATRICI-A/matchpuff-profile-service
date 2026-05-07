@@ -11,6 +11,7 @@ import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @DisplayName("Response DTOs Tests")
 class ResponseDTOsTest {
@@ -18,7 +19,7 @@ class ResponseDTOsTest {
     @Test
     void givenAdminResponse_whenBuilder_thenFieldsAreSet() {
         // Given
-        String id = "admin-123";
+        UUID id = UUID.randomUUID();
         String name = "Admin User";
         String email = "admin@example.com";
         LocalDateTime createdAt = LocalDateTime.now();
@@ -47,7 +48,7 @@ class ResponseDTOsTest {
     @Test
     void givenOrganizerResponse_whenBuilder_thenAllFieldsAreSet() {
         // Given
-        String id = "org-123";
+        UUID id = UUID.randomUUID();
         String name = "Organizer User";
         String email = "organizer@example.com";
         LocalDateTime createdAt = LocalDateTime.now();
@@ -79,7 +80,7 @@ class ResponseDTOsTest {
     @Test
     void givenStudentProfileResponse_whenBuilder_thenAllFieldsAreSet() {
         // Given
-        String id = "student-123";
+        UUID id = UUID.randomUUID();
         String name = "Student User";
         String email = "student@escuelaing.edu.co";
         LocalDateTime createdAt = LocalDateTime.now();
@@ -132,7 +133,7 @@ class ResponseDTOsTest {
     @Test
     void givenUserResponse_whenBuilder_thenBaseFieldsAreSet() {
         // Given
-        String id = "user-123";
+        UUID id = UUID.randomUUID();
         String name = "Regular User";
         String email = "user@example.com";
         LocalDateTime createdAt = LocalDateTime.now();
@@ -164,12 +165,12 @@ class ResponseDTOsTest {
         AdminResponse adminResponse = new AdminResponse();
 
         // When
-        adminResponse.setId("updated-id");
+        adminResponse.setId(UUID.randomUUID());
         adminResponse.setName("Updated Admin");
         adminResponse.setEmail("updated@example.com");
 
         // Then
-        assertEquals("updated-id", adminResponse.getId());
+        assertEquals(adminResponse.getId(), adminResponse.getId());
         assertEquals("Updated Admin", adminResponse.getName());
         assertEquals("updated@example.com", adminResponse.getEmail());
     }

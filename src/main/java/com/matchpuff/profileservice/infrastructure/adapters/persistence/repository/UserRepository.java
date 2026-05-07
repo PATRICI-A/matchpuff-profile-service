@@ -8,9 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface UserRepository extends MongoRepository<UserDocument, String> {
+public interface UserRepository extends MongoRepository<UserDocument, UUID> {
     Optional<UserDocument> findByEmail(String email);
     List<UserDocument> findByUserType(UserType userType);
 }

@@ -34,11 +34,11 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@Tag(name = "Users", description = "Creación, consulta y actualización de usuarios")
 public class UserController {
     private final UserServicePort userService;
 
     @PostMapping
+    @Tag(name = "Users - Creación", description = "Crear nuevos usuarios")
     @Operation(summary = "Crear usuario — STUDENT")
     public ResponseEntity<UserResponse> createStudentUser(
             @Valid @RequestBody UserStudentRequest request) {
@@ -47,6 +47,7 @@ public class UserController {
     }
 
     @PostMapping("/admin")
+    @Tag(name = "Users - Creación", description = "Crear nuevos usuarios")
     @Operation(summary = "Crear usuario — ADMIN")
     public ResponseEntity<UserResponse> createAdminUser(
             @Valid @RequestBody UserAdminRequest request) {
@@ -55,6 +56,7 @@ public class UserController {
     }
 
     @PostMapping("/organizer")
+    @Tag(name = "Users - Creación", description = "Crear nuevos usuarios")
     @Operation(summary = "Crear usuario — ORGANIZER")
     public ResponseEntity<UserResponse> createOrganizerUser(
             @Valid @RequestBody UserOrganizerRequest request) {
@@ -63,6 +65,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
+    @Tag(name = "Users - Lectura", description = "Obtener información de usuarios")
     @Operation(summary = "Obtener usuario por ID")
     public ResponseEntity<UserResponse> getUser(
             @PathVariable String userId) {
@@ -70,12 +73,14 @@ public class UserController {
     }
 
     @GetMapping("/student-profiles")
+    @Tag(name = "Users - Lectura", description = "Obtener información de usuarios")
     @Operation(summary = "Obtener todos los perfiles de estudiantes")
     public ResponseEntity<List<UserResponse>> getAllStudentProfiles() {
         return ResponseEntity.ok(userService.getAllStudentProfiles());
     }
 
     @PatchMapping("/{userId}")
+    @Tag(name = "Users - Actualización", description = "Actualizar información de usuarios")
     @Operation(summary = "Actualizar datos del usuario estudiante")
     public ResponseEntity<UserResponse> updateUserStudent(
             @PathVariable String userId,
@@ -84,6 +89,7 @@ public class UserController {
     }
 
     @PatchMapping("/admin/{userId}")
+    @Tag(name = "Users - Actualización", description = "Actualizar información de usuarios")
     @Operation(summary = "Actualizar datos del usuario administrador")
     public ResponseEntity<UserResponse> updateUserAdmin(
             @PathVariable String userId,
@@ -92,6 +98,7 @@ public class UserController {
     }
 
     @PatchMapping("/organizer/{userId}")
+    @Tag(name = "Users - Actualización", description = "Actualizar información de usuarios")
     @Operation(summary = "Actualizar datos del usuario organizador")
     public ResponseEntity<UserResponse> updateUserOrganizer(
             @PathVariable String userId,
@@ -100,6 +107,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/password")
+    @Tag(name = "User Security", description = "Gestionar seguridad de usuarios")
     @Operation(summary = "Cambiar la contraseña de un usuario")
     public ResponseEntity<Void> changePassword(
             @PathVariable String userId,
@@ -109,12 +117,14 @@ public class UserController {
     }
 
     @GetMapping
+    @Tag(name = "Users - Lectura", description = "Obtener información de usuarios")
     @Operation(summary = "Obtener todos los usuarios")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @PatchMapping("/{userId}/schedule")
+    @Tag(name = "User Profiles", description = "Gestionar perfiles y contenido de usuarios")
     @Operation(summary = "Agregar un horario al usuario estudiante")
     public ResponseEntity<UserResponse> updateUserSchedule(
             @PathVariable String userId,
@@ -123,6 +133,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/tags")
+    @Tag(name = "User Profiles", description = "Gestionar perfiles y contenido de usuarios")
     @Operation(summary = "Agregar un tag/interés al usuario estudiante")
     public ResponseEntity<UserResponse> updateUserTags(
             @PathVariable String userId,
@@ -131,6 +142,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
+    @Tag(name = "Users - Eliminación", description = "Eliminar usuarios")
     @Operation(summary = "Eliminar un usuario por ID")
     public ResponseEntity<Void> deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
@@ -141,6 +153,7 @@ public class UserController {
         value = "/{userId}/profile-image",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @Tag(name = "User Profiles", description = "Gestionar perfiles y contenido de usuarios")
     @Operation(summary = "Subir o actualizar la imagen de perfil del usuario")
     public ResponseEntity<UserResponseProfilePhoto> uploadProfileImage(
             @PathVariable String userId,
@@ -153,6 +166,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/profile-image")
+    @Tag(name = "User Profiles", description = "Gestionar perfiles y contenido de usuarios")
     @Operation(summary = "Abrir la imagen de perfil del usuario")
     public ResponseEntity<Void> getProfileImage(@PathVariable String userId) {
         UserResponse user = userService.getUser(userId);

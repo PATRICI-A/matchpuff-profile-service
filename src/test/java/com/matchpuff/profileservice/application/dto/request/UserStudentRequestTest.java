@@ -36,7 +36,7 @@ class UserStudentRequestTest {
         userStudentRequest.setName("Juan Perez");
         userStudentRequest.setEmail("juan.perez@escuelaing.edu.co");
         userStudentRequest.setGender(GenderEnum.MALE);
-        userStudentRequest.setCarreer(CareerEnum.SYSTEMS_ENGINEERING);
+        userStudentRequest.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         userStudentRequest.setSemester(5);
         userStudentRequest.setPhotourl("http://example.com/photo.jpg");
         userStudentRequest.setBiography("Student biography");
@@ -47,7 +47,7 @@ class UserStudentRequestTest {
         assertEquals("Juan Perez", userStudentRequest.getName());
         assertEquals("juan.perez@escuelaing.edu.co", userStudentRequest.getEmail());
         assertEquals(GenderEnum.MALE, userStudentRequest.getGender());
-        assertEquals(CareerEnum.SYSTEMS_ENGINEERING, userStudentRequest.getCarreer());
+        assertEquals(CareerEnum.SYSTEMS_ENGINEERING, userStudentRequest.getCareer());
         assertEquals(5, userStudentRequest.getSemester());
         assertEquals("http://example.com/photo.jpg", userStudentRequest.getPhotourl());
         assertEquals("Student biography", userStudentRequest.getBiography());
@@ -84,10 +84,10 @@ class UserStudentRequestTest {
     @Test
     void givenUserStudentRequest_whenSetCareer_thenCareerIsUpdated() {
         // When
-        userStudentRequest.setCarreer(CareerEnum.SYSTEMS_ENGINEERING);
+        userStudentRequest.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
 
         // Then
-        assertEquals(CareerEnum.SYSTEMS_ENGINEERING, userStudentRequest.getCarreer());
+        assertEquals(CareerEnum.SYSTEMS_ENGINEERING, userStudentRequest.getCareer());
     }
 
     @Test

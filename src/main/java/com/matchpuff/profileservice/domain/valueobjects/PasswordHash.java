@@ -9,13 +9,13 @@ public class PasswordHash {
     public PasswordHash(String value) {
         if (value == null || value.length() < 8) {
             throw new InvalidInputException(
-                "La contraseña debe tener al menos 8 caracteres"
+                "The password must be at least 8 characters long"
             );
         }
 
         if (!value.matches(".*[A-Z].*")) {
             throw new InvalidInputException(
-                "La contraseña debe contener al menos una letra mayúscula"
+                "The password must contain at least one uppercase letter"
             );
         }
 

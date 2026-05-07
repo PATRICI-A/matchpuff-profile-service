@@ -15,8 +15,10 @@ import com.matchpuff.profileservice.infrastructure.adapters.persistence.mapper.U
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Component
@@ -31,6 +33,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     public User save(StudentProfile student) {
         mailExistsForException(student.getEmail());
         StudentProfileDocument doc = UserMapper.toDocument(student);
+        ensureCreatedAt(doc);
         StudentProfileDocument saved = userRepository.save(doc);
         return UserMapper.toDomain(saved);
     }
@@ -39,6 +42,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     public User save(Admin admin) {
         mailExistsForException(admin.getEmail());
         AdminProfileDocument doc = UserMapper.toDocument(admin);
+        ensureCreatedAt(doc);
         AdminProfileDocument saved = userRepository.save(doc);
         return UserMapper.toDomain(saved);
     }
@@ -47,18 +51,19 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     public User save(Organizer organizer) {
         mailExistsForException(organizer.getEmail());
         OrganizerProfileDocument doc = UserMapper.toDocument(organizer);
+        ensureCreatedAt(doc);
         OrganizerProfileDocument saved = userRepository.save(doc);
         return UserMapper.toDomain(saved);
     }
 
     @Override
     public void delete(String userId) {
-        userRepository.deleteById(userId);
+        userRepository.deleteById(parseUserId(userId));
     }
 
     @Override
     public Optional<User> findById(String id) {
-        return userRepository.findById(id)
+        return userRepository.findById(parseUserId(id))
                 .flatMap(UserMapper::toDomainByType);
     }
 
@@ -70,14 +75,16 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public User update(String id, User user) {
+        UUID userId = parseUserId(id);
+
         if (user.getEmail() != null) {
             Optional<UserDocument> existing = userRepository.findByEmail(user.getEmail());
-            if (existing.isPresent() && !existing.get().getId().equals(id)) {
+            if (existing.isPresent() && !existing.get().getId().equals(userId)) {
                 throw new InvalidInputException("The email is already in use by another user.");
             }
         }
 
-        UserDocument storedUser = userRepository.findById(id)
+        UserDocument storedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new InvalidInputException("User not found: " + id));
 
         if (user instanceof StudentProfile student) {
@@ -180,5 +187,19 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
             throw new InvalidInputException("The email is already in use by another user.");
         }
         return false;
+    }
+
+    private UUID parseUserId(String userId) {
+        try {
+            return UUID.fromString(userId);
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            throw new InvalidInputException("Invalid user id: " + userId);
+        }
+    }
+
+    private void ensureCreatedAt(UserDocument userDocument) {
+        if (userDocument.getCreatedAt() == null) {
+            userDocument.setCreatedAt(LocalDateTime.now());
+        }
     }
 }

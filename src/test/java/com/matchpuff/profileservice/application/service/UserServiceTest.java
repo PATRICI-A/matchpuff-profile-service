@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -39,12 +40,12 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         student = new StudentProfile();
-        student.setId("user-1");
+        student.setId(UUID.randomUUID());
         student.setName("Laura Torres");
         student.setEmail("laura@escuelaing.edu.co");
 
         userResponse = UserResponse.builder()
-                .id("user-1")
+                .id(student.getId())
                 .name("Laura Torres")
                 .email("laura@escuelaing.edu.co")
                 .userType("STUDENT")
@@ -59,7 +60,7 @@ class UserServiceTest {
     @Test
     void givenAdmin_whenCreateAdminUser_thenDelegatesAndReturnsMappedResponse() {
         var admin = new com.matchpuff.profileservice.domain.model.Admin();
-        admin.setId("admin-1");
+        admin.setId(UUID.randomUUID());
         admin.setName("Admin User");
 
         when(userUseCase.createAdminUser(admin)).thenReturn(admin);
@@ -75,7 +76,7 @@ class UserServiceTest {
     @Test
     void givenOrganizer_whenCreateOrganizerUser_thenDelegatesAndReturnsMappedResponse() {
         var organizer = new com.matchpuff.profileservice.domain.model.Organizer();
-        organizer.setId("org-1");
+        organizer.setId(UUID.randomUUID());
         organizer.setName("Organizer User");
 
         when(userUseCase.createOrganizerUser(organizer)).thenReturn(organizer);
@@ -106,7 +107,7 @@ class UserServiceTest {
 
         com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto photoResponse =
                 com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto.builder()
-                        .id("user-1")
+                        .id(student.getId())
                         .name("Laura Torres")
                         .email("laura@escuelaing.edu.co")
                         .profileImageUrl("http://photo.jpg")
@@ -125,7 +126,7 @@ class UserServiceTest {
     @Test
     void whenGetAllStudentProfiles_thenReturnsMappedList() {
         StudentProfile s = new StudentProfile();
-        s.setId("s-1");
+        s.setId(UUID.randomUUID());
         s.setName("Student One");
 
         when(userUseCase.getAllStudentProfiles()).thenReturn(List.of(s));
@@ -162,7 +163,7 @@ class UserServiceTest {
         UserResponse result = userService.getUser("user-1");
 
         assertNotNull(result);
-        assertEquals("user-1", result.getId());
+        assertEquals(student.getId(), result.getId());
         verify(userUseCase).getUser("user-1");
     }
 
@@ -207,9 +208,7 @@ class UserServiceTest {
 
     @Test
     void givenUserIdAndTag_whenAddTag_thenReturnsMappedResponseInfo() {
-        Tag tag = new Tag();
-        tag.setName("Python");
-        tag.setCategory("Programación");
+        Tag tag = new Tag("Python", "Programación");
 
         when(userUseCase.addTagToStudent("user-1", tag)).thenReturn(student);
         when(userMapper.toResponse(student)).thenReturn(userResponse);

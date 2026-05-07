@@ -11,6 +11,7 @@ import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @DisplayName("Domain Models Tests")
 class DomainModelsTest {
@@ -21,14 +22,14 @@ class DomainModelsTest {
         Admin admin = new Admin();
 
         // When
-        admin.setId("admin-1");
+        admin.setId(UUID.randomUUID());
         admin.setName("Administrator");
         admin.setEmail("admin@escuelaing.edu.co");
         admin.setGender(GenderEnum.MALE);
         admin.setCreatedAt(LocalDateTime.now());
 
         // Then
-        assertEquals("admin-1", admin.getId());
+        assertNotNull(admin.getId());
         assertEquals("Administrator", admin.getName());
         assertEquals("admin@escuelaing.edu.co", admin.getEmail());
         assertEquals(GenderEnum.MALE, admin.getGender());
@@ -41,14 +42,14 @@ class DomainModelsTest {
         Organizer organizer = new Organizer();
 
         // When
-        organizer.setId("org-1");
+        organizer.setId(UUID.randomUUID());
         organizer.setName("Event Organizer");
         organizer.setEmail("organizer@escuelaing.edu.co");
         organizer.setGender(GenderEnum.FEMALE);
         organizer.setContactInfo("3001234567");
 
         // Then
-        assertEquals("org-1", organizer.getId());
+        assertNotNull(organizer.getId());
         assertEquals("Event Organizer", organizer.getName());
         assertEquals("organizer@escuelaing.edu.co", organizer.getEmail());
         assertEquals(GenderEnum.FEMALE, organizer.getGender());
@@ -94,11 +95,7 @@ class DomainModelsTest {
     @Test
     void givenTag_whenCreated_thenCanSetNameAndCategory() {
         // Given
-        Tag tag = new Tag();
-
-        // When
-        tag.setName("Java");
-        tag.setCategory("Programming Languages");
+        Tag tag = new Tag("Java", "Programming Languages");
 
         // Then
         assertEquals("Java", tag.getName());
@@ -108,13 +105,8 @@ class DomainModelsTest {
     @Test
     void givenMultipleTags_whenCreated_thenEachHasOwnState() {
         // When
-        Tag tag1 = new Tag();
-        tag1.setName("Python");
-        tag1.setCategory("Programming");
-
-        Tag tag2 = new Tag();
-        tag2.setName("Leadership");
-        tag2.setCategory("Soft Skills");
+        Tag tag1 = new Tag("Python", "Programming");
+        Tag tag2 = new Tag("Leadership", "Soft Skills");
 
         // Then
         assertEquals("Python", tag1.getName());
@@ -154,11 +146,11 @@ class DomainModelsTest {
         Admin admin = new Admin();
 
         // When - Admin doesn't have contactInfo field
-        admin.setId("admin-1");
+        admin.setId(UUID.randomUUID());
         admin.setName("Admin");
 
         // Then
-        assertEquals("admin-1", admin.getId());
+        assertNotNull(admin.getId());
         assertEquals("Admin", admin.getName());
         // Verify that Admin doesn't have contactInfo
         assertTrue(!java.util.Arrays.stream(admin.getClass().getDeclaredFields())

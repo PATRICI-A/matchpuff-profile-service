@@ -9,25 +9,18 @@ import com.matchpuff.profileservice.domain.model.Tag;
 import com.matchpuff.profileservice.domain.model.User;
 import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
 import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
 
-    private UserMapper mapper;
-
-    @BeforeEach
-    void setUp() {
-        // Implementación anónima para testear los métodos default de la interfaz
-        mapper = new UserMapper() { };
-    }
+    private UserMapper mapper = new UserMapperImpl();
 
     // ── resolveUserType ───────────────────────────────────────────
 
@@ -62,18 +55,16 @@ class UserMapperTest {
     @Test
     void givenStudentProfile_whenToResponseInfo_thenMapsAllFields() {
         StudentProfile student = new StudentProfile();
-        student.setId("s-1");
+        student.setId(UUID.randomUUID());
         student.setName("Ana Ruiz");
         student.setEmail("ana@escuelaing.edu.co");
         student.setGender(GenderEnum.FEMALE);
         student.setDateOfBirth(LocalDate.of(1999, 3, 10));
-        student.setStudentCarnet(20211234L);
+        student.setStudentCarnet("2021123412");
         student.setBiography("Estudiante apasionada");
         student.setCreatedAt(LocalDateTime.of(2024, 1, 1, 0, 0));
 
-        Tag tag = new Tag();
-        tag.setName("Spring Boot");
-        tag.setCategory("Backend");
+        Tag tag = new Tag("Spring Boot", "Backend");
         student.setTags(List.of(tag));
 
         Schedule schedule = new Schedule( DayOfWeekEnum.TUESDAY, "Algoritmos", LocalTime.of(9, 0), LocalTime.of(11, 0));
@@ -83,12 +74,12 @@ class UserMapperTest {
         assertTrue(info instanceof StudentProfileResponse);
         StudentProfileResponse studentInfo = (StudentProfileResponse) info;
 
-        assertEquals("s-1", studentInfo.getId());
+        assertEquals(student.getId(), studentInfo.getId());
         assertEquals("Ana Ruiz", studentInfo.getName());
         assertEquals("ana@escuelaing.edu.co", studentInfo.getEmail());
         assertEquals("STUDENT", studentInfo.getUserType());
         assertEquals("FEMALE", studentInfo.getGender());
-        assertEquals(20211234L, studentInfo.getStudentCarnet());
+        assertEquals("2021123412", studentInfo.getStudentCarnet());
         assertEquals("Estudiante apasionada", studentInfo.getBiography());
         assertNotNull(studentInfo.getTags());
         assertEquals(1, studentInfo.getTags().size());
@@ -99,7 +90,7 @@ class UserMapperTest {
     @Test
     void givenStudentWithNullSchedulesAndTags_whenToResponseInfo_thenSchedulesAndTagsAreNull() {
         StudentProfile student = new StudentProfile();
-        student.setId("s-2");
+        student.setId(UUID.randomUUID());
         student.setName("Pedro Gomez");
         student.setEmail("pedro@escuelaing.edu.co");
         student.setSchedules(null);
@@ -116,7 +107,7 @@ class UserMapperTest {
     @Test
     void givenAdmin_whenToResponseInfo_thenBiographySchedulesAndTagsAreNull() {
         Admin admin = new Admin();
-        admin.setId("a-1");
+        admin.setId(UUID.randomUUID());
         admin.setName("Admin User");
         admin.setEmail("admin@escuelaing.edu.co");
 
@@ -131,7 +122,7 @@ class UserMapperTest {
     @Test
     void givenOrganizer_whenToResponseInfo_thenUserTypeIsORGANIZER() {
         Organizer organizer = new Organizer();
-        organizer.setId("o-1");
+        organizer.setId(UUID.randomUUID());
         organizer.setName("Evento Corp");
         organizer.setEmail("org@escuelaing.edu.co");
         organizer.setContactInfo("contact@example.com");
@@ -141,14 +132,14 @@ class UserMapperTest {
         OrganizerResponse orgInfo = (OrganizerResponse) info;
 
         assertEquals("ORGANIZER", orgInfo.getUserType());
-        assertEquals("o-1", orgInfo.getId());
+        assertEquals(organizer.getId(), orgInfo.getId());
         assertEquals("contact@example.com", orgInfo.getContactInfo());
     }
 
     @Test
     void givenStudentWithGenderAndDob_whenToResponseInfo_thenGenderAndDobAreMapped() {
         StudentProfile student = new StudentProfile();
-        student.setId("s-3");
+        student.setId(UUID.randomUUID());
         student.setName("Luis");
         student.setEmail("luis@escuelaing.edu.co");
         student.setGender(GenderEnum.MALE);
@@ -201,10 +192,7 @@ class UserMapperTest {
 
     @Test
     void givenTagList_whenToTagResponseList_thenMapsAllFields() {
-        Tag tag = new Tag();
-        tag.setName("Docker");
-        tag.setCategory("DevOps");
-
+        Tag tag = new Tag("Docker", "DevOps");
         List<TagResponse> result = mapper.toTagResponseList(List.of(tag));
 
         assertEquals(1, result.size());
@@ -214,12 +202,10 @@ class UserMapperTest {
 
     @Test
     void givenMultipleTags_whenToTagResponseList_thenMapsAll() {
-        Tag t1 = new Tag();
-        t1.setName("Java");
+        Tag t1 = new Tag("Java", "Backend");
         t1.setCategory("Backend");
 
-        Tag t2 = new Tag();
-        t2.setName("React");
+        Tag t2 = new Tag("React", "Frontend");
         t2.setCategory("Frontend");
 
         List<TagResponse> result = mapper.toTagResponseList(List.of(t1, t2));
@@ -232,7 +218,7 @@ class UserMapperTest {
     @Test
     void givenStudentWithPhoto_whenToResponseProfilePhoto_thenReturnsPhotoInfo() {
         StudentProfile s = new StudentProfile();
-        s.setId("s-photo");
+        s.setId(UUID.randomUUID());
         s.setName("Photo User");
         s.setEmail("photo@escuelaing.edu.co");
         s.setPhotoUrl("http://photo.png");
@@ -245,7 +231,7 @@ class UserMapperTest {
     @Test
     void givenNonStudent_whenToResponseProfilePhoto_thenReturnsNull() {
         Admin a = new Admin();
-        a.setId("a-1");
+        a.setId(UUID.randomUUID());
         assertNull(mapper.toResponseProfilePhoto(a));
     }
 }

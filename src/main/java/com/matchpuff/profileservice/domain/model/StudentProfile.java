@@ -8,6 +8,7 @@ import com.matchpuff.profileservice.domain.model.enums.CareerEnum;
 import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
 import com.matchpuff.profileservice.domain.valueobjects.Biography;
 import com.matchpuff.profileservice.domain.valueobjects.StudentCarnet;
+import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
 
 @Data
 public class StudentProfile extends User {
@@ -29,15 +30,43 @@ public class StudentProfile extends User {
         return biography != null ? biography.getValue() : null;
     }
 
-    public void setStudentCarnet(Long studentCarnet) {
-        if (studentCarnet != null && studentCarnet > 0) {
+    public void setStudentCarnet(String studentCarnet) {
+        if (studentCarnet != null && !studentCarnet.trim().isEmpty()) {
             this.studentCarnet = new StudentCarnet(studentCarnet);
         } else {
             this.studentCarnet = null;
         }
     }
 
-    public Long getStudentCarnet() {
+    public String getStudentCarnet() {
         return studentCarnet != null ? studentCarnet.getValue() : null;
+    }
+
+    public void setCareer(CareerEnum career) {
+        if (career == null) {
+            throw new InvalidInputException("Career must not be null");
+        }
+        this.career = career;
+    }
+
+    public void setSemester(int semester) {
+        if (semester != 0 && (semester < 1 || semester > 10)) {
+            throw new InvalidInputException("Semester must be between 1 and 10");
+        }
+        this.semester = semester;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        if (photoUrl == null || photoUrl.isBlank()) {
+            throw new InvalidInputException("Photo URL must not be blank");
+        }
+        this.photoUrl = photoUrl;
+    }
+
+    public void setPrivacyLevel(PrivacyLevelEnum privacyLevel) {
+        if (privacyLevel == null) {
+            throw new InvalidInputException("Privacy level must not be null");
+        }
+        this.privacyLevel = privacyLevel;
     }
 }

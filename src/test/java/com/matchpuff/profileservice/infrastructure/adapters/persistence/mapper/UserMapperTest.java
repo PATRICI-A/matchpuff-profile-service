@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -36,7 +37,7 @@ class UserMapperTest {
 
     private StudentProfile buildStudent() {
         StudentProfile s = new StudentProfile();
-        s.setId("u-1");
+        s.setId(UUID.randomUUID());
         s.setName("Test User");
         s.setEmail("test@escuelaing.edu.co");
         s.setPasswordHash("HashedPassword123");
@@ -45,7 +46,7 @@ class UserMapperTest {
         s.setPhotoUrl("photo.jpg");
         s.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         s.setSemester(5);
-        s.setStudentCarnet(Long.valueOf(20211000));
+        s.setStudentCarnet("2021100011");
         s.setBiography("bio");
         s.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
 
@@ -56,10 +57,7 @@ class UserMapperTest {
             LocalTime.of(10, 0)
         );
 
-        Tag tag = new Tag();
-        tag.setName("Java");
-        tag.setCategory("TECH");
-
+        Tag tag = new Tag( "Java", "TECH" );
         s.setSchedules(List.of(schedule));
         s.setTags(List.of(tag));
 
@@ -68,7 +66,7 @@ class UserMapperTest {
 
     private StudentProfileDocument buildDocument() {
         StudentProfileDocument doc = new StudentProfileDocument();
-        doc.setId("u-1");
+        doc.setId(UUID.randomUUID());
         doc.setName("Test User");
         doc.setEmail("test@escuelaing.edu.co");
         doc.setPasswordHash("HashedPassword123");
@@ -77,7 +75,7 @@ class UserMapperTest {
         doc.setPhotourl("photo.jpg");
         doc.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         doc.setSemester(5);
-        doc.setStudentCarnet(Long.valueOf(20211000));
+        doc.setStudentCarnet("2021100011");
         doc.setBiography("bio");
         doc.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         doc.setUserType(UserType.STUDENT);
@@ -109,7 +107,7 @@ class UserMapperTest {
         StudentProfileDocument result = UserMapper.toDocument(student);
 
         assertNotNull(result);
-        assertEquals("u-1", result.getId());
+        assertEquals(student.getId(), result.getId());
         assertEquals(UserType.STUDENT, result.getUserType());
         assertEquals("Test User", result.getName());
         assertEquals("test@escuelaing.edu.co", result.getEmail());
@@ -128,7 +126,7 @@ class UserMapperTest {
         StudentProfile result = UserMapper.toDomain(doc);
 
         assertNotNull(result);
-        assertEquals("u-1", result.getId());
+        assertEquals(doc.getId(), result.getId());
         assertEquals("Test User", result.getName());
         assertEquals("test@escuelaing.edu.co", result.getEmail());
         assertEquals(5, result.getSemester());
@@ -289,7 +287,7 @@ class UserMapperTest {
     @Test
     void givenAdmin_whenToDocument_thenMapsCorrectly() {
         Admin admin = new Admin();
-        admin.setId("a-1");
+        admin.setId(UUID.randomUUID());
         admin.setName("Admin User");
         admin.setEmail("admin@escuelaing.edu.co");
         admin.setPasswordHash("HashedPass123");
@@ -298,7 +296,7 @@ class UserMapperTest {
         AdminProfileDocument result = UserMapper.toDocument(admin);
 
         assertNotNull(result);
-        assertEquals("a-1", result.getId());
+        assertEquals(admin.getId(), result.getId());
         assertEquals(UserType.ADMIN, result.getUserType());
         assertEquals("Admin User", result.getName());
     }
@@ -311,7 +309,7 @@ class UserMapperTest {
     @Test
     void givenAdminDocument_whenToDomain_thenMapsCorrectly() {
         AdminProfileDocument doc = new AdminProfileDocument();
-        doc.setId("a-1");
+        doc.setId(UUID.randomUUID());
         doc.setName("Admin User");
         doc.setEmail("admin@escuelaing.edu.co");
         doc.setPasswordHash("HashedPass123");
@@ -320,7 +318,7 @@ class UserMapperTest {
         Admin result = UserMapper.toDomain(doc);
 
         assertNotNull(result);
-        assertEquals("a-1", result.getId());
+        assertEquals(doc.getId(), result.getId());
         assertEquals("Admin User", result.getName());
         assertEquals(GenderEnum.MALE, result.getGender());
     }
@@ -337,7 +335,7 @@ class UserMapperTest {
     @Test
     void givenOrganizer_whenToDocument_thenMapsCorrectly() {
         Organizer organizer = new Organizer();
-        organizer.setId("o-1");
+        organizer.setId(UUID.randomUUID());
         organizer.setName("Club Org");
         organizer.setEmail("org@escuelaing.edu.co");
         organizer.setPasswordHash("HashedPass123");
@@ -347,7 +345,7 @@ class UserMapperTest {
         OrganizerProfileDocument result = UserMapper.toDocument(organizer);
 
         assertNotNull(result);
-        assertEquals("o-1", result.getId());
+        assertEquals(organizer.getId(), result.getId());
         assertEquals(UserType.ORGANIZER, result.getUserType());
         assertEquals("contact@evento.co", result.getContact());
     }
@@ -360,7 +358,7 @@ class UserMapperTest {
     @Test
     void givenOrganizerDocument_whenToDomain_thenMapsCorrectly() {
         OrganizerProfileDocument doc = new OrganizerProfileDocument();
-        doc.setId("o-1");
+        doc.setId(UUID.randomUUID());
         doc.setName("Club Org");
         doc.setEmail("org@escuelaing.edu.co");
         doc.setContact("contact@evento.co");
@@ -368,7 +366,7 @@ class UserMapperTest {
         Organizer result = UserMapper.toDomain(doc);
 
         assertNotNull(result);
-        assertEquals("o-1", result.getId());
+        assertEquals(doc.getId(), result.getId());
         assertEquals("contact@evento.co", result.getContactInfo());
     }
 
@@ -399,7 +397,7 @@ class UserMapperTest {
     @Test
     void givenAdminDocument_whenToDomainByType_thenReturnsAdmin() {
         AdminProfileDocument doc = new AdminProfileDocument();
-        doc.setId("a-1");
+        doc.setId(UUID.randomUUID());
         doc.setName("Admin");
         doc.setEmail("admin@escuelaing.edu.co");
 
@@ -412,7 +410,7 @@ class UserMapperTest {
     @Test
     void givenOrganizerDocument_whenToDomainByType_thenReturnsOrganizer() {
         OrganizerProfileDocument doc = new OrganizerProfileDocument();
-        doc.setId("o-1");
+        doc.setId(UUID.randomUUID());
         doc.setName("Organizer");
         doc.setEmail("org@escuelaing.edu.co");
         doc.setContact("contact@evento.co");
