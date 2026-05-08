@@ -47,10 +47,6 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
-# Allow the domain port package named "out" to be tracked by Git.
-!src/main/java/com/matchpuff/profileservice/domain/ports/out/
-!src/main/java/com/matchpuff/profileservice/domain/ports/out/UserRepositoryPort.java
-
 # Build results on 'Bin' directories
 **/[Bb]in/*
 # Uncomment if you have tasks that rely on *.refresh files to move binaries
