@@ -7,6 +7,7 @@ RUN mvn dependency:go-offline -B
 
 COPY src ./src
 
+
 ARG SSL_KEY_STORE_PASSWORD
 RUN keytool -genkeypair \
     -alias profile-service \
