@@ -23,7 +23,7 @@ Este microservicio gestiona la información del perfil de usuario y el flujo de 
 ### Diagramas
 - Diagrama de clases:
 
-![CAPTURA](docs/uml/DiagramaClases.jpg)
+![CAPTURA](docs/uml/DiagramaClases.png)
 
 
 - Diagrama de componentes: [pendiente de agregar]
