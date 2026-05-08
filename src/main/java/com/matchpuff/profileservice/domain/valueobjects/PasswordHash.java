@@ -13,13 +13,22 @@ public class PasswordHash {
             );
         }
 
-        if (!value.matches(".*[A-Z].*")) {
+        if (!containsUppercaseLetter(value)) {
             throw new InvalidInputException(
                 "The password must contain at least one uppercase letter"
             );
         }
 
         this.value = value;
+    }
+
+    private boolean containsUppercaseLetter(String value) {
+        for (int index = 0; index < value.length(); index++) {
+            if (Character.isUpperCase(value.charAt(index))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getValue() {

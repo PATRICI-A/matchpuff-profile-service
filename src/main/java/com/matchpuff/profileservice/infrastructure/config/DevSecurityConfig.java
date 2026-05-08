@@ -10,6 +10,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Profile("dev")
 public class DevSecurityConfig {
 
+    @SuppressWarnings("java:S4502")
     @Bean
     public SecurityFilterChain devSecurity(HttpSecurity http) throws Exception {
         http
