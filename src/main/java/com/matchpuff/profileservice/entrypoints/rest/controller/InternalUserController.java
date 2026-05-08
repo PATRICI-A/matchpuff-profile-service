@@ -19,24 +19,24 @@ public class InternalUserController {
     private final InternalUserServicePort internalUserService;
 
     @GetMapping("/{userId}")
-    @Tag(name = "Users - Lectura", description = "Obtener información de usuarios")
-    @Operation(summary = "Obtener usuario por ID")
+    @Tag(name = "Users - Reading", description = "Obtain information about users")
+    @Operation(summary = "Obtain user by ID")
     public ResponseEntity<UserAuthResponse> getUser(
             @PathVariable String userId) {
         return ResponseEntity.ok(internalUserService.getUser(userId));
     }
 
     @GetMapping("/mail/{email}")
-    @Tag(name = "Users - Lectura", description = "Obtener información de usuarios")
-    @Operation(summary = "Obtener usuario por mail")
+    @Tag(name = "Users - Reading", description = "Obtain information about users")
+    @Operation(summary = "Obtain user by email")
     public ResponseEntity<UserAuthResponse> getUserByEmail(
             @PathVariable String email) {
         return ResponseEntity.ok(internalUserService.getUserByEmail(email));
     }
 
     @PatchMapping("/{userId}/verify")
-    @Tag(name = "Users - Actualización", description = "Actualizar información de usuarios")
-    @Operation(summary = "Verificar usuario")
+    @Tag(name = "Users - Update", description = "Update user information")
+    @Operation(summary = "Verify user")
     public ResponseEntity<Void> verifyUser(
             @PathVariable String userId) {
         internalUserService.verifyUser(userId);
