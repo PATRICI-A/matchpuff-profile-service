@@ -89,6 +89,9 @@ jobs:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: profile-service
           image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          environment-variables: |
+            SPRING_PROFILES_ACTIVE=prod
+            SSL_KEY_STORE_PASSWORD=${{ secrets.SSL_KEY_STORE_PASSWORD }}
 
       # =========================================
       # Deploy to ECS
