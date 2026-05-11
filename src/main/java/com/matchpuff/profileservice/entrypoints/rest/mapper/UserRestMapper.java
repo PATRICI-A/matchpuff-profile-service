@@ -37,7 +37,9 @@ public class UserRestMapper {
         if (request.getPhotourl() != null) student.setPhotoUrl(request.getPhotourl());
         if (request.getBiography() != null) student.setBiography(request.getBiography());
         if (request.getPrivacyLevel() != null) student.setPrivacyLevel(request.getPrivacyLevel());
-
+        if (request.getDateOfBirth() != null) student.setDateOfBirth(request.getDateOfBirth());
+        if (request.getGeolocationEnabled() != null) student.setGeolocationEnabled(request.getGeolocationEnabled());
+        
         student.setTags(toDomainTags(Collections.emptyList()));
         student.setSchedules(toDomainSchedules(Collections.emptyList()));
 

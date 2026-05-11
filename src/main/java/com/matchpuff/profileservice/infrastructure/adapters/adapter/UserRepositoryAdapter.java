@@ -136,6 +136,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         merged.setStudentCarnet(incoming.getStudentCarnet() != null ? incoming.getStudentCarnet() : current.getStudentCarnet());
         merged.setBiography(incoming.getBiography() != null ? incoming.getBiography() : current.getBiography());
         merged.setPrivacyLevel(incoming.getPrivacyLevel() != null ? incoming.getPrivacyLevel() : current.getPrivacyLevel());
+        merged.setGeolocationEnabled(incoming.isGeolocationEnabled());
         merged.setSchedule(incoming.getSchedules() != null ? UserMapper.toDocument(incoming).getSchedule() : current.getSchedule());
         merged.setInterests(incoming.getTags() != null ? UserMapper.toDocument(incoming).getInterests() : current.getInterests());
         return merged;

@@ -21,6 +21,7 @@ public interface UserUseCasePort {
     User addScheduleToStudent(String userId, Schedule schedule);
     User addTagToStudent(String userId, Tag tag);
     User updateProfileImage(String userId, byte[] file, String contentType);
+    User updateGeolocation(String userId, boolean geolocationEnabled);
     List<User> getAllUsers();
     List<StudentProfile> getAllStudentProfiles();
 }

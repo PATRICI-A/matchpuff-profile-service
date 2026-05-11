@@ -18,6 +18,7 @@ public class StudentProfile extends User {
     private String photoUrl;
     private Biography biography;
     private PrivacyLevelEnum privacyLevel;
+    private boolean geolocationEnabled;
     private List<Schedule> schedules;
     private List<Tag> tags;
 

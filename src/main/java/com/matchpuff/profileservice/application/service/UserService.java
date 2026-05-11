@@ -90,4 +90,10 @@ public class UserService implements UserServicePort {
         List<StudentProfile> profiles = userUseCase.getAllStudentProfiles();
         return profiles.stream().map(userMapper::toResponse).toList();
     }
+
+    @Override
+    public UserResponse updateGeolocation(String userId, boolean geolocationEnabled) {
+        User updated = userUseCase.updateGeolocation(userId, geolocationEnabled);
+        return userMapper.toResponse(updated);
+    }
 }

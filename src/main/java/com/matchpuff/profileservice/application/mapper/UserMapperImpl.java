@@ -47,6 +47,7 @@ public class UserMapperImpl implements UserMapper {
                     .photoUrl(student.getPhotoUrl())
                     .biography(student.getBiography())
                     .privacyLevel(student.getPrivacyLevel())
+                    .geolocationEnabled(student.isGeolocationEnabled())
                     .schedules(toScheduleResponseList(student.getSchedules()))
                     .tags(toTagResponseList(student.getTags()))
                     .build();

@@ -2,6 +2,7 @@ package com.matchpuff.profileservice.entrypoints.rest.controller;
 
 import com.matchpuff.profileservice.application.dto.request.ScheduleRequest;
 import com.matchpuff.profileservice.application.dto.request.ChangePasswordRequest;
+import com.matchpuff.profileservice.application.dto.request.GeolocationRequest;
 import com.matchpuff.profileservice.application.dto.request.TagRequest;
 import com.matchpuff.profileservice.application.dto.request.UserAdminUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserAdminRequest;
@@ -172,6 +173,15 @@ public class UserController {
         } catch (IOException e) {
             throw new InvalidInputException("It was not possible to read the file. Please try again.");
         }
+    }
+
+    @PatchMapping("/{userId}/geolocation")
+    @Tag(name = "User Profiles", description = "Manage user profiles and content")
+    @Operation(summary = "Enable or disable geolocation for the user")
+    public ResponseEntity<UserResponse> updateGeolocation(
+            @PathVariable String userId,
+            @Valid @RequestBody GeolocationRequest request) {
+        return ResponseEntity.ok(userService.updateGeolocation(userId, request.isGeolocationEnabled()));
     }
 
     @GetMapping("/{userId}/profile-image")

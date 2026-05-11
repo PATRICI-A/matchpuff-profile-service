@@ -78,6 +78,16 @@ public class UserUseCase implements UserUseCasePort {
         user.setVerified(true);
         userRepository.update(userId, user);
     }
+    
+    @Override
+    public User updateGeolocation(String userId, boolean geolocationEnabled) {
+        User user = findOrThrow(userId);
+        if (!(user instanceof StudentProfile)) {
+            throw new ProfileServiceException("Only STUDENT users can update geolocation settings", HttpStatus.BAD_REQUEST);
+        }
+        ((StudentProfile) user).setGeolocationEnabled(geolocationEnabled);
+        return userRepository.update(userId, user);
+    }
 
     @Override
     public User updateUser(String userId, User user) {

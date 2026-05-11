@@ -23,7 +23,7 @@ public interface UserServicePort {
     UserResponse addSchedule(String userId, Schedule schedule);
     UserResponse addTag(String userId, Tag tag);
     UserResponseProfilePhoto updateProfileImage(String userId, byte[] file, String contentType);
-
+    UserResponse updateGeolocation(String userId, boolean geolocationEnabled);
 
     List<UserResponse> getAllUsers();
     List<UserResponse> getAllStudentProfiles();

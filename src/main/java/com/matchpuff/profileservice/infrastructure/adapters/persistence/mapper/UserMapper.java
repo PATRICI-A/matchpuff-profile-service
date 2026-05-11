@@ -46,6 +46,7 @@ public class UserMapper {
 		doc.setStudentCarnet(profile.getStudentCarnet());
 		doc.setBiography(profile.getBiography());
 		doc.setPrivacyLevel(profile.getPrivacyLevel());
+		doc.setGeolocationEnabled(profile.isGeolocationEnabled());
 		doc.setSchedule(toScheduleDocumentList(profile.getSchedules()));
 		doc.setInterests(toTagDocumentList(profile.getTags()));
 
@@ -112,6 +113,7 @@ public class UserMapper {
 		if (doc.getPrivacyLevel() != null) {
 			profile.setPrivacyLevel(doc.getPrivacyLevel());
 		}
+		profile.setGeolocationEnabled(doc.isGeolocationEnabled());
 		profile.setSchedules(toScheduleList(doc.getSchedule()));
 		profile.setTags(toTagList(doc.getInterests()));
 
