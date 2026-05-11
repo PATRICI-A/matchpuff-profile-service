@@ -18,6 +18,7 @@ import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.T
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.UserDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.UserType;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +32,8 @@ import static org.mockito.Mockito.mock;
 
 class UserMapperTest {
 
+    private final UserPersistenceMapper mapper = Mappers.getMapper(UserPersistenceMapper.class);
+
     // ─────────────────────────────────────────────
     // Helpers
     // ─────────────────────────────────────────────
@@ -41,6 +44,7 @@ class UserMapperTest {
         s.setName("Test User");
         s.setEmail("test@escuelaing.edu.co");
         s.setPasswordHash("HashedPassword123");
+        s.setGender(GenderEnum.MALE);
         s.setDateOfBirth(LocalDate.of(2000, 1, 1));
         s.setCreatedAt(LocalDateTime.now());
         s.setPhotoUrl("photo.jpg");
@@ -57,7 +61,7 @@ class UserMapperTest {
             LocalTime.of(10, 0)
         );
 
-        Tag tag = new Tag( "Java", "TECH" );
+        Tag tag = new Tag("Java", "TECH");
         s.setSchedules(List.of(schedule));
         s.setTags(List.of(tag));
 
@@ -70,6 +74,7 @@ class UserMapperTest {
         doc.setName("Test User");
         doc.setEmail("test@escuelaing.edu.co");
         doc.setPasswordHash("HashedPassword123");
+        doc.setGender(GenderEnum.MALE);
         doc.setBirthdate(LocalDateTime.of(2000, 1, 1, 0, 0));
         doc.setCreatedAt(LocalDateTime.now());
         doc.setPhotourl("photo.jpg");
@@ -104,7 +109,7 @@ class UserMapperTest {
     void givenStudent_whenToDocument_thenMapsCorrectly() {
         StudentProfile student = buildStudent();
 
-        StudentProfileDocument result = UserMapper.toDocument(student);
+        StudentProfileDocument result = mapper.toDocument(student);
 
         assertNotNull(result);
         assertEquals(student.getId(), result.getId());
@@ -123,7 +128,7 @@ class UserMapperTest {
     void givenDocument_whenToDomain_thenMapsCorrectly() {
         StudentProfileDocument doc = buildDocument();
 
-        StudentProfile result = UserMapper.toDomain(doc);
+        StudentProfile result = mapper.toDomain(doc);
 
         assertNotNull(result);
         assertEquals(doc.getId(), result.getId());
@@ -143,14 +148,14 @@ class UserMapperTest {
     void givenDocumentList_whenToDomainList_thenMapsAll() {
         List<StudentProfileDocument> docs = List.of(buildDocument());
 
-        List<StudentProfile> result = UserMapper.toDomainList(docs);
+        List<StudentProfile> result = mapper.toDomainList(docs);
 
         assertEquals(1, result.size());
     }
 
     @Test
     void givenNullList_whenToDomainList_thenReturnsEmpty() {
-        List<StudentProfile> result = UserMapper.toDomainList(null);
+        List<StudentProfile> result = mapper.toDomainList(null);
 
         assertTrue(result.isEmpty());
     }
@@ -167,7 +172,7 @@ class UserMapperTest {
         doc.setStartHour(LocalTime.of(8, 0));
         doc.setFinishHour(LocalTime.of(10, 0));
 
-        List<Schedule> result = UserMapper.toScheduleList(List.of(doc));
+        List<Schedule> result = mapper.toScheduleList(List.of(doc));
 
         assertEquals(1, result.size());
         assertEquals(DayOfWeekEnum.MONDAY, result.get(0).getDayOfWeek());
@@ -175,7 +180,7 @@ class UserMapperTest {
 
     @Test
     void givenNullSchedules_whenToScheduleList_thenReturnsEmpty() {
-        assertTrue(UserMapper.toScheduleList(null).isEmpty());
+        assertTrue(mapper.toScheduleList(null).isEmpty());
     }
 
     // ─────────────────────────────────────────────
@@ -188,7 +193,7 @@ class UserMapperTest {
         doc.setName("Java");
         doc.setCategory("TECH");
 
-        List<Tag> result = UserMapper.toTagList(List.of(doc));
+        List<Tag> result = mapper.toTagList(List.of(doc));
 
         assertEquals(1, result.size());
         assertEquals("Java", result.get(0).getName());
@@ -196,7 +201,7 @@ class UserMapperTest {
 
     @Test
     void givenNullTags_whenToTagList_thenReturnsEmpty() {
-        assertTrue(UserMapper.toTagList(null).isEmpty());
+        assertTrue(mapper.toTagList(null).isEmpty());
     }
 
     // ─────────────────────────────────────────────
@@ -208,7 +213,7 @@ class UserMapperTest {
         StudentProfile student = buildStudent();
         student.setDateOfBirth(null);
 
-        StudentProfileDocument result = UserMapper.toDocument(student);
+        StudentProfileDocument result = mapper.toDocument(student);
 
         assertNotNull(result);
         assertNull(result.getBirthdate());
@@ -219,11 +224,10 @@ class UserMapperTest {
         StudentProfile student = buildStudent();
         student.setSchedules(null);
 
-        StudentProfileDocument result = UserMapper.toDocument(student);
+        StudentProfileDocument result = mapper.toDocument(student);
 
         assertNotNull(result);
-        assertNotNull(result.getSchedule());
-        assertTrue(result.getSchedule().isEmpty());
+        assertNull(result.getSchedule());
     }
 
     @Test
@@ -231,11 +235,10 @@ class UserMapperTest {
         StudentProfile student = buildStudent();
         student.setTags(null);
 
-        StudentProfileDocument result = UserMapper.toDocument(student);
+        StudentProfileDocument result = mapper.toDocument(student);
 
         assertNotNull(result);
-        assertNotNull(result.getInterests());
-        assertTrue(result.getInterests().isEmpty());
+        assertNull(result.getInterests());
     }
 
     // ─────────────────────────────────────────────
@@ -247,7 +250,7 @@ class UserMapperTest {
         StudentProfileDocument doc = buildDocument();
         doc.setBirthdate(null);
 
-        StudentProfile result = UserMapper.toDomain(doc);
+        StudentProfile result = mapper.toDomain(doc);
 
         assertNotNull(result);
         assertNull(result.getDateOfBirth());
@@ -258,7 +261,7 @@ class UserMapperTest {
         StudentProfileDocument doc = buildDocument();
         doc.setSemester(null);
 
-        StudentProfile result = UserMapper.toDomain(doc);
+        StudentProfile result = mapper.toDomain(doc);
 
         assertNotNull(result);
         assertEquals(0, result.getSemester());
@@ -272,8 +275,8 @@ class UserMapperTest {
     void givenStudent_whenToDocumentAndBack_thenConsistencyMaintained() {
         StudentProfile original = buildStudent();
 
-        StudentProfileDocument doc = UserMapper.toDocument(original);
-        StudentProfile mappedBack = UserMapper.toDomain(doc);
+        StudentProfileDocument doc = mapper.toDocument(original);
+        StudentProfile mappedBack = mapper.toDomain(doc);
 
         assertEquals(original.getId(), mappedBack.getId());
         assertEquals(original.getEmail(), mappedBack.getEmail());
@@ -293,7 +296,7 @@ class UserMapperTest {
         admin.setPasswordHash("HashedPass123");
         admin.setGender(GenderEnum.MALE);
 
-        AdminProfileDocument result = UserMapper.toDocument(admin);
+        AdminProfileDocument result = mapper.toDocument(admin);
 
         assertNotNull(result);
         assertEquals(admin.getId(), result.getId());
@@ -303,7 +306,7 @@ class UserMapperTest {
 
     @Test
     void givenNullAdmin_whenToDocument_thenReturnsNull() {
-        assertNull(UserMapper.toDocument((Admin) null));
+        assertNull(mapper.toDocument((Admin) null));
     }
 
     @Test
@@ -315,7 +318,7 @@ class UserMapperTest {
         doc.setPasswordHash("HashedPass123");
         doc.setGender(GenderEnum.MALE);
 
-        Admin result = UserMapper.toDomain(doc);
+        Admin result = mapper.toDomain(doc);
 
         assertNotNull(result);
         assertEquals(doc.getId(), result.getId());
@@ -325,7 +328,7 @@ class UserMapperTest {
 
     @Test
     void givenNullAdminDocument_whenToDomain_thenReturnsNull() {
-        assertNull(UserMapper.toDomain((AdminProfileDocument) null));
+        assertNull(mapper.toDomain((AdminProfileDocument) null));
     }
 
     // ─────────────────────────────────────────────
@@ -342,7 +345,7 @@ class UserMapperTest {
         organizer.setGender(GenderEnum.FEMALE);
         organizer.setContactInfo("contact@evento.co");
 
-        OrganizerProfileDocument result = UserMapper.toDocument(organizer);
+        OrganizerProfileDocument result = mapper.toDocument(organizer);
 
         assertNotNull(result);
         assertEquals(organizer.getId(), result.getId());
@@ -352,7 +355,7 @@ class UserMapperTest {
 
     @Test
     void givenNullOrganizer_whenToDocument_thenReturnsNull() {
-        assertNull(UserMapper.toDocument((Organizer) null));
+        assertNull(mapper.toDocument((Organizer) null));
     }
 
     @Test
@@ -361,9 +364,10 @@ class UserMapperTest {
         doc.setId(UUID.randomUUID());
         doc.setName("Club Org");
         doc.setEmail("org@escuelaing.edu.co");
+        doc.setGender(GenderEnum.FEMALE);
         doc.setContact("contact@evento.co");
 
-        Organizer result = UserMapper.toDomain(doc);
+        Organizer result = mapper.toDomain(doc);
 
         assertNotNull(result);
         assertEquals(doc.getId(), result.getId());
@@ -372,7 +376,7 @@ class UserMapperTest {
 
     @Test
     void givenNullOrganizerDocument_whenToDomain_thenReturnsNull() {
-        assertNull(UserMapper.toDomain((OrganizerProfileDocument) null));
+        assertNull(mapper.toDomain((OrganizerProfileDocument) null));
     }
 
     // ─────────────────────────────────────────────
@@ -381,16 +385,15 @@ class UserMapperTest {
 
     @Test
     void givenNullDocument_whenToDomainByType_thenReturnsEmpty() {
-        Optional<User> result = UserMapper.toDomainByType(null);
+        Optional<User> result = mapper.toDomainByType(null);
         assertTrue(result.isEmpty());
     }
 
     @Test
     void givenDocumentWithNullType_whenToDomainByType_thenReturnsEmpty() {
-        // UserDocument is abstract; mock it so getUserType() returns null
         UserDocument mockDoc = mock(UserDocument.class);
 
-        Optional<User> result = UserMapper.toDomainByType(mockDoc);
+        Optional<User> result = mapper.toDomainByType(mockDoc);
         assertTrue(result.isEmpty());
     }
 
@@ -400,8 +403,9 @@ class UserMapperTest {
         doc.setId(UUID.randomUUID());
         doc.setName("Admin");
         doc.setEmail("admin@escuelaing.edu.co");
+        doc.setGender(GenderEnum.MALE);
 
-        Optional<User> result = UserMapper.toDomainByType(doc);
+        Optional<User> result = mapper.toDomainByType(doc);
 
         assertTrue(result.isPresent());
         assertInstanceOf(Admin.class, result.get());
@@ -413,9 +417,10 @@ class UserMapperTest {
         doc.setId(UUID.randomUUID());
         doc.setName("Organizer");
         doc.setEmail("org@escuelaing.edu.co");
+        doc.setGender(GenderEnum.MALE);
         doc.setContact("contact@evento.co");
 
-        Optional<User> result = UserMapper.toDomainByType(doc);
+        Optional<User> result = mapper.toDomainByType(doc);
 
         assertTrue(result.isPresent());
         assertInstanceOf(Organizer.class, result.get());
@@ -430,13 +435,13 @@ class UserMapperTest {
         StudentProfile student = buildStudent();
         student.setDateOfBirth(null);
 
-        StudentProfileDocument result = UserMapper.toDocument(student);
+        StudentProfileDocument result = mapper.toDocument(student);
 
         assertNull(result.getBirthdate());
     }
 
     @Test
     void givenNullStudent_whenToDocument_thenReturnsNull() {
-        assertNull(UserMapper.toDocument((StudentProfile) null));
+        assertNull(mapper.toDocument((StudentProfile) null));
     }
 }
