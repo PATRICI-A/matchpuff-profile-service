@@ -18,10 +18,6 @@ on:
 env:
   JAVA_VERSION: '21'
 
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
 
   sonar:
@@ -49,10 +45,11 @@ jobs:
           cache: maven
 
       # =========================================
-      # SonarCloud Analysis
+      # Run SonarCloud analysis
       # =========================================
       - name: Run Sonar Analysis
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
@@ -64,7 +61,4 @@ jobs:
             -Dsonar.organization=${SONAR_ORGANIZATION} \
             -Dsonar.host.url=${SONAR_HOST_URL} \
             -Dsonar.token=${SONAR_TOKEN} \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
-            -Dsonar.pullrequest.key=${{ github.event.pull_request.number || '' }} \
-            -Dsonar.pullrequest.branch=${{ github.head_ref || '' }} \
-            -Dsonar.pullrequest.base=${{ github.base_ref || '' }}
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
