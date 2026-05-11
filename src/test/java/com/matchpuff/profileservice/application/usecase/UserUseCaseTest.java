@@ -392,6 +392,60 @@ class UserUseCaseTest {
         );
     }
 
+    // ── removeScheduleFromStudent / removeTagFromStudent ─────────
+
+    @Test
+    void givenExistingSchedule_whenRemoveSchedule_thenScheduleIsRemoved() {
+        Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Calculo", LocalTime.of(8, 0), LocalTime.of(10, 0));
+        student.setSchedules(new ArrayList<>(List.of(schedule)));
+
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.update("user-1", student)).thenReturn(student);
+
+        User result = userUseCase.removeScheduleFromStudent("user-1", schedule);
+
+        assertTrue(((StudentProfile) result).getSchedules().isEmpty());
+        verify(userRepository).update("user-1", student);
+    }
+
+    @Test
+    void givenMissingSchedule_whenRemoveSchedule_thenThrowsProfileServiceException() {
+        Schedule existing = new Schedule(DayOfWeekEnum.MONDAY, "Calculo", LocalTime.of(8, 0), LocalTime.of(10, 0));
+        Schedule toRemove = new Schedule(DayOfWeekEnum.TUESDAY, "Fisica", LocalTime.of(10, 0), LocalTime.of(12, 0));
+        student.setSchedules(new ArrayList<>(List.of(existing)));
+
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+
+        assertThrows(ProfileServiceException.class, () -> userUseCase.removeScheduleFromStudent("user-1", toRemove));
+        verify(userRepository, never()).update(anyString(), any());
+    }
+
+    @Test
+    void givenExistingTagInImmutableList_whenRemoveTag_thenTagIsRemoved() {
+        Tag tag = new Tag("Java", "Backend");
+        student.setTags(List.of(tag));
+
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.update("user-1", student)).thenReturn(student);
+
+        User result = userUseCase.removeTagFromStudent("user-1", tag);
+
+        assertTrue(((StudentProfile) result).getTags().isEmpty());
+        verify(userRepository).update("user-1", student);
+    }
+
+    @Test
+    void givenMissingTag_whenRemoveTag_thenThrowsProfileServiceException() {
+        Tag existing = new Tag("Java", "Backend");
+        Tag toRemove = new Tag("Kotlin", "Mobile");
+        student.setTags(new ArrayList<>(List.of(existing)));
+
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+
+        assertThrows(ProfileServiceException.class, () -> userUseCase.removeTagFromStudent("user-1", toRemove));
+        verify(userRepository, never()).update(anyString(), any());
+    }
+
     // ── deleteUser ───────────────────────────────────────────────
 
     @Test

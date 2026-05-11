@@ -68,6 +68,18 @@ public class UserService implements UserServicePort {
     }
 
     @Override
+    public UserResponse removeSchedule(String userId, Schedule schedule) {
+        User updated = userUseCase.removeScheduleFromStudent(userId, schedule);
+        return userMapper.toResponse(updated);
+    }
+
+    @Override
+    public UserResponse removeTag(String userId, Tag tag) {
+        User updated = userUseCase.removeTagFromStudent(userId, tag);
+        return userMapper.toResponse(updated);
+    }
+
+    @Override
     public UserResponse addTag(String userId, Tag tag) {
         User updated = userUseCase.addTagToStudent(userId, tag);
         return userMapper.toResponse(updated);

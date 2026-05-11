@@ -167,6 +167,10 @@ public class UserUseCase implements UserUseCasePort {
 
     @Override
     public User addScheduleToStudent(String userId, Schedule schedule) {
+        User user = findOrThrow(userId);
+        if (!(user instanceof StudentProfile)) {
+            throw new ProfileServiceException("Only STUDENT users can have schedules", HttpStatus.BAD_REQUEST);
+        }
         StudentProfile student = (StudentProfile) findOrThrow(userId);
         if (student.getSchedules() == null || student.getSchedules().getClass().getName().contains("ImmutableCollections")) {
             student.setSchedules(student.getSchedules() == null ? new ArrayList<>() : new ArrayList<>(student.getSchedules()));
@@ -176,12 +180,54 @@ public class UserUseCase implements UserUseCasePort {
     }
 
     @Override
+    public User removeScheduleFromStudent(String userId, Schedule schedule) {
+        User user = findOrThrow(userId);
+        if (!(user instanceof StudentProfile student)) {
+            throw new ProfileServiceException("Only STUDENT users can have schedules", HttpStatus.BAD_REQUEST);
+        }
+        if (student.getSchedules() == null) {
+            throw new ProfileServiceException("No schedules to remove", HttpStatus.BAD_REQUEST);
+        }
+        if (student.getSchedules().getClass().getName().contains("ImmutableCollections")) {
+            student.setSchedules(new ArrayList<>(student.getSchedules()));
+        }
+        boolean removed = student.getSchedules().removeIf(s -> s.equals(schedule));
+        if (!removed) {
+            throw new ProfileServiceException("Schedule not found for removal", HttpStatus.BAD_REQUEST);
+        }
+        return userRepository.update(userId, student);
+    }
+
+    @Override
     public User addTagToStudent(String userId, Tag tag) {
+        User user = findOrThrow(userId);
+        if (!(user instanceof StudentProfile)) {
+            throw new ProfileServiceException("Only STUDENT users can have tags", HttpStatus.BAD_REQUEST);
+        }
         StudentProfile student = (StudentProfile) findOrThrow(userId);
         if (student.getTags() == null || student.getTags().getClass().getName().contains("ImmutableCollections")) {
             student.setTags(student.getTags() == null ? new ArrayList<>() : new ArrayList<>(student.getTags()));
         }
         student.getTags().add(tag);
+        return userRepository.update(userId, student);
+    }
+
+    @Override
+    public User removeTagFromStudent(String userId, Tag tag) {
+        User user = findOrThrow(userId);
+        if (!(user instanceof StudentProfile student)) {
+            throw new ProfileServiceException("Only STUDENT users can have tags", HttpStatus.BAD_REQUEST);
+        }
+        if (student.getTags() == null) {
+            throw new ProfileServiceException("No tags to remove", HttpStatus.BAD_REQUEST);
+        }
+        if (student.getTags().getClass().getName().contains("ImmutableCollections")) {
+            student.setTags(new ArrayList<>(student.getTags()));
+        }
+        boolean removed = student.getTags().removeIf(t -> t.equals(tag));
+        if (!removed) {
+            throw new ProfileServiceException("Tag not found for removal", HttpStatus.BAD_REQUEST);
+        }
         return userRepository.update(userId, student);
     }
 

@@ -22,6 +22,8 @@ public interface UserServicePort {
     void changePassword(String userId, String currentPassword, String newPassword);
     UserResponse addSchedule(String userId, Schedule schedule);
     UserResponse addTag(String userId, Tag tag);
+    UserResponse removeSchedule(String userId, Schedule schedule);
+    UserResponse removeTag(String userId, Tag tag);
     UserResponseProfilePhoto updateProfileImage(String userId, byte[] file, String contentType);
     UserResponse updateGeolocation(String userId, boolean geolocationEnabled);
 

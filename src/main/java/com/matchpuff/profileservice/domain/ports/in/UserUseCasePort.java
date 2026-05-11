@@ -20,6 +20,8 @@ public interface UserUseCasePort {
     void verifyUser(String userId);
     User addScheduleToStudent(String userId, Schedule schedule);
     User addTagToStudent(String userId, Tag tag);
+    User removeScheduleFromStudent(String userId, Schedule schedule);
+    User removeTagFromStudent(String userId, Tag tag);
     User updateProfileImage(String userId, byte[] file, String contentType);
     User updateGeolocation(String userId, boolean geolocationEnabled);
     List<User> getAllUsers();

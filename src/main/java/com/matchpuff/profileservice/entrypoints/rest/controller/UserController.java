@@ -142,6 +142,15 @@ public class UserController {
         return ResponseEntity.ok(userService.addSchedule(userId, UserRestMapper.toDomain(request)));
     }
 
+    @PatchMapping("/{userId}/schedule/remove")
+    @Tag(name = "User Profiles", description = "Manage user profiles and content")
+    @Operation(summary = "Remove availability schedule from student user")
+    public ResponseEntity<UserResponse> removeUserSchedule(
+            @PathVariable String userId,
+            @Valid @RequestBody ScheduleRequest request) {
+        return ResponseEntity.ok(userService.removeSchedule(userId, UserRestMapper.toDomain(request)));
+    }
+
     @PatchMapping("/{userId}/tags")
     @Tag(name = "User Profiles", description = "Manage user profiles and content")
     @Operation(summary = "Add a tag/interest to the student user")
@@ -149,6 +158,15 @@ public class UserController {
             @PathVariable String userId,
             @Valid @RequestBody TagRequest request) {
         return ResponseEntity.ok(userService.addTag(userId, UserRestMapper.toDomain(request)));
+    }
+
+    @PatchMapping("/{userId}/tags/remove")
+    @Tag(name = "User Profiles", description = "Manage user profiles and content")
+    @Operation(summary = "Remove a tag/interest from the student user")
+    public ResponseEntity<UserResponse> removeUserTag(
+            @PathVariable String userId,
+            @Valid @RequestBody TagRequest request) {
+        return ResponseEntity.ok(userService.removeTag(userId, UserRestMapper.toDomain(request)));
     }
 
     @DeleteMapping("/{userId}")

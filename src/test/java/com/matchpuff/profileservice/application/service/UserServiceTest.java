@@ -219,6 +219,32 @@ class UserServiceTest {
         verify(userUseCase).addTagToStudent("user-1", tag);
     }
 
+    @Test
+    void givenUserIdAndSchedule_whenRemoveSchedule_thenReturnsMappedResponseInfo() {
+        Schedule schedule = new Schedule(DayOfWeekEnum.WEDNESDAY, "Algebra", LocalTime.of(12, 0), LocalTime.of(14, 0));
+
+        when(userUseCase.removeScheduleFromStudent("user-1", schedule)).thenReturn(student);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
+
+        UserResponse result = userService.removeSchedule("user-1", schedule);
+
+        assertNotNull(result);
+        verify(userUseCase).removeScheduleFromStudent("user-1", schedule);
+    }
+
+    @Test
+    void givenUserIdAndTag_whenRemoveTag_thenReturnsMappedResponseInfo() {
+        Tag tag = new Tag("Python", "Programación");
+
+        when(userUseCase.removeTagFromStudent("user-1", tag)).thenReturn(student);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
+
+        UserResponse result = userService.removeTag("user-1", tag);
+
+        assertNotNull(result);
+        verify(userUseCase).removeTagFromStudent("user-1", tag);
+    }
+
     // ── getAllUsers ────────────────────────────────────────────────
 
     @Test

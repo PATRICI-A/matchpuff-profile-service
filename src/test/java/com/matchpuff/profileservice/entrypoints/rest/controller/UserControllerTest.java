@@ -87,6 +87,7 @@ class UserControllerTest {
                       "endTime": "10:00:00"
                     }
                   ],
+                  "geolocationEnabled": true,
                   "dateOfBirth": "2000-01-01"
                 }
                 """;
@@ -268,6 +269,28 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @WithMockUser
+    void givenValidSchedule_whenRemoveSchedule_thenReturns200() throws Exception {
+        when(userService.removeSchedule(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
+
+        String scheduleJson = """
+                {
+                  "dayOfWeek": "WEDNESDAY",
+                  "name": "Programación Avanzada",
+                  "startTime": "10:00:00",
+                  "endTime": "12:00:00"
+                }
+                """;
+
+        mockMvc.perform(patch("/api/v1/users/user-1/schedule/remove")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(scheduleJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()));
+    }
+
     // ── PATCH /api/v1/users/{userId}/tags ────────────────────────────
 
     @Test
@@ -304,6 +327,26 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidTagJson))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void givenValidTag_whenRemoveTag_thenReturns200() throws Exception {
+        when(userService.removeTag(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
+
+        String tagJson = """
+                {
+                  "name": "Kubernetes",
+                  "category": "DevOps"
+                }
+                """;
+
+        mockMvc.perform(patch("/api/v1/users/user-1/tags/remove")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(tagJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()));
     }
 
     // ── POST /api/v1/users/admin ─────────────────────────────────────
