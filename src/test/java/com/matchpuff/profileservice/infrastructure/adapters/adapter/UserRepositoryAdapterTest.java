@@ -11,7 +11,9 @@ import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.AdminProfileDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.OrganizerProfileDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.StudentProfileDocument;
+import com.matchpuff.profileservice.infrastructure.adapters.persistence.mapper.UserPersistenceMapper;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,10 +36,102 @@ class UserRepositoryAdapterTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private UserPersistenceMapper userMapper;
+
     @InjectMocks
     private UserRepositoryAdapter adapter;
 
     private static final String VALID_EMAIL = "test@escuelaing.edu.co";
+
+    @BeforeEach
+    void setUpMapperStubs() {
+        lenient().when(userMapper.toDocument(any(StudentProfile.class)))
+            .thenAnswer(inv -> {
+                StudentProfile s = inv.getArgument(0);
+                StudentProfileDocument doc = new StudentProfileDocument();
+                doc.setId(s.getId() != null ? s.getId() : java.util.UUID.randomUUID());
+                doc.setEmail(s.getEmail());
+                doc.setName(s.getName());
+                doc.setCreatedAt(s.getCreatedAt());
+                return doc;
+            });
+        lenient().when(userMapper.toDocument(any(Admin.class)))
+            .thenAnswer(inv -> {
+                Admin a = inv.getArgument(0);
+                AdminProfileDocument doc = new AdminProfileDocument();
+                doc.setId(a.getId() != null ? a.getId() : java.util.UUID.randomUUID());
+                doc.setEmail(a.getEmail());
+                doc.setName(a.getName());
+                doc.setCreatedAt(a.getCreatedAt());
+                return doc;
+            });
+        lenient().when(userMapper.toDocument(any(Organizer.class)))
+            .thenAnswer(inv -> {
+                Organizer o = inv.getArgument(0);
+                OrganizerProfileDocument doc = new OrganizerProfileDocument();
+                doc.setId(o.getId() != null ? o.getId() : java.util.UUID.randomUUID());
+                doc.setEmail(o.getEmail());
+                doc.setName(o.getName());
+                doc.setContact(o.getContactInfo());
+                doc.setCreatedAt(o.getCreatedAt());
+                return doc;
+            });
+        lenient().when(userMapper.toDomain(any(StudentProfileDocument.class)))
+            .thenAnswer(inv -> {
+                StudentProfileDocument doc = inv.getArgument(0);
+                StudentProfile s = new StudentProfile();
+                s.setId(doc.getId());
+                if (doc.getEmail() != null) s.setEmail(doc.getEmail());
+                if (doc.getName() != null) s.setName(doc.getName());
+                return s;
+            });
+        lenient().when(userMapper.toDomain(any(AdminProfileDocument.class)))
+            .thenAnswer(inv -> {
+                AdminProfileDocument doc = inv.getArgument(0);
+                Admin a = new Admin();
+                a.setId(doc.getId());
+                if (doc.getEmail() != null) a.setEmail(doc.getEmail());
+                if (doc.getName() != null) a.setName(doc.getName());
+                return a;
+            });
+        lenient().when(userMapper.toDomain(any(OrganizerProfileDocument.class)))
+            .thenAnswer(inv -> {
+                OrganizerProfileDocument doc = inv.getArgument(0);
+                Organizer o = new Organizer();
+                o.setId(doc.getId());
+                if (doc.getEmail() != null) o.setEmail(doc.getEmail());
+                if (doc.getName() != null) o.setName(doc.getName());
+                o.setContactInfo(doc.getContact());
+                return o;
+            });
+        lenient().when(userMapper.toDomainByType(any(StudentProfileDocument.class)))
+            .thenAnswer(inv -> {
+                StudentProfileDocument doc = inv.getArgument(0);
+                StudentProfile s = new StudentProfile();
+                s.setId(doc.getId());
+                if (doc.getEmail() != null) s.setEmail(doc.getEmail());
+                if (doc.getName() != null) s.setName(doc.getName());
+                return Optional.of(s);
+            });
+        lenient().when(userMapper.toDomainByType(any(AdminProfileDocument.class)))
+            .thenAnswer(inv -> {
+                AdminProfileDocument doc = inv.getArgument(0);
+                Admin a = new Admin();
+                a.setId(doc.getId());
+                if (doc.getEmail() != null) a.setEmail(doc.getEmail());
+                return Optional.of(a);
+            });
+        lenient().when(userMapper.toDomainByType(any(OrganizerProfileDocument.class)))
+            .thenAnswer(inv -> {
+                OrganizerProfileDocument doc = inv.getArgument(0);
+                Organizer o = new Organizer();
+                o.setId(doc.getId());
+                if (doc.getEmail() != null) o.setEmail(doc.getEmail());
+                o.setContactInfo(doc.getContact());
+                return Optional.of(o);
+            });
+    }
 
     private StudentProfile buildStudent() {
         StudentProfile s = new StudentProfile();
@@ -467,5 +561,105 @@ class UserRepositoryAdapterTest {
         List<StudentProfile> result = adapter.findAllStudents();
 
         assertTrue(result.isEmpty());
+    }
+
+    // ── findById edge cases ───────────────────────────────────────
+
+    @Test
+    void givenInvalidUUID_whenFindById_thenThrowsInvalidInputException() {
+        assertThrows(InvalidInputException.class, () -> adapter.findById("not-a-uuid"));
+    }
+
+    @Test
+    void givenNullUserId_whenFindById_thenThrowsInvalidInputException() {
+        assertThrows(InvalidInputException.class, () -> adapter.findById(null));
+    }
+
+    @Test
+    void givenNonExistingId_whenFindById_thenReturnsEmpty() {
+        UUID id = UUID.randomUUID();
+        when(userRepository.findById(id)).thenReturn(Optional.empty());
+
+        Optional<User> result = adapter.findById(id.toString());
+
+        assertFalse(result.isPresent());
+    }
+
+    // ── delete edge cases ─────────────────────────────────────────
+
+    @Test
+    void givenInvalidUUID_whenDelete_thenThrowsInvalidInputException() {
+        assertThrows(InvalidInputException.class, () -> adapter.delete("bad-uuid"));
+    }
+
+    @Test
+    void givenNullUserId_whenDelete_thenThrowsInvalidInputException() {
+        assertThrows(InvalidInputException.class, () -> adapter.delete(null));
+    }
+
+    // ── update edge cases ─────────────────────────────────────────
+
+    @Test
+    void givenInvalidUUID_whenUpdate_thenThrowsInvalidInputException() {
+        assertThrows(InvalidInputException.class, () -> adapter.update("bad-uuid", buildStudent()));
+    }
+
+    @Test
+    void givenNotFoundDocument_whenUpdate_thenThrowsInvalidInputException() {
+        StudentProfile student = buildStudent();
+        UUID userId = UUID.randomUUID();
+
+        StudentProfileDocument existingDoc = buildStudentDoc();
+        existingDoc.setId(userId);
+
+        when(userRepository.findByEmail(VALID_EMAIL)).thenReturn(Optional.of(existingDoc));
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(InvalidInputException.class, () -> adapter.update(userId.toString(), student));
+    }
+
+    @Test
+    void givenOrganizerDocumentButAdminRequest_whenUpdate_thenThrowsInvalidInputException() {
+        Admin admin = new Admin();
+        UUID adminId = UUID.randomUUID();
+        admin.setId(adminId);
+        admin.setName("Admin");
+
+        OrganizerProfileDocument orgDoc = new OrganizerProfileDocument();
+        orgDoc.setId(adminId);
+
+        when(userRepository.findById(adminId)).thenReturn(Optional.of(orgDoc));
+
+        assertThrows(InvalidInputException.class, () -> adapter.update(adminId.toString(), admin));
+    }
+
+    @Test
+    void givenStudentDocumentButOrganizerRequest_whenUpdate_thenThrowsInvalidInputException() {
+        Organizer organizer = new Organizer();
+        UUID orgId = UUID.randomUUID();
+        organizer.setId(orgId);
+
+        StudentProfileDocument studentDoc = buildStudentDoc();
+        studentDoc.setId(orgId);
+
+        when(userRepository.findById(orgId)).thenReturn(Optional.of(studentDoc));
+
+        assertThrows(InvalidInputException.class, () -> adapter.update(orgId.toString(), organizer));
+    }
+
+    // ── findByEmail not found ─────────────────────────────────────
+
+    @Test
+    void givenNonExistingEmail_whenFindByEmail_thenReturnsEmptyViaMapper() {
+        UUID id = UUID.randomUUID();
+        StudentProfileDocument doc = buildStudentDoc();
+        doc.setId(id);
+
+        when(userRepository.findByEmail(VALID_EMAIL)).thenReturn(Optional.of(doc));
+
+        Optional<User> result = adapter.findByEmail(VALID_EMAIL);
+
+        assertTrue(result.isPresent());
+        assertEquals(VALID_EMAIL, result.get().getEmail());
     }
 }

@@ -100,8 +100,8 @@ class UserMapperTest {
         assertTrue(info instanceof StudentProfileResponse);
         StudentProfileResponse studentInfo = (StudentProfileResponse) info;
 
-        assertTrue(studentInfo.getSchedules().isEmpty());
-        assertTrue(studentInfo.getTags().isEmpty());
+        assertNull(studentInfo.getSchedules());
+        assertNull(studentInfo.getTags());
     }
 
     @Test
@@ -156,7 +156,7 @@ class UserMapperTest {
 
     @Test
     void givenNullList_whenToScheduleResponseList_thenReturnsNull() {
-        assertTrue(mapper.toScheduleResponseList(null).isEmpty());
+        assertNull(mapper.toScheduleResponseList(null));
     }
 
     @Test
@@ -181,7 +181,7 @@ class UserMapperTest {
 
     @Test
     void givenNullList_whenToTagResponseList_thenReturnsNull() {
-        assertTrue(mapper.toTagResponseList(null).isEmpty());
+        assertNull(mapper.toTagResponseList(null));
     }
 
     @Test

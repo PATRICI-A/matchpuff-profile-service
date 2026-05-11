@@ -82,9 +82,13 @@ class UserRestMapperTest {
     @Test
     void givenUserRequestWithNullSemester_whenToDomain_thenSemesterIsZero() {
         UserStudentRequest request = new UserStudentRequest();
-        request.setName("Test");
+        request.setName("Test User");
         request.setEmail("test@escuelaing.edu.co");
         request.setPassword("TestPassword123");
+        request.setGender(GenderEnum.MALE);
+        request.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
+        request.setPhotourl("http://photo.jpg");
+        request.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         request.setSemester(null);
 
         StudentProfile result = mapper.toDomain(request);
@@ -95,9 +99,13 @@ class UserRestMapperTest {
     @Test
     void givenUserRequestWithNullTags_whenToDomain_thenTagsAreNull() {
         UserStudentRequest request = new UserStudentRequest();
-        request.setName("Test");
+        request.setName("Test User");
         request.setEmail("test@escuelaing.edu.co");
         request.setPassword("TestPassword123");
+        request.setGender(GenderEnum.MALE);
+        request.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
+        request.setPhotourl("http://photo.jpg");
+        request.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
 
         StudentProfile result = mapper.toDomain(request);
 
@@ -107,9 +115,13 @@ class UserRestMapperTest {
     @Test
     void givenUserRequestWithNullSchedules_whenToDomain_thenSchedulesAreNull() {
         UserStudentRequest request = new UserStudentRequest();
-        request.setName("Test");
+        request.setName("Test User");
         request.setEmail("test@escuelaing.edu.co");
         request.setPassword("TestPassword123");
+        request.setGender(GenderEnum.MALE);
+        request.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
+        request.setPhotourl("http://photo.jpg");
+        request.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
 
         StudentProfile result = mapper.toDomain(request);
 
@@ -285,8 +297,11 @@ class UserRestMapperTest {
     @Test
     void givenStudentUpdateRequestWithNullSemester_whenToDomain_thenSemesterIsZero() {
         UserStudentUpdateRequest request = new UserStudentUpdateRequest();
-        request.setName("Test");
+        request.setName("Test User");
         request.setEmail("test@escuelaing.edu.co");
+        request.setGender(GenderEnum.MALE);
+        request.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
+        request.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         request.setSemester(null);
 
         StudentProfile result = mapper.toDomain(request);

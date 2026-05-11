@@ -266,4 +266,43 @@ class UserServiceTest {
 
         assertTrue(result.isEmpty());
     }
+
+    // ── getUserByEmail ────────────────────────────────────────────
+
+    @Test
+    void givenEmail_whenGetUserByEmail_thenReturnsMappedResponse() {
+        when(userUseCase.getUserByEmail("laura@escuelaing.edu.co")).thenReturn(student);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
+
+        UserResponse result = userService.getUserByEmail("laura@escuelaing.edu.co");
+
+        assertNotNull(result);
+        assertEquals(student.getId(), result.getId());
+        verify(userUseCase).getUserByEmail("laura@escuelaing.edu.co");
+    }
+
+    // ── updateGeolocation ─────────────────────────────────────────
+
+    @Test
+    void givenUserIdAndGeolocationTrue_whenUpdateGeolocation_thenReturnsMappedResponse() {
+        when(userUseCase.updateGeolocation("user-1", true)).thenReturn(student);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
+
+        UserResponse result = userService.updateGeolocation("user-1", true);
+
+        assertNotNull(result);
+        verify(userUseCase).updateGeolocation("user-1", true);
+        verify(userMapper).toResponse(student);
+    }
+
+    @Test
+    void givenUserIdAndGeolocationFalse_whenUpdateGeolocation_thenReturnsMappedResponse() {
+        when(userUseCase.updateGeolocation("user-1", false)).thenReturn(student);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
+
+        UserResponse result = userService.updateGeolocation("user-1", false);
+
+        assertNotNull(result);
+        verify(userUseCase).updateGeolocation("user-1", false);
+    }
 }
