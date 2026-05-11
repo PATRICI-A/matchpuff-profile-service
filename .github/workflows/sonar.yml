@@ -13,15 +13,17 @@ on:
   push:
     branches:
       - develop
+      - main
 
 env:
   JAVA_VERSION: '21'
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
 
-  # =========================================================
-  # QA – SONAR ANALYSIS
-  # =========================================================
   sonar:
     name: "QA – Sonar Analysis"
     runs-on: ubuntu-latest
@@ -47,7 +49,7 @@ jobs:
           cache: maven
 
       # =========================================
-      # Run SonarCloud analysis
+      # SonarCloud Analysis
       # =========================================
       - name: Run Sonar Analysis
         env:
@@ -55,10 +57,14 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
           MONGO_URI: ${{ secrets.MONGO_URI_TEST }}
+
         run: |
           mvn clean verify sonar:sonar -B \
             -Dsonar.projectKey=patrici-a \
             -Dsonar.organization=${SONAR_ORGANIZATION} \
             -Dsonar.host.url=${SONAR_HOST_URL} \
             -Dsonar.token=${SONAR_TOKEN} \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+            -Dsonar.pullrequest.key=${{ github.event.pull_request.number || '' }} \
+            -Dsonar.pullrequest.branch=${{ github.head_ref || '' }} \
+            -Dsonar.pullrequest.base=${{ github.base_ref || '' }}
