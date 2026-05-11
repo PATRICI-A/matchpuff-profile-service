@@ -1,4 +1,4 @@
-name: CD – Deploy Profile Service
+name: CD – Deploy Profile Service AWS Production Deploy
 
 on:
   push:
