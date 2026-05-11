@@ -38,6 +38,9 @@ public class StudentProfileDocument extends UserDocument {
     @Field("privacyLevel")
     private PrivacyLevelEnum privacyLevel;
 
+    @Field("geolocationEnabled")
+    private boolean geolocationEnabled;
+
     @Field("schedule")
     private List<ScheduleDocument> schedule;
     

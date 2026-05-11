@@ -20,6 +20,7 @@ public class StudentProfileResponse extends UserResponse {
     private String photoUrl;
     private String biography;
     private PrivacyLevelEnum privacyLevel;
+    private boolean geolocationEnabled;
     private List<ScheduleResponse> schedules;
     private List<TagResponse> tags;
 

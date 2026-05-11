@@ -18,6 +18,7 @@ import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
 import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
 import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -26,11 +27,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserRestMapperTest {
 
+    private final UserRestMapper mapper = Mappers.getMapper(UserRestMapper.class);
+
     // ── toDomain(UserRequest) ─────────────────────────────────────
 
     @Test
     void givenNullUserRequest_whenToDomain_thenReturnsNull() {
-        assertNull(UserRestMapper.toDomain((UserStudentRequest) null));
+        assertNull(mapper.toDomain((UserStudentRequest) null));
     }
 
     @Test
@@ -58,7 +61,7 @@ class UserRestMapperTest {
         scheduleRequest.setStartTime(LocalTime.of(7, 0));
         scheduleRequest.setEndTime(LocalTime.of(9, 0));
 
-        StudentProfile result = UserRestMapper.toDomain(request);
+        StudentProfile result = mapper.toDomain(request);
 
         assertNotNull(result);
         assertEquals("Juan Diaz", result.getName());
@@ -79,12 +82,16 @@ class UserRestMapperTest {
     @Test
     void givenUserRequestWithNullSemester_whenToDomain_thenSemesterIsZero() {
         UserStudentRequest request = new UserStudentRequest();
-        request.setName("Test");
+        request.setName("Test User");
         request.setEmail("test@escuelaing.edu.co");
         request.setPassword("TestPassword123");
+        request.setGender(GenderEnum.MALE);
+        request.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
+        request.setPhotourl("http://photo.jpg");
+        request.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         request.setSemester(null);
 
-        StudentProfile result = UserRestMapper.toDomain(request);
+        StudentProfile result = mapper.toDomain(request);
 
         assertEquals(0, result.getSemester());
     }
@@ -92,11 +99,15 @@ class UserRestMapperTest {
     @Test
     void givenUserRequestWithNullTags_whenToDomain_thenTagsAreNull() {
         UserStudentRequest request = new UserStudentRequest();
-        request.setName("Test");
+        request.setName("Test User");
         request.setEmail("test@escuelaing.edu.co");
         request.setPassword("TestPassword123");
+        request.setGender(GenderEnum.MALE);
+        request.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
+        request.setPhotourl("http://photo.jpg");
+        request.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
 
-        StudentProfile result = UserRestMapper.toDomain(request);
+        StudentProfile result = mapper.toDomain(request);
 
         assertTrue(result.getTags().isEmpty());
     }
@@ -104,11 +115,15 @@ class UserRestMapperTest {
     @Test
     void givenUserRequestWithNullSchedules_whenToDomain_thenSchedulesAreNull() {
         UserStudentRequest request = new UserStudentRequest();
-        request.setName("Test");
+        request.setName("Test User");
         request.setEmail("test@escuelaing.edu.co");
         request.setPassword("TestPassword123");
+        request.setGender(GenderEnum.MALE);
+        request.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
+        request.setPhotourl("http://photo.jpg");
+        request.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
 
-        StudentProfile result = UserRestMapper.toDomain(request);
+        StudentProfile result = mapper.toDomain(request);
 
         assertTrue(result.getSchedules().isEmpty());
     }
@@ -117,7 +132,7 @@ class UserRestMapperTest {
 
     @Test
     void givenNullScheduleRequest_whenToDomain_thenReturnsNull() {
-        assertNull(UserRestMapper.toDomain((ScheduleRequest) null));
+        assertNull(mapper.toDomain((ScheduleRequest) null));
     }
 
     @Test
@@ -128,7 +143,7 @@ class UserRestMapperTest {
         request.setStartTime(LocalTime.of(15, 0));
         request.setEndTime(LocalTime.of(17, 0));
 
-        Schedule result = UserRestMapper.toDomain(request);
+        Schedule result = mapper.toDomain(request);
 
         assertNotNull(result);
         assertEquals(DayOfWeekEnum.FRIDAY, result.getDayOfWeek());
@@ -141,7 +156,7 @@ class UserRestMapperTest {
 
     @Test
     void givenNullTagRequest_whenToDomain_thenReturnsNull() {
-        assertNull(UserRestMapper.toDomain((TagRequest) null));
+        assertNull(mapper.toDomain((TagRequest) null));
     }
 
     @Test
@@ -150,7 +165,7 @@ class UserRestMapperTest {
         request.setName("Kubernetes");
         request.setCategory("DevOps");
 
-        Tag result = UserRestMapper.toDomain(request);
+        Tag result = mapper.toDomain(request);
 
         assertNotNull(result);
         assertEquals("Kubernetes", result.getName());
@@ -161,7 +176,7 @@ class UserRestMapperTest {
 
     @Test
     void givenNullAdminRequest_whenToDomain_thenReturnsNull() {
-        assertNull(UserRestMapper.toDomain((UserAdminRequest) null));
+        assertNull(mapper.toDomain((UserAdminRequest) null));
     }
 
     @Test
@@ -172,7 +187,7 @@ class UserRestMapperTest {
         request.setPassword("AdminPass123");
         request.setGender(GenderEnum.MALE);
 
-        Admin result = UserRestMapper.toDomain(request);
+        Admin result = mapper.toDomain(request);
 
         assertNotNull(result);
         assertEquals("Admin User", result.getName());
@@ -185,7 +200,7 @@ class UserRestMapperTest {
 
     @Test
     void givenNullAdminUpdateRequest_whenToDomain_thenReturnsNull() {
-        assertNull(UserRestMapper.toDomain((UserAdminUpdateRequest) null));
+        assertNull(mapper.toDomain((UserAdminUpdateRequest) null));
     }
 
     @Test
@@ -195,7 +210,7 @@ class UserRestMapperTest {
         request.setEmail("updated@escuelaing.edu.co");
         request.setGender(GenderEnum.FEMALE);
 
-        Admin result = UserRestMapper.toDomain(request);
+        Admin result = mapper.toDomain(request);
 
         assertNotNull(result);
         assertEquals("Updated Admin", result.getName());
@@ -207,7 +222,7 @@ class UserRestMapperTest {
 
     @Test
     void givenNullOrganizerRequest_whenToDomain_thenReturnsNull() {
-        assertNull(UserRestMapper.toDomain((UserOrganizerRequest) null));
+        assertNull(mapper.toDomain((UserOrganizerRequest) null));
     }
 
     @Test
@@ -219,7 +234,7 @@ class UserRestMapperTest {
         request.setGender(GenderEnum.FEMALE);
         request.setContactInfo("contact@evento.co");
 
-        Organizer result = UserRestMapper.toDomain(request);
+        Organizer result = mapper.toDomain(request);
 
         assertNotNull(result);
         assertEquals("Event Org", result.getName());
@@ -232,7 +247,7 @@ class UserRestMapperTest {
 
     @Test
     void givenNullOrganizerUpdateRequest_whenToDomain_thenReturnsNull() {
-        assertNull(UserRestMapper.toDomain((UserOrganizerUpdateRequest) null));
+        assertNull(mapper.toDomain((UserOrganizerUpdateRequest) null));
     }
 
     @Test
@@ -243,7 +258,7 @@ class UserRestMapperTest {
         request.setGender(GenderEnum.MALE);
         request.setContactInfo("new@evento.co");
 
-        Organizer result = UserRestMapper.toDomain(request);
+        Organizer result = mapper.toDomain(request);
 
         assertNotNull(result);
         assertEquals("Updated Org", result.getName());
@@ -254,7 +269,7 @@ class UserRestMapperTest {
 
     @Test
     void givenNullStudentUpdateRequest_whenToDomain_thenReturnsNull() {
-        assertNull(UserRestMapper.toDomain((UserStudentUpdateRequest) null));
+        assertNull(mapper.toDomain((UserStudentUpdateRequest) null));
     }
 
     @Test
@@ -270,7 +285,7 @@ class UserRestMapperTest {
         request.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         request.setDateOfBirth(LocalDate.of(2000, 1, 1));
 
-        StudentProfile result = UserRestMapper.toDomain(request);
+        StudentProfile result = mapper.toDomain(request);
 
         assertNotNull(result);
         assertEquals("Updated Student", result.getName());
@@ -282,11 +297,14 @@ class UserRestMapperTest {
     @Test
     void givenStudentUpdateRequestWithNullSemester_whenToDomain_thenSemesterIsZero() {
         UserStudentUpdateRequest request = new UserStudentUpdateRequest();
-        request.setName("Test");
+        request.setName("Test User");
         request.setEmail("test@escuelaing.edu.co");
+        request.setGender(GenderEnum.MALE);
+        request.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
+        request.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         request.setSemester(null);
 
-        StudentProfile result = UserRestMapper.toDomain(request);
+        StudentProfile result = mapper.toDomain(request);
 
         assertEquals(0, result.getSemester());
     }

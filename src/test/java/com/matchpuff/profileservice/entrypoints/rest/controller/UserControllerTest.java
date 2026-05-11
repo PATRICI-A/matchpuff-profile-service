@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.dto.response.StudentProfileResponse;
 import com.matchpuff.profileservice.application.service.UserServicePort;
+import com.matchpuff.profileservice.entrypoints.rest.mapper.UserRestMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ class UserControllerTest {
 
     @MockitoBean
     private UserServicePort userService;
+
+    @MockitoBean
+    private UserRestMapper userRestMapper;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -87,6 +91,7 @@ class UserControllerTest {
                       "endTime": "10:00:00"
                     }
                   ],
+                  "geolocationEnabled": true,
                   "dateOfBirth": "2000-01-01"
                 }
                 """;
@@ -268,6 +273,28 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @WithMockUser
+    void givenValidSchedule_whenRemoveSchedule_thenReturns200() throws Exception {
+        when(userService.removeSchedule(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
+
+        String scheduleJson = """
+                {
+                  "dayOfWeek": "WEDNESDAY",
+                  "name": "Programación Avanzada",
+                  "startTime": "10:00:00",
+                  "endTime": "12:00:00"
+                }
+                """;
+
+        mockMvc.perform(patch("/api/v1/users/user-1/schedule/remove")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(scheduleJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()));
+    }
+
     // ── PATCH /api/v1/users/{userId}/tags ────────────────────────────
 
     @Test
@@ -304,6 +331,26 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidTagJson))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void givenValidTag_whenRemoveTag_thenReturns200() throws Exception {
+        when(userService.removeTag(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
+
+        String tagJson = """
+                {
+                  "name": "Kubernetes",
+                  "category": "DevOps"
+                }
+                """;
+
+        mockMvc.perform(patch("/api/v1/users/user-1/tags/remove")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(tagJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()));
     }
 
     // ── POST /api/v1/users/admin ─────────────────────────────────────
@@ -436,5 +483,137 @@ class UserControllerTest {
 
         mockMvc.perform(get("/api/v1/users/" + mockUserResponse.getId().toString() + "/profile-image"))
                 .andExpect(status().isBadRequest());
+    }
+
+    // ── GET /api/v1/users/mail/{email} ────────────────────────────
+
+    @Test
+    @WithMockUser
+    void givenExistingEmail_whenGetUserByEmail_thenReturns200() throws Exception {
+        when(userService.getUserByEmail("test@escuelaing.edu.co")).thenReturn(mockUserResponseInfo);
+
+        mockMvc.perform(get("/api/v1/users/mail/test@escuelaing.edu.co"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Test User"))
+                .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()));
+    }
+
+    // ── PATCH /api/v1/users/admin/{userId} ───────────────────────
+
+    @Test
+    @WithMockUser
+    void givenValidAdminUpdateRequest_whenUpdateUserAdmin_thenReturns200() throws Exception {
+        when(userService.updateUser(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
+
+        String adminUpdateJson = """
+                {
+                  "name": "Updated Admin",
+                  "email": "admin@escuelaing.edu.co",
+                  "gender": "MALE"
+                }
+                """;
+
+        mockMvc.perform(patch("/api/v1/users/admin/user-1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(adminUpdateJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()));
+    }
+
+    @Test
+    @WithMockUser
+    void givenMissingGender_whenUpdateUserAdmin_thenReturns400() throws Exception {
+        String invalidAdminJson = """
+                {
+                  "name": "Updated Admin"
+                }
+                """;
+
+        mockMvc.perform(patch("/api/v1/users/admin/user-1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidAdminJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    // ── PATCH /api/v1/users/organizer/{userId} ────────────────────
+
+    @Test
+    @WithMockUser
+    void givenValidOrganizerUpdateRequest_whenUpdateUserOrganizer_thenReturns200() throws Exception {
+        when(userService.updateUser(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
+
+        String orgUpdateJson = """
+                {
+                  "name": "Updated Org",
+                  "email": "org@escuelaing.edu.co",
+                  "gender": "FEMALE",
+                  "contactInfo": "new@contact.co"
+                }
+                """;
+
+        mockMvc.perform(patch("/api/v1/users/organizer/user-1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(orgUpdateJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()));
+    }
+
+    @Test
+    @WithMockUser
+    void givenMissingContactInfo_whenUpdateUserOrganizer_thenReturns400() throws Exception {
+        String invalidOrgJson = """
+                {
+                  "name": "Updated Org",
+                  "gender": "FEMALE"
+                }
+                """;
+
+        mockMvc.perform(patch("/api/v1/users/organizer/user-1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidOrgJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    // ── PATCH /api/v1/users/{userId}/geolocation ──────────────────
+
+    @Test
+    @WithMockUser
+    void givenGeolocationEnabledTrue_whenUpdateGeolocation_thenReturns200() throws Exception {
+        when(userService.updateGeolocation(eq("user-1"), eq(true))).thenReturn(mockUserResponseInfo);
+
+        String geoJson = """
+                {
+                  "geolocationEnabled": true
+                }
+                """;
+
+        mockMvc.perform(patch("/api/v1/users/user-1/geolocation")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(geoJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()));
+    }
+
+    @Test
+    @WithMockUser
+    void givenGeolocationEnabledFalse_whenUpdateGeolocation_thenReturns200() throws Exception {
+        when(userService.updateGeolocation(eq("user-1"), eq(false))).thenReturn(mockUserResponseInfo);
+
+        String geoJson = """
+                {
+                  "geolocationEnabled": false
+                }
+                """;
+
+        mockMvc.perform(patch("/api/v1/users/user-1/geolocation")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(geoJson))
+                .andExpect(status().isOk());
     }
 }

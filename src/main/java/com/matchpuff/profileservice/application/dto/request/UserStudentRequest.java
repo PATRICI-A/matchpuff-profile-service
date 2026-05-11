@@ -54,4 +54,7 @@ public class UserStudentRequest {
     @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")
     private LocalDate dateOfBirth;
+
+    @NotNull(message = "Geolocation enabled is required")
+    private Boolean geolocationEnabled;
 }

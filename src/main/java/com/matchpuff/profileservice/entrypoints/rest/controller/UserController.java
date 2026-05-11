@@ -2,6 +2,7 @@ package com.matchpuff.profileservice.entrypoints.rest.controller;
 
 import com.matchpuff.profileservice.application.dto.request.ScheduleRequest;
 import com.matchpuff.profileservice.application.dto.request.ChangePasswordRequest;
+import com.matchpuff.profileservice.application.dto.request.GeolocationRequest;
 import com.matchpuff.profileservice.application.dto.request.TagRequest;
 import com.matchpuff.profileservice.application.dto.request.UserAdminUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserAdminRequest;
@@ -36,6 +37,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class UserController {
     private final UserServicePort userService;
+    private final UserRestMapper userRestMapper;
 
     @PostMapping("/student")
     @Tag(name = "Users - Creation", description = "Create new users")
@@ -43,7 +45,7 @@ public class UserController {
     public ResponseEntity<UserResponse> createStudentUser(
             @Valid @RequestBody UserStudentRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(userService.createStudentUser(UserRestMapper.toDomain(request)));
+            .body(userService.createStudentUser(userRestMapper.toDomain(request)));
     }
 
     @PostMapping("/admin")
@@ -52,7 +54,7 @@ public class UserController {
     public ResponseEntity<UserResponse> createAdminUser(
             @Valid @RequestBody UserAdminRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(userService.createAdminUser(UserRestMapper.toDomain(request)));
+            .body(userService.createAdminUser(userRestMapper.toDomain(request)));
     }
 
     @PostMapping("/organizer")
@@ -61,7 +63,7 @@ public class UserController {
     public ResponseEntity<UserResponse> createOrganizerUser(
             @Valid @RequestBody UserOrganizerRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(userService.createOrganizerUser(UserRestMapper.toDomain(request)));
+            .body(userService.createOrganizerUser(userRestMapper.toDomain(request)));
     }
 
     @GetMapping("/{userId}")
@@ -94,7 +96,7 @@ public class UserController {
     public ResponseEntity<UserResponse> updateUserStudent(
             @PathVariable String userId,
             @Valid @RequestBody UserStudentUpdateRequest request) {
-        return ResponseEntity.ok(userService.updateUser(userId, UserRestMapper.toDomain(request)));
+        return ResponseEntity.ok(userService.updateUser(userId, userRestMapper.toDomain(request)));
     }
 
     @PatchMapping("/admin/{userId}")
@@ -103,7 +105,7 @@ public class UserController {
     public ResponseEntity<UserResponse> updateUserAdmin(
             @PathVariable String userId,
             @Valid @RequestBody UserAdminUpdateRequest request) {
-        return ResponseEntity.ok(userService.updateUser(userId, UserRestMapper.toDomain(request)));
+        return ResponseEntity.ok(userService.updateUser(userId, userRestMapper.toDomain(request)));
     }
 
     @PatchMapping("/organizer/{userId}")
@@ -112,7 +114,7 @@ public class UserController {
     public ResponseEntity<UserResponse> updateUserOrganizer(
             @PathVariable String userId,
             @Valid @RequestBody UserOrganizerUpdateRequest request) {
-        return ResponseEntity.ok(userService.updateUser(userId, UserRestMapper.toDomain(request)));
+        return ResponseEntity.ok(userService.updateUser(userId, userRestMapper.toDomain(request)));
     }
 
     @PatchMapping("/{userId}/password")
@@ -138,7 +140,16 @@ public class UserController {
     public ResponseEntity<UserResponse> updateUserSchedule(
             @PathVariable String userId,
             @Valid @RequestBody ScheduleRequest request) {
-        return ResponseEntity.ok(userService.addSchedule(userId, UserRestMapper.toDomain(request)));
+        return ResponseEntity.ok(userService.addSchedule(userId, userRestMapper.toDomain(request)));
+    }
+
+    @PatchMapping("/{userId}/schedule/remove")
+    @Tag(name = "User Profiles", description = "Manage user profiles and content")
+    @Operation(summary = "Remove availability schedule from student user")
+    public ResponseEntity<UserResponse> removeUserSchedule(
+            @PathVariable String userId,
+            @Valid @RequestBody ScheduleRequest request) {
+        return ResponseEntity.ok(userService.removeSchedule(userId, userRestMapper.toDomain(request)));
     }
 
     @PatchMapping("/{userId}/tags")
@@ -147,7 +158,16 @@ public class UserController {
     public ResponseEntity<UserResponse> updateUserTags(
             @PathVariable String userId,
             @Valid @RequestBody TagRequest request) {
-        return ResponseEntity.ok(userService.addTag(userId, UserRestMapper.toDomain(request)));
+        return ResponseEntity.ok(userService.addTag(userId, userRestMapper.toDomain(request)));
+    }
+
+    @PatchMapping("/{userId}/tags/remove")
+    @Tag(name = "User Profiles", description = "Manage user profiles and content")
+    @Operation(summary = "Remove a tag/interest from the student user")
+    public ResponseEntity<UserResponse> removeUserTag(
+            @PathVariable String userId,
+            @Valid @RequestBody TagRequest request) {
+        return ResponseEntity.ok(userService.removeTag(userId, userRestMapper.toDomain(request)));
     }
 
     @DeleteMapping("/{userId}")
@@ -172,6 +192,15 @@ public class UserController {
         } catch (IOException e) {
             throw new InvalidInputException("It was not possible to read the file. Please try again.");
         }
+    }
+
+    @PatchMapping("/{userId}/geolocation")
+    @Tag(name = "User Profiles", description = "Manage user profiles and content")
+    @Operation(summary = "Enable or disable geolocation for the user")
+    public ResponseEntity<UserResponse> updateGeolocation(
+            @PathVariable String userId,
+            @Valid @RequestBody GeolocationRequest request) {
+        return ResponseEntity.ok(userService.updateGeolocation(userId, request.isGeolocationEnabled()));
     }
 
     @GetMapping("/{userId}/profile-image")

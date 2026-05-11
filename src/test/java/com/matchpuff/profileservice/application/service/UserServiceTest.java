@@ -219,6 +219,32 @@ class UserServiceTest {
         verify(userUseCase).addTagToStudent("user-1", tag);
     }
 
+    @Test
+    void givenUserIdAndSchedule_whenRemoveSchedule_thenReturnsMappedResponseInfo() {
+        Schedule schedule = new Schedule(DayOfWeekEnum.WEDNESDAY, "Algebra", LocalTime.of(12, 0), LocalTime.of(14, 0));
+
+        when(userUseCase.removeScheduleFromStudent("user-1", schedule)).thenReturn(student);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
+
+        UserResponse result = userService.removeSchedule("user-1", schedule);
+
+        assertNotNull(result);
+        verify(userUseCase).removeScheduleFromStudent("user-1", schedule);
+    }
+
+    @Test
+    void givenUserIdAndTag_whenRemoveTag_thenReturnsMappedResponseInfo() {
+        Tag tag = new Tag("Python", "Programación");
+
+        when(userUseCase.removeTagFromStudent("user-1", tag)).thenReturn(student);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
+
+        UserResponse result = userService.removeTag("user-1", tag);
+
+        assertNotNull(result);
+        verify(userUseCase).removeTagFromStudent("user-1", tag);
+    }
+
     // ── getAllUsers ────────────────────────────────────────────────
 
     @Test
@@ -239,5 +265,44 @@ class UserServiceTest {
         List<UserResponse> result = userService.getAllUsers();
 
         assertTrue(result.isEmpty());
+    }
+
+    // ── getUserByEmail ────────────────────────────────────────────
+
+    @Test
+    void givenEmail_whenGetUserByEmail_thenReturnsMappedResponse() {
+        when(userUseCase.getUserByEmail("laura@escuelaing.edu.co")).thenReturn(student);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
+
+        UserResponse result = userService.getUserByEmail("laura@escuelaing.edu.co");
+
+        assertNotNull(result);
+        assertEquals(student.getId(), result.getId());
+        verify(userUseCase).getUserByEmail("laura@escuelaing.edu.co");
+    }
+
+    // ── updateGeolocation ─────────────────────────────────────────
+
+    @Test
+    void givenUserIdAndGeolocationTrue_whenUpdateGeolocation_thenReturnsMappedResponse() {
+        when(userUseCase.updateGeolocation("user-1", true)).thenReturn(student);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
+
+        UserResponse result = userService.updateGeolocation("user-1", true);
+
+        assertNotNull(result);
+        verify(userUseCase).updateGeolocation("user-1", true);
+        verify(userMapper).toResponse(student);
+    }
+
+    @Test
+    void givenUserIdAndGeolocationFalse_whenUpdateGeolocation_thenReturnsMappedResponse() {
+        when(userUseCase.updateGeolocation("user-1", false)).thenReturn(student);
+        when(userMapper.toResponse(student)).thenReturn(userResponse);
+
+        UserResponse result = userService.updateGeolocation("user-1", false);
+
+        assertNotNull(result);
+        verify(userUseCase).updateGeolocation("user-1", false);
     }
 }
