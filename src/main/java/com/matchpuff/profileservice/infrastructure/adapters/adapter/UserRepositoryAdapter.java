@@ -11,7 +11,7 @@ import com.matchpuff.profileservice.domain.model.StudentProfile;
 import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
 import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.UserDocument;
-import com.matchpuff.profileservice.infrastructure.adapters.persistence.mapper.UserMapper;
+import com.matchpuff.profileservice.infrastructure.adapters.persistence.mapper.UserPersistenceMapper;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
@@ -24,36 +24,38 @@ import java.util.UUID;
 @Component
 public class UserRepositoryAdapter implements UserRepositoryPort {
     private final UserRepository userRepository;
+    private final UserPersistenceMapper userMapper;
 
-    public UserRepositoryAdapter(UserRepository userRepository) {
+    public UserRepositoryAdapter(UserRepository userRepository, UserPersistenceMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     @Override
     public User save(StudentProfile student) {
         mailExistsForException(student.getEmail());
-        StudentProfileDocument doc = UserMapper.toDocument(student);
+        StudentProfileDocument doc = userMapper.toDocument(student);
         ensureCreatedAt(doc);
         StudentProfileDocument saved = userRepository.save(doc);
-        return UserMapper.toDomain(saved);
+        return userMapper.toDomain(saved);
     }
 
     @Override
     public User save(Admin admin) {
         mailExistsForException(admin.getEmail());
-        AdminProfileDocument doc = UserMapper.toDocument(admin);
+        AdminProfileDocument doc = userMapper.toDocument(admin);
         ensureCreatedAt(doc);
         AdminProfileDocument saved = userRepository.save(doc);
-        return UserMapper.toDomain(saved);
+        return userMapper.toDomain(saved);
     }
 
     @Override
     public User save(Organizer organizer) {
         mailExistsForException(organizer.getEmail());
-        OrganizerProfileDocument doc = UserMapper.toDocument(organizer);
+        OrganizerProfileDocument doc = userMapper.toDocument(organizer);
         ensureCreatedAt(doc);
         OrganizerProfileDocument saved = userRepository.save(doc);
-        return UserMapper.toDomain(saved);
+        return userMapper.toDomain(saved);
     }
 
     @Override
@@ -64,13 +66,13 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public Optional<User> findById(String id) {
         return userRepository.findById(parseUserId(id))
-                .flatMap(UserMapper::toDomainByType);
+                .flatMap(userMapper::toDomainByType);
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email)
-                .flatMap(UserMapper::toDomainByType);
+                .flatMap(userMapper::toDomainByType);
     }
 
     @Override
@@ -94,7 +96,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
             StudentProfileDocument doc = mergeStudentDocument(current, student);
             StudentProfileDocument updated = userRepository.save(doc);
-            return UserMapper.toDomain(updated);
+            return userMapper.toDomain(updated);
         }
 
         if (user instanceof Admin admin) {
@@ -104,7 +106,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
             AdminProfileDocument doc = mergeAdminDocument(current, admin);
             AdminProfileDocument updated = userRepository.save(doc);
-            return UserMapper.toDomain(updated);
+            return userMapper.toDomain(updated);
         }
 
         if (user instanceof Organizer organizer) {
@@ -114,7 +116,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
             OrganizerProfileDocument doc = mergeOrganizerDocument(current, organizer);
             OrganizerProfileDocument updated = userRepository.save(doc);
-            return UserMapper.toDomain(updated);
+            return userMapper.toDomain(updated);
         }
 
         throw new InvalidInputException("Unsupported user type for update.");
@@ -137,8 +139,8 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         merged.setBiography(incoming.getBiography() != null ? incoming.getBiography() : current.getBiography());
         merged.setPrivacyLevel(incoming.getPrivacyLevel() != null ? incoming.getPrivacyLevel() : current.getPrivacyLevel());
         merged.setGeolocationEnabled(incoming.isGeolocationEnabled());
-        merged.setSchedule(incoming.getSchedules() != null ? UserMapper.toDocument(incoming).getSchedule() : current.getSchedule());
-        merged.setInterests(incoming.getTags() != null ? UserMapper.toDocument(incoming).getInterests() : current.getInterests());
+        merged.setSchedule(incoming.getSchedules() != null ? userMapper.toDocument(incoming).getSchedule() : current.getSchedule());
+        merged.setInterests(incoming.getTags() != null ? userMapper.toDocument(incoming).getInterests() : current.getInterests());
         return merged;
     }
 
@@ -170,14 +172,14 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public List<User> findAll() {
         return userRepository.findAll().stream()
-                .flatMap(doc -> UserMapper.toDomainByType(doc).stream())
+                .flatMap(doc -> userMapper.toDomainByType(doc).stream())
                 .toList();
     }
-    
+
     @Override
     public List<StudentProfile> findAllStudents() {
         return userRepository.findByUserType(UserType.STUDENT).stream()
-                .flatMap(doc -> UserMapper.toDomainByType(doc).stream())
+                .flatMap(doc -> userMapper.toDomainByType(doc).stream())
                 .filter(StudentProfile.class::isInstance)
                 .map(StudentProfile.class::cast)
                 .toList();
