@@ -786,7 +786,7 @@ El microservicio se integra con otros sistemas del ecosistema Matchpuff.
 ---
 ### 📊 Diagrama de base de datos
 
-*(Adjunta aquí el diagrama de base de datos)*
+![Captura](docs/uml/DiagramaPersistencia.jpeg)
 
 El microservicio de Perfiles utiliza **MongoDB** como motor de base de datos NoSQL. Contiene una colección principal: `users`, con subdocumentos embebidos diferenciados por tipo.
 
@@ -1014,7 +1014,7 @@ La arquitectura de dominio se centra en la jerarquía de entidades de usuario.
 
 ### 🗄️ Diagrama de Despliegue
 
-*(Adjunta aquí el diagrama de despliegue)*
+![Captura](docs/uml/DiagramaDespliegue.jpeg)
 
 ---
 
@@ -1221,9 +1221,7 @@ void createStudentUser_shouldHashPasswordAndSave() {
 
 ### 🖼️ Evidencias de ejecución
 
-*(Adjunta aquí la imagen de la consola con las pruebas ejecutándose exitosamente)*
-
-*(Adjunta aquí la imagen del reporte de cobertura JaCoCo)*
+![Captura](docs/images/Jacoco.jpeg)
 
 ---
 
