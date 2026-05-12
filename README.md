@@ -14,7 +14,7 @@
 
 ### ☁️ Infraestructura & Calidad
 
-![AWS ECS](https://img.shields.io/badge/AWS_ECS-Deploy-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+![Azure ECS](https://img.shields.io/badge/Azure_ECS-Deploy-FF9900?style=for-the-badge&logo=amazonAzure&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Container-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Maven](https://img.shields.io/badge/Maven-Build-C71A36?style=for-the-badge&logo=apache-maven&logoColor=white)
 
@@ -43,7 +43,7 @@
 9. [🧪 Evidencia de Pruebas y Ejecución](#9--evidencia-de-las-pruebas-y-como-ejecutarlas)
 10. [🗂️ Organización del Código](#10--codigo-de-la-implementacion-organizado-en-las-respectivas-carpetas)
 11. [🚀 Ejecución del Proyecto](#11--ejecucion-del-proyecto)
-12. [☁️ CI/CD y Despliegue en AWS](#12--evidencia-de-cicd-y-despliegue-en-aws)
+12. [☁️ CI/CD y Despliegue en Azure](#12--evidencia-de-cicd-y-despliegue-en-Azure)
 13. [🤝 Contribuciones](#13--contribuciones)
 
 ---
@@ -51,7 +51,11 @@
 ## 1. 👤 Integrantes:
 
 Javier Mauricio Romero Deaquiz
+
+
 Mariana Malagón
+
+
 Andrés Cardozo Martinez
 
 
@@ -220,9 +224,9 @@ hotfix/[descripcion-breve-del-fix]
 | **Spring Boot Actuator** | Exposición de endpoints de salud (`/actuator/health`) para monitoreo y healthchecks de Docker. |
 | **Docker** | Contenerización del microservicio con build multi-stage y soporte HTTPS (SSL/TLS). |
 | **Docker Compose** | Orquestación local de la aplicación para desarrollo y pruebas. |
-| **AWS ECS (Fargate)** | Plataforma cloud donde se despliega el contenedor Docker del microservicio en producción. |
+| **Azure ECS (Fargate)** | Plataforma cloud donde se despliega el contenedor Docker del microservicio en producción. |
 | **Amazon ECR** | Registro de contenedores Docker donde se almacenan las imágenes del microservicio. |
-| **GitHub Actions** | Automatización de CI/CD: compilación, pruebas, análisis de cobertura y despliegue en AWS. |
+| **GitHub Actions** | Automatización de CI/CD: compilación, pruebas, análisis de cobertura y despliegue en Azure. |
 | **SonarCloud** | Análisis estático de calidad de código y cobertura de pruebas. |
 | **JaCoCo** | Generación de reportes de cobertura de pruebas integrados al pipeline CI. |
 
@@ -722,13 +726,13 @@ Esta sección muestra los diagramas clave del microservicio de perfiles, ilustra
 
 ### 🏗️ Diagrama de Componentes — Vista General
 
-*(Adjunta aquí el diagrama de componentes general)*
+
 
 ---
 
 ### 🔍 Diagrama de Componentes — Vista Específica
 
-*(Adjunta aquí el diagrama de componentes específico)*
+
 
 **Arquitectura Hexagonal:**  
 El microservicio de Perfiles separa controladores, casos de uso, lógica de negocio y adaptadores externos para mantener modularidad y escalabilidad.
@@ -1020,26 +1024,26 @@ La arquitectura de dominio se centra en la jerarquía de entidades de usuario.
 
 #### 🚀 Despliegue e Infraestructura
 
-El microservicio de **Perfiles** se ejecuta como un contenedor Docker en **AWS ECS (Fargate)**, respaldado por una arquitectura robusta de CI/CD.
+El microservicio de **Perfiles** se ejecuta como un contenedor Docker en **Azure**, respaldado por una arquitectura robusta de CI/CD.
 
-- **Ejecución:** Contenedor Docker en AWS ECS con imagen almacenada en Amazon ECR.
+- **Ejecución:** Contenedor Docker en Azure ECS con imagen almacenada en Amazon ECR.
 - **Base de datos:** **MongoDB** con URI inyectada como variable de entorno `MONGO_URI`.
 - **Almacenamiento de imágenes:** **Cloudinary** con credenciales configuradas por variables de entorno.
 - **HTTPS:** El servicio corre sobre SSL/TLS en el puerto `8443` con un keystore PKCS12.
 - **CI/CD (GitHub Actions):**
 	- Pruebas unitarias (JUnit 5) en cada PR a `develop` y `main`.
-	- Despliegue automático a AWS ECS en merges a `main`.
+	- Despliegue automático a Azure ECS en merges a `main`.
 	- Análisis de calidad de código con SonarCloud.
 - **Construcción:** Dockerfile multi-stage (Maven Build → JRE 21 Alpine Runtime).
-- **Configuración:** Variables de entorno gestionadas desde AWS Secrets/Environment.
+- **Configuración:** Variables de entorno gestionadas desde Azure Secrets/Environment.
 
-<div align="center">
+<div align="center">	
 
 | 🌐 **Componente** | 📝 **Descripción** |
 |------------------|-------------------|
-| AWS ECS Fargate | Hosting del contenedor Docker del microservicio |
+| Azure ECS Fargate | Hosting del contenedor Docker del microservicio |
 | Amazon ECR | Registro privado de imágenes Docker |
-| MongoDB Atlas / AWS | Base de datos NoSQL para perfiles de usuarios |
+| MongoDB Atlas / Azure | Base de datos NoSQL para perfiles de usuarios |
 | Cloudinary | Almacenamiento de fotos de perfil |
 | GitHub Actions | Automatización de CI/CD y calidad de código |
 | Swagger UI | Documentación interactiva en `/swagger-ui.html` |
@@ -1321,11 +1325,11 @@ matchpuff-profile-service/
 │           └── 📁 infrastructure/adapters/    (UserRepositoryAdapterTest, CloudinaryAdapterTest,
 │                                               UserMapperTest)
 │
-├── 📁 .aws/                                                  # 🛠️ CONFIGURACIÓN AWS
+├── 📁 .Azure/                                                  # 🛠️ CONFIGURACIÓN Azure
 │   └── 📄 task-definition.json
 ├── 📁 .github/workflows/                                     # 🔄 CI/CD
 │   ├── 📄 ci.yml
-│   ├── 📄 cd-aws.yml
+│   ├── 📄 cd-Azure.yml
 │   ├── 📄 cd-azure.yml
 │   └── 📄 sonar.yml
 ├── 📄 Dockerfile
@@ -1422,19 +1426,21 @@ Esto levanta:
 | `SERVER_PORT` | `8443` | Puerto del servidor |
 | `APP_STARTUP_FAIL_FAST` | `true` | Si la app falla al iniciar cuando no hay conexión a MongoDB |
 
-## 12. ☁️ CI/CD y Despliegue en AWS
+## 12. ☁️ CI/CD y Despliegue en Azure
 
-El proyecto implementa un **pipeline automatizado** con **GitHub Actions** para garantizar la calidad del código y el despliegue continuo en **AWS ECS**.
+El proyecto implementa un **pipeline automatizado** con **GitHub Actions** para garantizar la calidad del código y el despliegue continuo en **Azure ECS**.
 
 ---
 
 ### 🔗 Enlaces de Despliegue
 
+
+https://patricia-profile-service-gpcucxgpdub4azbw.canadacentral-01.azurewebsites.net/swagger-ui/index.html#/
 <div align="center">
 
 | 🌍 Ambiente | 📝 Estado |
 |:-----------|:---------|
-| **🟢 Producción (AWS ECS)** | ![Active](https://img.shields.io/badge/Status-Active-success?style=flat) |
+| **🟢 Producción (Azure ECS)** | ![Active](https://img.shields.io/badge/Status-Active-success?style=flat) |
 
 </div>
 
@@ -1453,9 +1459,9 @@ El flujo de trabajo ejecuta los siguientes pasos en cada push o PR:
 
 **CD (en merges a `main`):**
 
-1. **Login a AWS** — Configura credenciales de AWS con `aws-actions/configure-aws-credentials`.
+1. **Login a Azure** — Configura credenciales de Azure con `Azure-actions/configure-Azure-credentials`.
 2. **Build & Push a ECR** — Construye la imagen Docker y la sube a Amazon ECR.
-3. **Deploy a ECS** — Actualiza la task definition y fuerza un nuevo despliegue en ECS con `aws-actions/amazon-ecs-deploy-task-definition`.
+3. **Deploy a ECS** — Actualiza la task definition y fuerza un nuevo despliegue en ECS con `Azure-actions/amazon-ecs-deploy-task-definition`.
 
 ---
 
@@ -1465,8 +1471,8 @@ El flujo de trabajo ejecuta los siguientes pasos en cada push o PR:
 
 | Componente | Servicio | Propósito |
 |:-----------|:---------|:----------|
-| **Compute** | ![AWS ECS](https://img.shields.io/badge/AWS_ECS-FF9900?logo=amazonaws&logoColor=white) | Ejecución del contenedor Docker del microservicio en Fargate |
-| **Registry** | ![ECR](https://img.shields.io/badge/Amazon_ECR-FF9900?logo=amazonaws&logoColor=white) | Registro privado de imágenes Docker |
+| **Compute** | ![Azure ECS](https://img.shields.io/badge/Azure_ECS-FF9900?logo=amazonAzure&logoColor=white) | Ejecución del contenedor Docker del microservicio en Fargate |
+| **Registry** | ![ECR](https://img.shields.io/badge/Amazon_ECR-FF9900?logo=amazonAzure&logoColor=white) | Registro privado de imágenes Docker |
 | **Database** | ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white) | Persistencia de perfiles de usuarios |
 | **Storage** | ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?logo=cloudinary&logoColor=white) | Almacenamiento de fotos de perfil |
 | **CI/CD** | ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=github-actions&logoColor=white) | Automatización de pruebas y despliegue continuo |
@@ -1479,7 +1485,7 @@ El flujo de trabajo ejecuta los siguientes pasos en cada push o PR:
 
 ### 📊 Evidencias de Despliegue
 
-*(Adjunta aquí las capturas de pantalla de AWS ECS y el pipeline de GitHub Actions)*
+*(Adjunta aquí las capturas de pantalla de Azure ECS y el pipeline de GitHub Actions)*
 
 ---
 
@@ -1503,7 +1509,7 @@ El equipo **Matchpuff** aplicó la metodología **Scrum** con sprints semanales 
 - **Backlogs**: Gestión de tareas en GitHub Projects.
 
 ### 🎯 Valores del Equipo
-Compromiso, Coraje, Enfoque, Apertura y Respeto fueron los pilares para afrontar desafíos técnicos como la arquitectura hexagonal con Spring Boot 3.4.5, la integración con Cloudinary, el despliegue en AWS ECS con HTTPS y el diseño de un microservicio de perfiles escalable.
+Compromiso, Coraje, Enfoque, Apertura y Respeto fueron los pilares para afrontar desafíos técnicos como la arquitectura hexagonal con Spring Boot 3.4.5, la integración con Cloudinary, el despliegue en Azure ECS con HTTPS y el diseño de un microservicio de perfiles escalable.
 
 ---
 
