@@ -77,14 +77,6 @@ class StudentProfileTest {
     }
 
     @Test
-    void givenTags_whenSet_thenGetTagsReturnsThem() {
-        Tag tag = new Tag( "Java", "Programming");
-        student.setTags(List.of(tag));
-        assertEquals(1, student.getTags().size());
-        assertEquals("Java", student.getTags().get(0).getName());
-    }
-
-    @Test
     void givenInheritedEmailField_whenSet_thenGetEmailReturnsString() {
         assertEquals("maria@escuelaing.edu.co", student.getEmail());
     }

@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -70,7 +71,7 @@ public class UserController {
     @Tag(name = "Users - Reading", description = "Obtain information about users")
     @Operation(summary = "Obtain user by ID")
     public ResponseEntity<UserResponse> getUser(
-            @PathVariable String userId) {
+            @PathVariable UUID userId) {
         return ResponseEntity.ok(userService.getUser(userId));
     }
 
@@ -94,7 +95,7 @@ public class UserController {
     @Tag(name = "Users - Updating", description = "Update user information")
     @Operation(summary = "Update student user data")
     public ResponseEntity<UserResponse> updateUserStudent(
-            @PathVariable String userId,
+            @PathVariable UUID userId,
             @Valid @RequestBody UserStudentUpdateRequest request) {
         return ResponseEntity.ok(userService.updateUser(userId, userRestMapper.toDomain(request)));
     }
@@ -103,7 +104,7 @@ public class UserController {
     @Tag(name = "Users - Updating", description = "Update user information")
     @Operation(summary = "Update admin user data")
     public ResponseEntity<UserResponse> updateUserAdmin(
-            @PathVariable String userId,
+            @PathVariable UUID userId,
             @Valid @RequestBody UserAdminUpdateRequest request) {
         return ResponseEntity.ok(userService.updateUser(userId, userRestMapper.toDomain(request)));
     }
@@ -112,7 +113,7 @@ public class UserController {
     @Tag(name = "Users - Updating", description = "Update user information")
     @Operation(summary = "Update organizer user data")
     public ResponseEntity<UserResponse> updateUserOrganizer(
-            @PathVariable String userId,
+            @PathVariable UUID userId,
             @Valid @RequestBody UserOrganizerUpdateRequest request) {
         return ResponseEntity.ok(userService.updateUser(userId, userRestMapper.toDomain(request)));
     }
@@ -121,7 +122,7 @@ public class UserController {
     @Tag(name = "User Security", description = "Manage user security settings such as passwords")
     @Operation(summary = "Change user password")
     public ResponseEntity<Void> changePassword(
-            @PathVariable String userId,
+            @PathVariable UUID userId,
             @Valid @RequestBody ChangePasswordRequest request) {
         userService.changePassword(userId, request.getCurrentPassword(), request.getNewPassword());
         return ResponseEntity.noContent().build();
@@ -138,7 +139,7 @@ public class UserController {
     @Tag(name = "User Profiles", description = "Manage user profiles and content")
     @Operation(summary = "Add availability schedule to student user")
     public ResponseEntity<UserResponse> updateUserSchedule(
-            @PathVariable String userId,
+            @PathVariable UUID userId,
             @Valid @RequestBody ScheduleRequest request) {
         return ResponseEntity.ok(userService.addSchedule(userId, userRestMapper.toDomain(request)));
     }
@@ -147,7 +148,7 @@ public class UserController {
     @Tag(name = "User Profiles", description = "Manage user profiles and content")
     @Operation(summary = "Remove availability schedule from student user")
     public ResponseEntity<UserResponse> removeUserSchedule(
-            @PathVariable String userId,
+            @PathVariable UUID userId,
             @Valid @RequestBody ScheduleRequest request) {
         return ResponseEntity.ok(userService.removeSchedule(userId, userRestMapper.toDomain(request)));
     }
@@ -156,24 +157,24 @@ public class UserController {
     @Tag(name = "User Profiles", description = "Manage user profiles and content")
     @Operation(summary = "Add a tag/interest to the student user")
     public ResponseEntity<UserResponse> updateUserTags(
-            @PathVariable String userId,
+            @PathVariable UUID userId,
             @Valid @RequestBody TagRequest request) {
-        return ResponseEntity.ok(userService.addTag(userId, userRestMapper.toDomain(request)));
+        return ResponseEntity.ok(userService.addTag(userId, request.getTagId()));
     }
 
     @PatchMapping("/{userId}/tags/remove")
     @Tag(name = "User Profiles", description = "Manage user profiles and content")
     @Operation(summary = "Remove a tag/interest from the student user")
     public ResponseEntity<UserResponse> removeUserTag(
-            @PathVariable String userId,
+            @PathVariable UUID userId,
             @Valid @RequestBody TagRequest request) {
-        return ResponseEntity.ok(userService.removeTag(userId, userRestMapper.toDomain(request)));
+        return ResponseEntity.ok(userService.removeTag(userId, request.getTagId()));
     }
 
     @DeleteMapping("/{userId}")
     @Tag(name = "Users - Deletion", description = "Delete users from the system")
     @Operation(summary = "Delete a user by ID")
-    public ResponseEntity<Void> deleteUser(@PathVariable String userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
@@ -185,7 +186,7 @@ public class UserController {
     @Tag(name = "User Profiles", description = "Manage user profiles and content")
     @Operation(summary = "Upload or update the profile image of the user")
     public ResponseEntity<UserResponseProfilePhoto> uploadProfileImage(
-            @PathVariable String userId,
+            @PathVariable UUID userId,
             @RequestParam("file") MultipartFile file) {
         try {
             return ResponseEntity.ok(userService.updateProfileImage(userId, file.getBytes(), file.getContentType()));
@@ -198,7 +199,7 @@ public class UserController {
     @Tag(name = "User Profiles", description = "Manage user profiles and content")
     @Operation(summary = "Enable or disable geolocation for the user")
     public ResponseEntity<UserResponse> updateGeolocation(
-            @PathVariable String userId,
+            @PathVariable UUID userId,
             @Valid @RequestBody GeolocationRequest request) {
         return ResponseEntity.ok(userService.updateGeolocation(userId, request.isGeolocationEnabled()));
     }
@@ -206,7 +207,7 @@ public class UserController {
     @GetMapping("/{userId}/profile-image")
     @Tag(name = "User Profiles", description = "Manage user profiles and content")
     @Operation(summary = "Retrieve the profile image of the user")
-    public ResponseEntity<Void> getProfileImage(@PathVariable String userId) {
+    public ResponseEntity<Void> getProfileImage(@PathVariable UUID userId) {
         UserResponse user = userService.getUser(userId);
 
         if (!(user instanceof StudentProfileResponse student) || student.getPhotoUrl() == null || student.getPhotoUrl().isBlank()) {

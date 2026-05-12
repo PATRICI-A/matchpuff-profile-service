@@ -8,6 +8,7 @@ import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class StudentProfileDocument extends UserDocument {
@@ -44,7 +45,7 @@ public class StudentProfileDocument extends UserDocument {
     @Field("schedule")
     private List<ScheduleDocument> schedule;
     
-    @Field("interests")
-    private List<TagDocument> interests;
+    @Field("tagsId")
+    private List<UUID> tagsId;
 
 }

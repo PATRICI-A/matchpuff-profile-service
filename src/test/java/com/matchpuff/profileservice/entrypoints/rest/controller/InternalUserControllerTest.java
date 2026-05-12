@@ -39,7 +39,7 @@ class InternalUserControllerTest {
                 .verified(false)
                 .build();
 
-        when(internalUserService.getUser(userId.toString())).thenReturn(response);
+        when(internalUserService.getUser(userId)).thenReturn(response);
 
         mockMvc.perform(get("/api/v1/internal/users/" + userId))
                 .andExpect(status().isOk())
@@ -58,7 +58,7 @@ class InternalUserControllerTest {
                 .verified(true)
                 .build();
 
-        when(internalUserService.getUser(userId.toString())).thenReturn(response);
+        when(internalUserService.getUser(userId)).thenReturn(response);
 
         mockMvc.perform(get("/api/v1/internal/users/" + userId))
                 .andExpect(status().isOk())
@@ -109,7 +109,7 @@ class InternalUserControllerTest {
     @WithMockUser
     void givenUserId_whenVerifyUser_thenReturns204() throws Exception {
         UUID userId = UUID.randomUUID();
-        doNothing().when(internalUserService).verifyUser(userId.toString());
+        doNothing().when(internalUserService).verifyUser(userId);
 
         mockMvc.perform(patch("/api/v1/internal/users/" + userId + "/verify")
                         .with(csrf()))
@@ -119,7 +119,7 @@ class InternalUserControllerTest {
     @Test
     @WithMockUser
     void givenAnotherUserId_whenVerifyUser_thenReturns204() throws Exception {
-        String userId = UUID.randomUUID().toString();
+        UUID userId = UUID.randomUUID();
         doNothing().when(internalUserService).verifyUser(userId);
 
         mockMvc.perform(patch("/api/v1/internal/users/" + userId + "/verify")

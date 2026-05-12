@@ -1,17 +1,13 @@
 package com.matchpuff.profileservice.application.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import java.util.UUID;
 import lombok.Data;
 
 @Data
 public class TagRequest {
 
-    @NotBlank(message = "The tag name cannot be blank")
-    @Size(min = 1, max = 50, message = "The tag name must be between 1 and 50 characters")
-    private String name;
+    @NotNull(message = "The tag ID cannot be null")
+    private UUID tagId;
 
-    @NotBlank(message = "The tag category cannot be blank")
-    @Size(min = 1, max = 100, message = "The tag category must be between 1 and 100 characters")
-    private String category;
 }

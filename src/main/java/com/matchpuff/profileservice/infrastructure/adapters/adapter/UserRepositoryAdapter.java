@@ -59,13 +59,13 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public void delete(String userId) {
-        userRepository.deleteById(parseUserId(userId));
+    public void delete(UUID userId) {
+        userRepository.deleteById(userId);
     }
 
     @Override
-    public Optional<User> findById(String id) {
-        return userRepository.findById(parseUserId(id))
+    public Optional<User> findById(UUID id) {
+        return userRepository.findById(id)
                 .flatMap(userMapper::toDomainByType);
     }
 
@@ -76,17 +76,16 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public User update(String id, User user) {
-        UUID userId = parseUserId(id);
+    public User update(UUID id, User user) {
 
         if (user.getEmail() != null) {
             Optional<UserDocument> existing = userRepository.findByEmail(user.getEmail());
-            if (existing.isPresent() && !existing.get().getId().equals(userId)) {
+            if (existing.isPresent() && !existing.get().getId().equals(id)) {
                 throw new InvalidInputException("The email is already in use by another user.");
             }
         }
 
-        UserDocument storedUser = userRepository.findById(userId)
+        UserDocument storedUser = userRepository.findById(id)
                 .orElseThrow(() -> new InvalidInputException("User not found: " + id));
 
         if (user instanceof StudentProfile student) {
@@ -140,7 +139,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         merged.setPrivacyLevel(incoming.getPrivacyLevel() != null ? incoming.getPrivacyLevel() : current.getPrivacyLevel());
         merged.setGeolocationEnabled(incoming.isGeolocationEnabled());
         merged.setSchedule(incoming.getSchedules() != null ? userMapper.toDocument(incoming).getSchedule() : current.getSchedule());
-        merged.setInterests(incoming.getTags() != null ? userMapper.toDocument(incoming).getInterests() : current.getInterests());
+        merged.setTagsId(incoming.getTagsId() != null ? incoming.getTagsId() : current.getTagsId());
         return merged;
     }
 
@@ -190,14 +189,6 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
             throw new InvalidInputException("The email is already in use by another user.");
         }
         return false;
-    }
-
-    private UUID parseUserId(String userId) {
-        try {
-            return UUID.fromString(userId);
-        } catch (IllegalArgumentException | NullPointerException ex) {
-            throw new InvalidInputException("Invalid user id: " + userId);
-        }
     }
 
     private void ensureCreatedAt(UserDocument userDocument) {

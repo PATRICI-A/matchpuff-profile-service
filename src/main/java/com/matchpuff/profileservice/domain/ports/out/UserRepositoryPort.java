@@ -4,16 +4,17 @@ import com.matchpuff.profileservice.domain.model.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface UserRepositoryPort {
 
 	User save(StudentProfile student);
 	User save(Admin admin);
 	User save(Organizer organizer);
-	void delete(String userId);
-	Optional<User> findById(String id);
+	void delete(UUID userId);
+	Optional<User> findById(UUID id);
 	Optional<User> findByEmail(String email);
-	User update(String id, User user);
+	User update(UUID id, User user);
     List<User> findAll();
 
 	List<StudentProfile> findAllStudents();

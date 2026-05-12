@@ -93,28 +93,6 @@ class DomainModelsTest {
     }
 
     @Test
-    void givenTag_whenCreated_thenCanSetNameAndCategory() {
-        // Given
-        Tag tag = new Tag("Java", "Programming Languages");
-
-        // Then
-        assertEquals("Java", tag.getName());
-        assertEquals("Programming Languages", tag.getCategory());
-    }
-
-    @Test
-    void givenMultipleTags_whenCreated_thenEachHasOwnState() {
-        // When
-        Tag tag1 = new Tag("Python", "Programming");
-        Tag tag2 = new Tag("Leadership", "Soft Skills");
-
-        // Then
-        assertEquals("Python", tag1.getName());
-        assertEquals("Leadership", tag2.getName());
-        assertNotEquals(tag1.getName(), tag2.getName());
-    }
-
-    @Test
     void givenStudentProfile_whenSetDateOfBirth_thenCanRetrieveIt() {
         // Given
         StudentProfile student = new StudentProfile();

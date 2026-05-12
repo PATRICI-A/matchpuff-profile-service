@@ -2,9 +2,11 @@ package com.matchpuff.profileservice.entrypoints.rest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.matchpuff.profileservice.application.dto.request.UserAdminUpdateRequest;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.dto.response.StudentProfileResponse;
 import com.matchpuff.profileservice.application.service.UserServicePort;
+import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.entrypoints.rest.mapper.UserRestMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -167,9 +169,9 @@ class UserControllerTest {
     @Test
     @WithMockUser
     void givenExistingId_whenGetUser_thenReturns200() throws Exception {
-        when(userService.getUser("user-1")).thenReturn(mockUserResponseInfo);
+        when(userService.getUser(mockUserResponseInfo.getId())).thenReturn(mockUserResponseInfo);
 
-        mockMvc.perform(get("/api/v1/users/user-1"))
+        mockMvc.perform(get("/api/v1/users/" + mockUserResponseInfo.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()))
                 .andExpect(jsonPath("$.name").value("Test User"));
@@ -180,9 +182,9 @@ class UserControllerTest {
     @Test
     @WithMockUser
     void givenValidRequest_whenUpdateUser_thenReturns200() throws Exception {
-        when(userService.updateUser(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
+        when(userService.updateUser(eq(mockUserResponseInfo.getId()), any())).thenReturn(mockUserResponseInfo);
 
-        mockMvc.perform(patch("/api/v1/users/student/user-1")
+        mockMvc.perform(patch("/api/v1/users/student/" + mockUserResponseInfo.getId())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(buildValidUserRequestJson()))
@@ -193,7 +195,7 @@ class UserControllerTest {
     @Test
     @WithMockUser
     void givenValidPasswordChangeRequest_whenChangePassword_thenReturns204() throws Exception {
-        doNothing().when(userService).changePassword("user-1", "CurrentPassword123", "NewPassword123");
+        doNothing().when(userService).changePassword(mockUserResponseInfo.getId(), "CurrentPassword123", "NewPassword123");
 
         String passwordJson = """
                 {
@@ -202,7 +204,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/v1/users/user-1/password")
+        mockMvc.perform(patch("/api/v1/users/" + mockUserResponseInfo.getId() + "/password")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(passwordJson))
@@ -238,7 +240,7 @@ class UserControllerTest {
     @Test
     @WithMockUser
     void givenValidSchedule_whenAddSchedule_thenReturns200() throws Exception {
-        when(userService.addSchedule(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
+        when(userService.addSchedule(eq(mockUserResponseInfo.getId()), any())).thenReturn(mockUserResponseInfo);
 
         String scheduleJson = """
                 {
@@ -249,7 +251,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/v1/users/user-1/schedule")
+        mockMvc.perform(patch("/api/v1/users/" + mockUserResponseInfo.getId() + "/schedule")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(scheduleJson))
@@ -266,7 +268,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/v1/users/user-1/schedule")
+        mockMvc.perform(patch("/api/v1/users/" + mockUserResponseInfo.getId() + "/schedule")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidScheduleJson))
@@ -276,7 +278,7 @@ class UserControllerTest {
     @Test
     @WithMockUser
     void givenValidSchedule_whenRemoveSchedule_thenReturns200() throws Exception {
-        when(userService.removeSchedule(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
+        when(userService.removeSchedule(eq(mockUserResponseInfo.getId()), any())).thenReturn(mockUserResponseInfo);
 
         String scheduleJson = """
                 {
@@ -287,7 +289,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/v1/users/user-1/schedule/remove")
+        mockMvc.perform(patch("/api/v1/users/" + mockUserResponseInfo.getId() + "/schedule/remove")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(scheduleJson))
@@ -300,16 +302,12 @@ class UserControllerTest {
     @Test
     @WithMockUser
     void givenValidTag_whenAddTag_thenReturns200() throws Exception {
-        when(userService.addTag(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
+        when(userService.addTag(eq(mockUserResponseInfo.getId()), any())).thenReturn(mockUserResponseInfo);
 
-        String tagJson = """
-                {
-                  "name": "Kubernetes",
-                  "category": "DevOps"
-                }
-                """;
+        String tagId = UUID.randomUUID().toString();
+        String tagJson = String.format("{ \"tagId\": \"%s\" }", tagId);
 
-        mockMvc.perform(patch("/api/v1/users/user-1/tags")
+        mockMvc.perform(patch("/api/v1/users/" + mockUserResponseInfo.getId() + "/tags")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tagJson))
@@ -326,7 +324,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/v1/users/user-1/tags")
+        mockMvc.perform(patch("/api/v1/users/" + mockUserResponseInfo.getId() + "/tags")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidTagJson))
@@ -336,19 +334,15 @@ class UserControllerTest {
     @Test
     @WithMockUser
     void givenValidTag_whenRemoveTag_thenReturns200() throws Exception {
-        when(userService.removeTag(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
+        when(userService.removeTag(eq(mockUserResponseInfo.getId()), any())).thenReturn(mockUserResponseInfo);
 
-        String tagJson = """
-                {
-                  "name": "Kubernetes",
-                  "category": "DevOps"
-                }
-                """;
+        String tagId2 = UUID.randomUUID().toString();
+        String tagJson2 = String.format("{ \"tagId\": \"%s\" }", tagId2);
 
-        mockMvc.perform(patch("/api/v1/users/user-1/tags/remove")
+        mockMvc.perform(patch("/api/v1/users/" + mockUserResponseInfo.getId() + "/tags/remove")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(tagJson))
+                        .content(tagJson2))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(mockUserResponseInfo.getId().toString()));
     }
@@ -419,10 +413,10 @@ class UserControllerTest {
 
     @Test
     @WithMockUser
-    void whenDeleteUser_thenReturns204() throws Exception {
-        doNothing().when(userService).deleteUser("user-1");
+   void whenDeleteUser_thenReturns204() throws Exception {
+           doNothing().when(userService).deleteUser(mockUserResponseInfo.getId());
 
-        mockMvc.perform(delete("/api/v1/users/user-1")
+        mockMvc.perform(delete("/api/v1/users/" + mockUserResponseInfo.getId())
                 .with(csrf()))
                 .andExpect(status().isNoContent());
     }
@@ -443,10 +437,10 @@ class UserControllerTest {
                         .profileImageUrl("http://photo.jpg")
                         .build();
 
-        when(userService.updateProfileImage(eq(mockUserResponse.getId().toString()), any(byte[].class), eq("image/png")))
+        when(userService.updateProfileImage(eq(mockUserResponse.getId()), any(byte[].class), eq("image/png")))
                 .thenReturn(photo);
 
-        mockMvc.perform(multipart("/api/v1/users/" + mockUserResponse.getId().toString() + "/profile-image")
+        mockMvc.perform(multipart("/api/v1/users/" + mockUserResponse.getId() + "/profile-image")
                 .file(file)
                 .with(csrf()))
                 .andExpect(status().isOk())
@@ -463,9 +457,9 @@ class UserControllerTest {
                 .photoUrl("http://photo.jpg")
                 .build();
 
-        when(userService.getUser(mockUserResponse.getId().toString())).thenReturn(photoUser);
+        when(userService.getUser(mockUserResponse.getId())).thenReturn(photoUser);
 
-        mockMvc.perform(get("/api/v1/users/" + mockUserResponse.getId().toString() + "/profile-image"))
+        mockMvc.perform(get("/api/v1/users/" + mockUserResponse.getId() + "/profile-image"))
                 .andExpect(status().isFound())
                 .andExpect(header().string("Location", "http://photo.jpg"));
     }
@@ -479,9 +473,9 @@ class UserControllerTest {
                 .email("test@escuelaing.edu.co")
                 .build();
 
-        when(userService.getUser(mockUserResponse.getId().toString())).thenReturn(photoUser);
+        when(userService.getUser(mockUserResponse.getId())).thenReturn(photoUser);
 
-        mockMvc.perform(get("/api/v1/users/" + mockUserResponse.getId().toString() + "/profile-image"))
+        mockMvc.perform(get("/api/v1/users/" + mockUserResponse.getId() + "/profile-image"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -503,7 +497,8 @@ class UserControllerTest {
     @Test
     @WithMockUser
     void givenValidAdminUpdateRequest_whenUpdateUserAdmin_thenReturns200() throws Exception {
-        when(userService.updateUser(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
+        when(userRestMapper.toDomain(any(UserAdminUpdateRequest.class))).thenReturn(new Admin());
+        when(userService.updateUser(eq(mockUserResponseInfo.getId()), any())).thenReturn(mockUserResponseInfo);
 
         String adminUpdateJson = """
                 {
@@ -513,7 +508,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/v1/users/admin/user-1")
+        mockMvc.perform(patch("/api/v1/users/admin/" + mockUserResponseInfo.getId())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(adminUpdateJson))
@@ -530,7 +525,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/v1/users/admin/user-1")
+        mockMvc.perform(patch("/api/v1/users/admin/" + mockUserResponseInfo.getId())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidAdminJson))
@@ -541,8 +536,8 @@ class UserControllerTest {
 
     @Test
     @WithMockUser
-    void givenValidOrganizerUpdateRequest_whenUpdateUserOrganizer_thenReturns200() throws Exception {
-        when(userService.updateUser(eq("user-1"), any())).thenReturn(mockUserResponseInfo);
+         void givenValidOrganizerUpdateRequest_whenUpdateUserOrganizer_thenReturns200() throws Exception {
+                         when(userService.updateUser(eq(mockUserResponseInfo.getId()), any())).thenReturn(mockUserResponseInfo);
 
         String orgUpdateJson = """
                 {
@@ -553,7 +548,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/v1/users/organizer/user-1")
+        mockMvc.perform(patch("/api/v1/users/organizer/" + mockUserResponseInfo.getId())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orgUpdateJson))
@@ -571,7 +566,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/v1/users/organizer/user-1")
+        mockMvc.perform(patch("/api/v1/users/organizer/" + mockUserResponseInfo.getId())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidOrgJson))
@@ -582,8 +577,8 @@ class UserControllerTest {
 
     @Test
     @WithMockUser
-    void givenGeolocationEnabledTrue_whenUpdateGeolocation_thenReturns200() throws Exception {
-        when(userService.updateGeolocation(eq("user-1"), eq(true))).thenReturn(mockUserResponseInfo);
+         void givenGeolocationEnabledTrue_whenUpdateGeolocation_thenReturns200() throws Exception {
+                         when(userService.updateGeolocation(eq(mockUserResponseInfo.getId()), eq(true))).thenReturn(mockUserResponseInfo);
 
         String geoJson = """
                 {
@@ -591,7 +586,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/v1/users/user-1/geolocation")
+        mockMvc.perform(patch("/api/v1/users/" + mockUserResponseInfo.getId() + "/geolocation")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(geoJson))
@@ -601,8 +596,8 @@ class UserControllerTest {
 
     @Test
     @WithMockUser
-    void givenGeolocationEnabledFalse_whenUpdateGeolocation_thenReturns200() throws Exception {
-        when(userService.updateGeolocation(eq("user-1"), eq(false))).thenReturn(mockUserResponseInfo);
+         void givenGeolocationEnabledFalse_whenUpdateGeolocation_thenReturns200() throws Exception {
+                         when(userService.updateGeolocation(eq(mockUserResponseInfo.getId()), eq(false))).thenReturn(mockUserResponseInfo);
 
         String geoJson = """
                 {
@@ -610,7 +605,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/v1/users/user-1/geolocation")
+        mockMvc.perform(patch("/api/v1/users/" + mockUserResponseInfo.getId() + "/geolocation")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(geoJson))

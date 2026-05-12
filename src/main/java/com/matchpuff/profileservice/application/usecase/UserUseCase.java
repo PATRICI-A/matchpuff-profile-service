@@ -5,7 +5,6 @@ import com.matchpuff.profileservice.domain.exceptions.InvalidImageInputException
 import com.matchpuff.profileservice.domain.exceptions.ProfileServiceException;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.*;
-import com.matchpuff.profileservice.domain.model.Tag;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
 import com.matchpuff.profileservice.domain.ports.out.ImageStoragePort;
 import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
@@ -14,6 +13,7 @@ import com.matchpuff.profileservice.application.service.PasswordHashingService;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -50,7 +50,7 @@ public class UserUseCase implements UserUseCasePort {
 
     // ── DELETE ───────────────────────────────────────────────────
     @Override
-    public void deleteUser(String userId) {
+    public void deleteUser(UUID userId) {
         findOrThrow(userId);
         userRepository.delete(userId);
     }
@@ -58,7 +58,7 @@ public class UserUseCase implements UserUseCasePort {
     // ── GET ──────────────────────────────────────────────────────
 
     @Override
-    public User getUser(String userId) {
+    public User getUser(UUID userId) {
         return findOrThrow(userId);
     }
 
@@ -70,7 +70,7 @@ public class UserUseCase implements UserUseCasePort {
 
     // ── UPDATE ───────────────────────────────────────────────────
     @Override
-    public void verifyUser(String userId) {
+    public void verifyUser(UUID userId) {
         User user = findOrThrow(userId);
         if (user.isVerified()) {
             throw new ProfileServiceException("User is already verified", HttpStatus.BAD_REQUEST);
@@ -80,7 +80,7 @@ public class UserUseCase implements UserUseCasePort {
     }
     
     @Override
-    public User updateGeolocation(String userId, boolean geolocationEnabled) {
+    public User updateGeolocation(UUID userId, boolean geolocationEnabled) {
         User user = findOrThrow(userId);
         if (!(user instanceof StudentProfile)) {
             throw new ProfileServiceException("Only STUDENT users can update geolocation settings", HttpStatus.BAD_REQUEST);
@@ -90,7 +90,7 @@ public class UserUseCase implements UserUseCasePort {
     }
 
     @Override
-    public User updateUser(String userId, User user) {
+    public User updateUser(UUID userId, User user) {
         if (user instanceof StudentProfile student) {
             return updateStudentUser(userId, student);
         }
@@ -107,7 +107,7 @@ public class UserUseCase implements UserUseCasePort {
     }
 
     @Override
-    public void changePassword(String userId, String currentPassword, String newPassword) {
+    public void changePassword(UUID userId, String currentPassword, String newPassword) {
         User user = findOrThrow(userId);
 
         if (user.getPasswordHash() == null || !passwordHashingService.verifyPassword(currentPassword, user.getPasswordHash())) {
@@ -118,7 +118,7 @@ public class UserUseCase implements UserUseCasePort {
         userRepository.update(userId, user);
     }
 
-    public User updateStudentUser(String userId, StudentProfile request) {
+    public User updateStudentUser(UUID userId, StudentProfile request) {
         StudentProfile student = (StudentProfile) findOrThrow(userId);
 
         if (request.getName() != null)         student.setName(request.getName());
@@ -132,13 +132,13 @@ public class UserUseCase implements UserUseCasePort {
         if (request.getCareer() != null)       student.setCareer(request.getCareer());
         if (request.getSemester() > 0)         student.setSemester(request.getSemester());
         if (request.getDateOfBirth() != null)  student.setDateOfBirth(request.getDateOfBirth());
-        if (request.getTags() != null)         student.setTags(request.getTags());
+        if (request.getTagsId() != null)         student.setTagsId(request.getTagsId());
         if (request.getSchedules() != null)    student.setSchedules(request.getSchedules());
 
         return userRepository.update(userId, student);
     }
 
-    public User updateAdminUser(String userId, Admin request) {
+    public User updateAdminUser(UUID userId, Admin request) {
         Admin admin = (Admin) findOrThrow(userId);
 
         if (request.getName() != null)         admin.setName(request.getName());
@@ -151,7 +151,7 @@ public class UserUseCase implements UserUseCasePort {
         return userRepository.update(userId, admin);
     }
 
-    public User updateOrganizerUser(String userId, Organizer request) {
+    public User updateOrganizerUser(UUID userId, Organizer request) {
         Organizer organizer = (Organizer) findOrThrow(userId);
 
         if (request.getName() != null)         organizer.setName(request.getName());
@@ -166,7 +166,7 @@ public class UserUseCase implements UserUseCasePort {
     }
 
     @Override
-    public User addScheduleToStudent(String userId, Schedule schedule) {
+    public User addScheduleToStudent(UUID userId, Schedule schedule) {
         User user = findOrThrow(userId);
         if (!(user instanceof StudentProfile)) {
             throw new ProfileServiceException("Only STUDENT users can have schedules", HttpStatus.BAD_REQUEST);
@@ -180,7 +180,7 @@ public class UserUseCase implements UserUseCasePort {
     }
 
     @Override
-    public User removeScheduleFromStudent(String userId, Schedule schedule) {
+    public User removeScheduleFromStudent(UUID userId, Schedule schedule) {
         User user = findOrThrow(userId);
         if (!(user instanceof StudentProfile student)) {
             throw new ProfileServiceException("Only STUDENT users can have schedules", HttpStatus.BAD_REQUEST);
@@ -199,32 +199,32 @@ public class UserUseCase implements UserUseCasePort {
     }
 
     @Override
-    public User addTagToStudent(String userId, Tag tag) {
+    public User addTagToStudent(UUID userId, UUID tagId) {
         User user = findOrThrow(userId);
         if (!(user instanceof StudentProfile)) {
             throw new ProfileServiceException("Only STUDENT users can have tags", HttpStatus.BAD_REQUEST);
         }
         StudentProfile student = (StudentProfile) findOrThrow(userId);
-        if (student.getTags() == null || student.getTags().getClass().getName().contains("ImmutableCollections")) {
-            student.setTags(student.getTags() == null ? new ArrayList<>() : new ArrayList<>(student.getTags()));
+        if (student.getTagsId() == null || student.getTagsId().getClass().getName().contains("ImmutableCollections")) {
+            student.setTagsId(student.getTagsId() == null ? new ArrayList<>() : new ArrayList<>(student.getTagsId()));
         }
-        student.getTags().add(tag);
+        student.getTagsId().add(tagId);
         return userRepository.update(userId, student);
     }
 
     @Override
-    public User removeTagFromStudent(String userId, Tag tag) {
+    public User removeTagFromStudent(UUID userId, UUID tagId) {
         User user = findOrThrow(userId);
         if (!(user instanceof StudentProfile student)) {
             throw new ProfileServiceException("Only STUDENT users can have tags", HttpStatus.BAD_REQUEST);
         }
-        if (student.getTags() == null) {
+        if (student.getTagsId() == null) {
             throw new ProfileServiceException("No tags to remove", HttpStatus.BAD_REQUEST);
         }
-        if (student.getTags().getClass().getName().contains("ImmutableCollections")) {
-            student.setTags(new ArrayList<>(student.getTags()));
+        if (student.getTagsId().getClass().getName().contains("ImmutableCollections")) {
+            student.setTagsId(new ArrayList<>(student.getTagsId()));
         }
-        boolean removed = student.getTags().removeIf(t -> t.equals(tag));
+        boolean removed = student.getTagsId().removeIf(t -> t.equals(tagId));
         if (!removed) {
             throw new ProfileServiceException("Tag not found for removal", HttpStatus.BAD_REQUEST);
         }
@@ -232,7 +232,7 @@ public class UserUseCase implements UserUseCasePort {
     }
 
     @Override
-    public User updateProfileImage(String userId, byte[] file, String contentType) {
+    public User updateProfileImage(UUID userId, byte[] file, String contentType) {
         if (file == null || file.length == 0) throw new InvalidImageInputException("The file is empty");
         if (file.length > 5 * 1024 * 1024) throw new InvalidImageInputException("Image exceeds 5MB limit");
         if (!"image/png".equals(contentType) && !"image/jpeg".equals(contentType)) throw new InvalidImageInputException("Invalid format. Only PNG and JPEG are allowed");
@@ -265,7 +265,7 @@ public class UserUseCase implements UserUseCasePort {
         }
     }
 
-    private User findOrThrow(String userId) {
+    private User findOrThrow(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ProfileServiceException("User not found: " + userId, HttpStatus.NOT_FOUND));
     }

@@ -1,7 +1,6 @@
 package com.matchpuff.profileservice.entrypoints.rest.mapper;
 
 import com.matchpuff.profileservice.application.dto.request.ScheduleRequest;
-import com.matchpuff.profileservice.application.dto.request.TagRequest;
 import com.matchpuff.profileservice.application.dto.request.UserAdminRequest;
 import com.matchpuff.profileservice.application.dto.request.UserAdminUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserOrganizerRequest;
@@ -12,11 +11,9 @@ import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.domain.model.Organizer;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
-import com.matchpuff.profileservice.domain.model.Tag;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.ArrayList;
 
 @Mapper(componentModel = "spring")
 public interface UserRestMapper {
@@ -24,7 +21,7 @@ public interface UserRestMapper {
     @Mapping(target = "passwordHash", source = "password")
     @Mapping(target = "photoUrl", source = "photourl")
     @Mapping(target = "schedules", expression = "java(new java.util.ArrayList<>())")
-    @Mapping(target = "tags", expression = "java(new java.util.ArrayList<>())")
+    @Mapping(target = "tagsId", expression = "java(new java.util.ArrayList<>())")
     StudentProfile toDomain(UserStudentRequest request);
 
     @Mapping(target = "passwordHash", source = "password")
@@ -38,7 +35,7 @@ public interface UserRestMapper {
     Organizer toDomain(UserOrganizerUpdateRequest request);
 
     @Mapping(target = "schedules", ignore = true)
-    @Mapping(target = "tags", ignore = true)
+    @Mapping(target = "tagsId", ignore = true)
     @Mapping(target = "photoUrl", ignore = true)
     StudentProfile toDomain(UserStudentUpdateRequest request);
 
@@ -50,10 +47,5 @@ public interface UserRestMapper {
                 request.getStartTime(),
                 request.getEndTime()
         );
-    }
-
-    default Tag toDomain(TagRequest request) {
-        if (request == null) return null;
-        return new Tag(request.getName(), request.getCategory());
     }
 }

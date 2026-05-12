@@ -1,6 +1,8 @@
 package com.matchpuff.profileservice.infrastructure.adapters.adapter;
 
 import java.util.Map;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.cloudinary.Cloudinary;
@@ -19,14 +21,14 @@ public class CloudinaryAdapter implements ImageStoragePort {
     }
 
     @Override
-    public String uploadProfileImage(byte[] file, String userId) {
+    public String uploadProfileImage(byte[] file, UUID userId) {
         try {
             @SuppressWarnings("unchecked")
             Map<String, Object> uploadResult = cloudinary.uploader().upload(
                 file,
                 ObjectUtils.asMap(
                     "folder", "profile_pictures",
-                    "public_id", userId,
+                    "public_id", userId.toString(),
                     "overwrite", true
                 )
             );
