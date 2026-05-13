@@ -48,6 +48,8 @@ public class InternalUserController {
     }
 
     @GetMapping("/matching/profiles/{id}")
+    @Tag(name = "Users - Reading", description = "Obtain information about users")
+    @Operation(summary = "Obtain user profile for matching by ID")
     public UserMatchProfileDto getProfileForMatching(
             @PathVariable UUID id
     ) {
@@ -55,6 +57,8 @@ public class InternalUserController {
     }
 
     @GetMapping("/matching/profiles")
+    @Tag(name = "Users - Reading", description = "Obtain information about users")
+    @Operation(summary = "Obtain all user profiles for matching")
     public List<UserMatchProfileDto> getAllProfilesForMatching() {
         return internalUserService.getAllProfilesForMatching();
     }
