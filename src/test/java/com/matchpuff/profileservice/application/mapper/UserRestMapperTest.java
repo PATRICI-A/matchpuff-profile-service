@@ -1,4 +1,4 @@
-package com.matchpuff.profileservice.entrypoints.rest.mapper;
+package com.matchpuff.profileservice.application.mapper;
 
 import com.matchpuff.profileservice.application.dto.request.ScheduleRequest;
 import com.matchpuff.profileservice.application.dto.request.TagRequest;
@@ -8,11 +8,11 @@ import com.matchpuff.profileservice.application.dto.request.UserOrganizerRequest
 import com.matchpuff.profileservice.application.dto.request.UserOrganizerUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserStudentRequest;
 import com.matchpuff.profileservice.application.dto.request.UserStudentUpdateRequest;
+import com.matchpuff.profileservice.application.mapper.UserMapper;
 import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.domain.model.Organizer;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
-import com.matchpuff.profileservice.domain.model.Tag;
 import com.matchpuff.profileservice.domain.model.enums.CareerEnum;
 import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
 import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
@@ -22,12 +22,13 @@ import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserRestMapperTest {
 
-    private final UserRestMapper mapper = Mappers.getMapper(UserRestMapper.class);
+    private final UserMapper mapper = Mappers.getMapper(UserMapper.class);
 
     // ── toDomain(UserRequest) ─────────────────────────────────────
 
@@ -52,8 +53,7 @@ class UserRestMapperTest {
         request.setDateOfBirth(LocalDate.of(1999, 10, 5));
 
         TagRequest tagRequest = new TagRequest();
-        tagRequest.setName("Python");
-        tagRequest.setCategory("IA");
+        tagRequest.setTagId(UUID.randomUUID());
 
         ScheduleRequest scheduleRequest = new ScheduleRequest();
         scheduleRequest.setDayOfWeek(DayOfWeekEnum.THURSDAY);
@@ -74,9 +74,9 @@ class UserRestMapperTest {
         assertEquals(PrivacyLevelEnum.PRIVATE, result.getPrivacyLevel());
         assertEquals(LocalDate.of(1999, 10, 5), result.getDateOfBirth());
 
-        assertTrue(result.getTags().isEmpty());
+        assertTrue(result.getTagsId().isEmpty());
 
-        assertTrue(result.getSchedules().isEmpty());
+        assertTrue(result.getSchedulesAvailability().isEmpty());
     }
 
     @Test
@@ -109,7 +109,7 @@ class UserRestMapperTest {
 
         StudentProfile result = mapper.toDomain(request);
 
-        assertTrue(result.getTags().isEmpty());
+        assertTrue(result.getTagsId().isEmpty());
     }
 
     @Test
@@ -125,7 +125,7 @@ class UserRestMapperTest {
 
         StudentProfile result = mapper.toDomain(request);
 
-        assertTrue(result.getSchedules().isEmpty());
+        assertTrue(result.getSchedulesAvailability().isEmpty());
     }
 
     // ── toDomain(ScheduleRequest) ─────────────────────────────────
@@ -151,27 +151,7 @@ class UserRestMapperTest {
         assertEquals(LocalTime.of(15, 0), result.getStartTime());
         assertEquals(LocalTime.of(17, 0), result.getEndTime());
     }
-
-    // ── toDomain(TagRequest) ──────────────────────────────────────
-
-    @Test
-    void givenNullTagRequest_whenToDomain_thenReturnsNull() {
-        assertNull(mapper.toDomain((TagRequest) null));
-    }
-
-    @Test
-    void givenValidTagRequest_whenToDomain_thenMapsAllFields() {
-        TagRequest request = new TagRequest();
-        request.setName("Kubernetes");
-        request.setCategory("DevOps");
-
-        Tag result = mapper.toDomain(request);
-
-        assertNotNull(result);
-        assertEquals("Kubernetes", result.getName());
-        assertEquals("DevOps", result.getCategory());
-    }
-
+    
     // ── toDomain(UserAdminRequest) ────────────────────────────────
 
     @Test

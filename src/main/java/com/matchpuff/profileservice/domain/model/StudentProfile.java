@@ -3,6 +3,7 @@ package com.matchpuff.profileservice.domain.model;
 import lombok.Data;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.matchpuff.profileservice.domain.model.enums.CareerEnum;
 import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
@@ -19,8 +20,8 @@ public class StudentProfile extends User {
     private Biography biography;
     private PrivacyLevelEnum privacyLevel;
     private boolean geolocationEnabled;
-    private List<Schedule> schedules;
-    private List<Tag> tags;
+    private List<Schedule> schedulesAvailability;
+    private List<UUID> tagsId;
 
 
     public void setBiography(String biography) {

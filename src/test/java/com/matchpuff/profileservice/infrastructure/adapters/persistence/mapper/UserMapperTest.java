@@ -4,7 +4,6 @@ import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.domain.model.Organizer;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
-import com.matchpuff.profileservice.domain.model.Tag;
 import com.matchpuff.profileservice.domain.model.User;
 import com.matchpuff.profileservice.domain.model.enums.CareerEnum;
 import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
@@ -14,7 +13,6 @@ import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.A
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.OrganizerProfileDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.ScheduleDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.StudentProfileDocument;
-import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.TagDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.UserDocument;
 import com.matchpuff.profileservice.infrastructure.adapters.persistence.entity.UserType;
 import org.junit.jupiter.api.Test;
@@ -60,10 +58,8 @@ class UserMapperTest {
             LocalTime.of(8, 0),
             LocalTime.of(10, 0)
         );
-
-        Tag tag = new Tag("Java", "TECH");
-        s.setSchedules(List.of(schedule));
-        s.setTags(List.of(tag));
+        s.setSchedulesAvailability(List.of(schedule));
+        s.setTagsId(List.of(UUID.randomUUID()));
 
         return s;
     }
@@ -91,12 +87,8 @@ class UserMapperTest {
         sd.setStartHour(LocalTime.of(8, 0));
         sd.setFinishHour(LocalTime.of(10, 0));
 
-        TagDocument td = new TagDocument();
-        td.setName("Java");
-        td.setCategory("TECH");
-
-        doc.setSchedule(List.of(sd));
-        doc.setInterests(List.of(td));
+        doc.setScheduleAvailability(List.of(sd));
+        doc.setTagsId(List.of(UUID.randomUUID()));
 
         return doc;
     }
@@ -116,8 +108,8 @@ class UserMapperTest {
         assertEquals(UserType.STUDENT, result.getUserType());
         assertEquals("Test User", result.getName());
         assertEquals("test@escuelaing.edu.co", result.getEmail());
-        assertNotNull(result.getSchedule());
-        assertNotNull(result.getInterests());
+        assertNotNull(result.getScheduleAvailability());
+        assertNotNull(result.getTagsId());
     }
 
     // ─────────────────────────────────────────────
@@ -135,8 +127,8 @@ class UserMapperTest {
         assertEquals("Test User", result.getName());
         assertEquals("test@escuelaing.edu.co", result.getEmail());
         assertEquals(5, result.getSemester());
-        assertNotNull(result.getSchedules());
-        assertNotNull(result.getTags());
+        assertNotNull(result.getSchedulesAvailability());
+        assertNotNull(result.getTagsId());
     }
 
 
@@ -184,27 +176,6 @@ class UserMapperTest {
     }
 
     // ─────────────────────────────────────────────
-    // Tag mapping
-    // ─────────────────────────────────────────────
-
-    @Test
-    void givenTagDocs_whenToTagList_thenMapsCorrectly() {
-        TagDocument doc = new TagDocument();
-        doc.setName("Java");
-        doc.setCategory("TECH");
-
-        List<Tag> result = mapper.toTagList(List.of(doc));
-
-        assertEquals(1, result.size());
-        assertEquals("Java", result.get(0).getName());
-    }
-
-    @Test
-    void givenNullTags_whenToTagList_thenReturnsEmpty() {
-        assertTrue(mapper.toTagList(null).isEmpty());
-    }
-
-    // ─────────────────────────────────────────────
     // toDocument – null date / null collections
     // ─────────────────────────────────────────────
 
@@ -222,23 +193,23 @@ class UserMapperTest {
     @Test
     void givenStudentWithNullSchedules_whenToDocument_thenScheduleIsEmpty() {
         StudentProfile student = buildStudent();
-        student.setSchedules(null);
+        student.setSchedulesAvailability(null);
 
         StudentProfileDocument result = mapper.toDocument(student);
 
         assertNotNull(result);
-        assertNull(result.getSchedule());
+        assertNull(result.getScheduleAvailability());
     }
 
     @Test
     void givenStudentWithNullTags_whenToDocument_thenInterestsIsEmpty() {
         StudentProfile student = buildStudent();
-        student.setTags(null);
+        student.setTagsId(null);
 
         StudentProfileDocument result = mapper.toDocument(student);
 
         assertNotNull(result);
-        assertNull(result.getInterests());
+        assertNull(result.getTagsId());
     }
 
     // ─────────────────────────────────────────────

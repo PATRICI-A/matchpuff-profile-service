@@ -6,7 +6,6 @@ import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.domain.model.Organizer;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
-import com.matchpuff.profileservice.domain.model.Tag;
 import com.matchpuff.profileservice.domain.model.User;
 import com.matchpuff.profileservice.domain.model.enums.CareerEnum;
 import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
@@ -59,8 +58,8 @@ class UserUseCaseTest {
         student.setSemester(4);
         student.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         student.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
-        student.setSchedules(new ArrayList<>());
-        student.setTags(new ArrayList<>());
+        student.setSchedulesAvailability(new ArrayList<>());
+        student.setTagsId(new ArrayList<>());
     }
 
     // ── createStudentUser ─────────────────────────────────────────
@@ -114,9 +113,9 @@ class UserUseCaseTest {
 
     @Test
     void givenExistingId_whenGetUser_thenReturnsUser() {
-        when(userRepository.findById(student.getId().toString())).thenReturn(Optional.of(student));
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
 
-        User result = userUseCase.getUser(student.getId().toString());
+        User result = userUseCase.getUser(student.getId());
 
         assertNotNull(result);
         assertEquals(student.getId(), result.getId());
@@ -124,13 +123,14 @@ class UserUseCaseTest {
 
     @Test
     void givenNonExistingId_whenGetUser_thenThrowsProfileServiceException() {
-        when(userRepository.findById("unknown")).thenReturn(Optional.empty());
+        UUID unknownId = UUID.randomUUID();
+        when(userRepository.findById(unknownId)).thenReturn(Optional.empty());
 
         ProfileServiceException ex = assertThrows(
-                ProfileServiceException.class,
-                () -> userUseCase.getUser("unknown")
+            ProfileServiceException.class,
+            () -> userUseCase.getUser(unknownId)
         );
-        assertTrue(ex.getMessage().contains("unknown"));
+        assertTrue(ex.getMessage().contains("not found"));
     }
 
     // ── updateStudentUser ─────────────────────────────────────────
@@ -140,10 +140,10 @@ class UserUseCaseTest {
         StudentProfile request = new StudentProfile();
         request.setName("Nuevo Nombre");
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.updateStudentUser("user-1", request);
+        User result = userUseCase.updateStudentUser(student.getId(), request);
 
         assertEquals("Nuevo Nombre", result.getName());
     }
@@ -153,10 +153,10 @@ class UserUseCaseTest {
         StudentProfile request = new StudentProfile();
         request.setCareer(CareerEnum.COMPUTER_SCIENCE);
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.updateStudentUser("user-1", request);
+        User result = userUseCase.updateStudentUser(student.getId(), request);
 
         assertEquals(CareerEnum.COMPUTER_SCIENCE, ((StudentProfile) result).getCareer());
     }
@@ -166,10 +166,10 @@ class UserUseCaseTest {
         StudentProfile request = new StudentProfile();
         request.setSemester(0);
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.updateStudentUser("user-1", request);
+        User result = userUseCase.updateStudentUser(student.getId(), request);
 
         assertEquals(4, ((StudentProfile) result).getSemester());
     }
@@ -179,10 +179,10 @@ class UserUseCaseTest {
         StudentProfile request = new StudentProfile();
         request.setSemester(8);
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.updateStudentUser("user-1", request);
+        User result = userUseCase.updateStudentUser(student.getId(), request);
 
         assertEquals(8, ((StudentProfile) result).getSemester());
     }
@@ -192,13 +192,13 @@ class UserUseCaseTest {
         StudentProfile request = new StudentProfile();
         request.setName("Nuevo Nombre");
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.updateUser("user-1", request);
+        User result = userUseCase.updateUser(student.getId(), request);
 
         assertEquals("Nuevo Nombre", result.getName());
-        verify(userRepository).update("user-1", student);
+        verify(userRepository).update(student.getId(), student);
     }
 
     @Test
@@ -210,13 +210,13 @@ class UserUseCaseTest {
         Admin request = new Admin();
         request.setName("Admin Nuevo");
 
-        when(userRepository.findById("admin-1")).thenReturn(Optional.of(admin));
-        when(userRepository.update("admin-1", admin)).thenReturn(admin);
+        when(userRepository.findById(admin.getId())).thenReturn(Optional.of(admin));
+        when(userRepository.update(admin.getId(), admin)).thenReturn(admin);
 
-        User result = userUseCase.updateUser("admin-1", request);
+        User result = userUseCase.updateUser(admin.getId(), request);
 
         assertEquals("Admin Nuevo", result.getName());
-        verify(userRepository).update("admin-1", admin);
+        verify(userRepository).update(admin.getId(), admin);
     }
 
     @Test
@@ -228,24 +228,25 @@ class UserUseCaseTest {
         Organizer request = new Organizer();
         request.setName("Organizer Nuevo");
 
-        when(userRepository.findById("org-1")).thenReturn(Optional.of(organizer));
-        when(userRepository.update("org-1", organizer)).thenReturn(organizer);
+        when(userRepository.findById(organizer.getId())).thenReturn(Optional.of(organizer));
+        when(userRepository.update(organizer.getId(), organizer)).thenReturn(organizer);
 
-        User result = userUseCase.updateUser("org-1", request);
+        User result = userUseCase.updateUser(organizer.getId(), request);
 
         assertEquals("Organizer Nuevo", result.getName());
-        verify(userRepository).update("org-1", organizer);
+        verify(userRepository).update(organizer.getId(), organizer);
     }
 
     @Test
     void givenNonExistingUser_whenUpdate_thenThrowsProfileServiceException() {
-        when(userRepository.findById("ghost")).thenReturn(Optional.empty());
+        UUID ghostId = UUID.randomUUID();
+        when(userRepository.findById(ghostId)).thenReturn(Optional.empty());
 
         StudentProfile studentProfile = new StudentProfile();
 
         assertThrows(
                 ProfileServiceException.class,
-                () -> userUseCase.updateStudentUser("ghost", studentProfile)
+                () -> userUseCase.updateStudentUser(ghostId, studentProfile)
         );
     }
 
@@ -253,30 +254,30 @@ class UserUseCaseTest {
     void givenValidCurrentPassword_whenChangePassword_thenHashesAndUpdatesUser() {
         student.setPasswordHash("CurrentPassword123");
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
         when(passwordHashingService.verifyPassword("CurrentPassword123", "CurrentPassword123")).thenReturn(true);
         when(passwordHashingService.hashPassword("NewPassword123")).thenReturn("HashedNewPassword123");
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        userUseCase.changePassword("user-1", "CurrentPassword123", "NewPassword123");
+        userUseCase.changePassword(student.getId(), "CurrentPassword123", "NewPassword123");
 
         assertEquals("HashedNewPassword123", student.getPasswordHash());
-        verify(userRepository).update("user-1", student);
+        verify(userRepository).update(student.getId(), student);
     }
 
     @Test
     void givenWrongCurrentPassword_whenChangePassword_thenThrowsProfileServiceException() {
         student.setPasswordHash("CurrentPassword123");
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
         when(passwordHashingService.verifyPassword("BadPassword123", "CurrentPassword123")).thenReturn(false);
 
         assertThrows(
                 ProfileServiceException.class,
-                () -> userUseCase.changePassword("user-1", "BadPassword123", "NewPassword123")
+                () -> userUseCase.changePassword(student.getId(), "BadPassword123", "NewPassword123")
         );
 
-        verify(userRepository, never()).update(anyString(), any());
+        verify(userRepository, never()).update(any(UUID.class), any());
     }
 
     // ── addScheduleToStudent ──────────────────────────────────────
@@ -286,38 +287,39 @@ class UserUseCaseTest {
         Schedule schedule = new Schedule( DayOfWeekEnum.MONDAY, "Cálculo I", LocalTime.of(8, 0), LocalTime.of(10, 0));
 
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.addScheduleToStudent("user-1", schedule);
+        User result = userUseCase.addScheduleToStudent(student.getId(), schedule);
 
-        assertEquals(1, ((StudentProfile) result).getSchedules().size());
-        assertEquals("Cálculo I", ((StudentProfile) result).getSchedules().get(0).getName());
+        assertEquals(1, ((StudentProfile) result).getSchedulesAvailability().size());
+        assertEquals("Cálculo I", ((StudentProfile) result).getSchedulesAvailability().get(0).getName());
     }
 
     @Test
     void givenStudentWithNullSchedules_whenAddSchedule_thenListIsInitialized() {
-        student.setSchedules(null);
+        student.setSchedulesAvailability(null);
         Schedule schedule = new Schedule( DayOfWeekEnum.TUESDAY, "Física", LocalTime.of(10, 0), LocalTime.of(12, 0));
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.addScheduleToStudent("user-1", schedule);
+        User result = userUseCase.addScheduleToStudent(student.getId(), schedule);
 
-        assertNotNull(((StudentProfile) result).getSchedules());
-        assertEquals(1, ((StudentProfile) result).getSchedules().size());
+        assertNotNull(((StudentProfile) result).getSchedulesAvailability());
+        assertEquals(1, ((StudentProfile) result).getSchedulesAvailability().size());
     }
 
     @Test
     void givenNonExistingUser_whenAddSchedule_thenThrowsProfileServiceException() {
-        when(userRepository.findById("missing")).thenReturn(Optional.empty());
+        UUID missingId = UUID.randomUUID();
+        when(userRepository.findById(missingId)).thenReturn(Optional.empty());
 
         Schedule schedule = new Schedule( DayOfWeekEnum.WEDNESDAY, "Química", LocalTime.of(12, 0), LocalTime.of(14, 0));
 
         assertThrows(
                 ProfileServiceException.class,
-                () -> userUseCase.addScheduleToStudent("missing", schedule)
+                () -> userUseCase.addScheduleToStudent(missingId, schedule)
         );
     }
 
@@ -325,72 +327,73 @@ class UserUseCaseTest {
 
     @Test
     void givenExistingStudent_whenAddTag_thenTagIsAdded() {
-        Tag tag = new Tag("Machine Learning", "IA");
+        java.util.UUID tagId = UUID.randomUUID();
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.addTagToStudent("user-1", tag);
+        User result = userUseCase.addTagToStudent(student.getId(), tagId);
 
-        assertEquals(1, ((StudentProfile) result).getTags().size());
-        assertEquals("Machine Learning", ((StudentProfile) result).getTags().get(0).getName());
+        assertEquals(1, ((StudentProfile) result).getTagsId().size());
+        assertEquals(tagId, ((StudentProfile) result).getTagsId().get(0));
     }
 
     @Test
     void givenStudentWithNullTags_whenAddTag_thenListIsInitialized() {
-        student.setTags(null);
-        Tag tag = new Tag("Kotlin", "Mobile Development");
+        student.setTagsId(null);
+        java.util.UUID tagId = UUID.randomUUID();
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.addTagToStudent("user-1", tag);
+        User result = userUseCase.addTagToStudent(student.getId(), tagId);
 
-        assertNotNull(((StudentProfile) result).getTags());
-        assertEquals(1, ((StudentProfile) result).getTags().size());
+        assertNotNull(((StudentProfile) result).getTagsId());
+        assertEquals(1, ((StudentProfile) result).getTagsId().size());
     }
 
     @Test
     void givenStudentWithImmutableTags_whenAddTag_thenListIsCopiedAndTagIsAdded() {
-        Tag existingTag = new Tag("Java", "Backend");
-        student.setTags(List.of(existingTag));
+        java.util.UUID existing = UUID.randomUUID();
+        student.setTagsId(List.of(existing));
 
-        Tag newTag = new Tag("Kotlin", "Mobile Development");
+        java.util.UUID newTag = UUID.randomUUID();
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.addTagToStudent("user-1", newTag);
+        User result = userUseCase.addTagToStudent(student.getId(), newTag);
 
-        assertEquals(2, ((StudentProfile) result).getTags().size());
-        assertEquals("Kotlin", ((StudentProfile) result).getTags().get(1).getName());
+        assertEquals(2, ((StudentProfile) result).getTagsId().size());
+        assertEquals(newTag, ((StudentProfile) result).getTagsId().get(1));
     }
 
     @Test
     void givenStudentWithImmutableSchedules_whenAddSchedule_thenListIsCopiedAndScheduleIsAdded() {
         Schedule existingSchedule = new Schedule(DayOfWeekEnum.MONDAY, "Base", LocalTime.of(8, 0), LocalTime.of(10, 0));
-        student.setSchedules(List.of(existingSchedule));
+        student.setSchedulesAvailability(List.of(existingSchedule));
 
         Schedule newSchedule = new Schedule(DayOfWeekEnum.TUESDAY, "Nuevo", LocalTime.of(10, 0), LocalTime.of(12, 0));
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.addScheduleToStudent("user-1", newSchedule);
+        User result = userUseCase.addScheduleToStudent(student.getId(), newSchedule);
 
-        assertEquals(2, ((StudentProfile) result).getSchedules().size());
-        assertEquals("Nuevo", ((StudentProfile) result).getSchedules().get(1).getName());
+        assertEquals(2, ((StudentProfile) result).getSchedulesAvailability().size());
+        assertEquals("Nuevo", ((StudentProfile) result).getSchedulesAvailability().get(1).getName());
     }
 
     @Test
     void givenNonExistingUser_whenAddTag_thenThrowsProfileServiceException() {
-        when(userRepository.findById("nobody")).thenReturn(Optional.empty());
+        UUID nobody = UUID.randomUUID();
+        when(userRepository.findById(nobody)).thenReturn(Optional.empty());
 
-        Tag tag = new Tag("Python", "Programación");
+        java.util.UUID tagId = UUID.randomUUID();
 
         assertThrows(
                 ProfileServiceException.class,
-                () -> userUseCase.addTagToStudent("nobody", tag)
+                () -> userUseCase.addTagToStudent(nobody, tagId)
         );
     }
 
@@ -399,72 +402,73 @@ class UserUseCaseTest {
     @Test
     void givenExistingSchedule_whenRemoveSchedule_thenScheduleIsRemoved() {
         Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Calculo", LocalTime.of(8, 0), LocalTime.of(10, 0));
-        student.setSchedules(new ArrayList<>(List.of(schedule)));
+        student.setSchedulesAvailability(new ArrayList<>(List.of(schedule)));
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.removeScheduleFromStudent("user-1", schedule);
+        User result = userUseCase.removeScheduleFromStudent(student.getId(), schedule);
 
-        assertTrue(((StudentProfile) result).getSchedules().isEmpty());
-        verify(userRepository).update("user-1", student);
+        assertTrue(((StudentProfile) result).getSchedulesAvailability().isEmpty());
+        verify(userRepository).update(student.getId(), student);
     }
 
     @Test
     void givenMissingSchedule_whenRemoveSchedule_thenThrowsProfileServiceException() {
         Schedule existing = new Schedule(DayOfWeekEnum.MONDAY, "Calculo", LocalTime.of(8, 0), LocalTime.of(10, 0));
         Schedule toRemove = new Schedule(DayOfWeekEnum.TUESDAY, "Fisica", LocalTime.of(10, 0), LocalTime.of(12, 0));
-        student.setSchedules(new ArrayList<>(List.of(existing)));
+        student.setSchedulesAvailability(new ArrayList<>(List.of(existing)));
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
 
-        assertThrows(ProfileServiceException.class, () -> userUseCase.removeScheduleFromStudent("user-1", toRemove));
-        verify(userRepository, never()).update(anyString(), any());
+        assertThrows(ProfileServiceException.class, () -> userUseCase.removeScheduleFromStudent(student.getId(), toRemove));
+        verify(userRepository, never()).update(any(UUID.class), any());
     }
 
     @Test
     void givenExistingTagInImmutableList_whenRemoveTag_thenTagIsRemoved() {
-        Tag tag = new Tag("Java", "Backend");
-        student.setTags(List.of(tag));
+        UUID tagId = UUID.randomUUID();
+        student.setTagsId(List.of(tagId));
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.removeTagFromStudent("user-1", tag);
+        User result = userUseCase.removeTagFromStudent(student.getId(), tagId);
 
-        assertTrue(((StudentProfile) result).getTags().isEmpty());
-        verify(userRepository).update("user-1", student);
+        assertTrue(((StudentProfile) result).getTagsId().isEmpty());
+        verify(userRepository).update(student.getId(), student);
     }
 
     @Test
     void givenMissingTag_whenRemoveTag_thenThrowsProfileServiceException() {
-        Tag existing = new Tag("Java", "Backend");
-        Tag toRemove = new Tag("Kotlin", "Mobile");
-        student.setTags(new ArrayList<>(List.of(existing)));
+        UUID existingTagId = UUID.randomUUID();
+        UUID toRemoveTagId = UUID.randomUUID();
+        student.setTagsId(new ArrayList<>(List.of(existingTagId)));
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
 
-        assertThrows(ProfileServiceException.class, () -> userUseCase.removeTagFromStudent("user-1", toRemove));
-        verify(userRepository, never()).update(anyString(), any());
+        assertThrows(ProfileServiceException.class, () -> userUseCase.removeTagFromStudent(student.getId(), toRemoveTagId));
+        verify(userRepository, never()).update(any(UUID.class), any());
     }
 
     // ── deleteUser ───────────────────────────────────────────────
 
     @Test
     void givenExistingUser_whenDeleteUser_thenDeletesFromRepository() {
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
 
-        userUseCase.deleteUser("user-1");
+        userUseCase.deleteUser(student.getId());
 
-        verify(userRepository).delete("user-1");
+        verify(userRepository).delete(student.getId());
     }
 
     @Test
     void givenMissingUser_whenDeleteUser_thenThrowsAndDoesNotDelete() {
-        when(userRepository.findById("missing")).thenReturn(Optional.empty());
+        UUID missingId = UUID.randomUUID();
+        when(userRepository.findById(missingId)).thenReturn(Optional.empty());
 
-        assertThrows(ProfileServiceException.class, () -> userUseCase.deleteUser("missing"));
-        verify(userRepository, never()).delete(anyString());
+        assertThrows(ProfileServiceException.class, () -> userUseCase.deleteUser(missingId));
+        verify(userRepository, never()).delete(any(UUID.class));
     }
 
     // ── getAllUsers ────────────────────────────────────────────────
@@ -504,7 +508,7 @@ class UserUseCaseTest {
     void givenNullFile_whenUpdateProfileImage_thenThrowsInvalidImageInputException() {
         InvalidImageInputException ex = assertThrows(
                 InvalidImageInputException.class,
-                () -> userUseCase.updateProfileImage("user-1", null, "image/png")
+                () -> userUseCase.updateProfileImage(student.getId(), null, "image/png")
         );
 
         assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
@@ -517,7 +521,7 @@ class UserUseCaseTest {
 
         assertThrows(
                 InvalidImageInputException.class,
-                () -> userUseCase.updateProfileImage("user-1", file, "image/png")
+                () -> userUseCase.updateProfileImage(student.getId(), file, "image/png")
         );
         verifyNoInteractions(imageStoragePort);
     }
@@ -528,7 +532,7 @@ class UserUseCaseTest {
 
         assertThrows(
                 InvalidImageInputException.class,
-                () -> userUseCase.updateProfileImage("user-1", tooLarge, "image/jpeg")
+                () -> userUseCase.updateProfileImage(student.getId(), tooLarge, "image/jpeg")
         );
         verifyNoInteractions(imageStoragePort);
     }
@@ -539,18 +543,18 @@ class UserUseCaseTest {
 
         assertThrows(
                 InvalidImageInputException.class,
-                () -> userUseCase.updateProfileImage("user-1", file, "text/plain")
+                () -> userUseCase.updateProfileImage(student.getId(), file, "text/plain")
         );
         verifyNoInteractions(imageStoragePort);
     }
 
     @Test
     void givenMissingUser_whenUpdateProfileImage_thenThrowsProfileServiceExceptionNotFound() {
-        when(userRepository.findById("missing")).thenReturn(Optional.empty());
+        when(userRepository.findById(student.getId())).thenReturn(Optional.empty());
 
         ProfileServiceException ex = assertThrows(
                 ProfileServiceException.class,
-                () -> userUseCase.updateProfileImage("missing", new byte[10], "image/png")
+                () -> userUseCase.updateProfileImage(student.getId(), new byte[10], "image/png")
         );
 
         assertEquals(HttpStatus.NOT_FOUND, ex.getStatus());
@@ -561,11 +565,11 @@ class UserUseCaseTest {
     void givenNonStudentUser_whenUpdateProfileImage_thenThrowsProfileServiceExceptionBadRequest() {
         Admin admin = new Admin();
         admin.setId(UUID.randomUUID());
-        when(userRepository.findById(admin.getId().toString())).thenReturn(Optional.of(admin));
+        when(userRepository.findById(admin.getId())).thenReturn(Optional.of(admin));
 
         ProfileServiceException ex = assertThrows(
                 ProfileServiceException.class,
-                () -> userUseCase.updateProfileImage(admin.getId().toString(), new byte[100], "image/jpeg")
+                () -> userUseCase.updateProfileImage(admin.getId(), new byte[100], "image/jpeg")
         );
 
         assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
@@ -574,15 +578,15 @@ class UserUseCaseTest {
 
     @Test
     void givenStudentAndValidImage_whenUpdateProfileImage_thenUploadsAndPersistsPhotoUrl() {
-        when(userRepository.findById(student.getId().toString())).thenReturn(Optional.of(student));
-        when(imageStoragePort.uploadProfileImage(any(), eq(student.getId().toString()))).thenReturn("https://cdn/new-photo.jpg");
-        when(userRepository.update(student.getId().toString(), student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(imageStoragePort.uploadProfileImage(any(), eq(student.getId()))).thenReturn("https://cdn/new-photo.jpg");
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.updateProfileImage(student.getId().toString(), new byte[256], "image/jpeg");
+        User result = userUseCase.updateProfileImage(student.getId(), new byte[256], "image/jpeg");
 
         assertEquals("https://cdn/new-photo.jpg", ((StudentProfile) result).getPhotoUrl());
-        verify(imageStoragePort).uploadProfileImage(any(), eq(student.getId().toString()));
-        verify(userRepository).update(student.getId().toString(), student);
+        verify(imageStoragePort).uploadProfileImage(any(), eq(student.getId()));
+        verify(userRepository).update(student.getId(), student);
     }
 
     // ── getUserByEmail ────────────────────────────────────────────
@@ -610,51 +614,52 @@ class UserUseCaseTest {
     @Test
     void givenUnverifiedUser_whenVerifyUser_thenSetsVerifiedTrueAndUpdates() {
         student.setVerified(false);
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        userUseCase.verifyUser("user-1");
+        userUseCase.verifyUser(student.getId());
 
         assertTrue(student.isVerified());
-        verify(userRepository).update("user-1", student);
+        verify(userRepository).update(student.getId(), student);
     }
 
     @Test
     void givenAlreadyVerifiedUser_whenVerifyUser_thenThrowsProfileServiceException() {
         student.setVerified(true);
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
 
-        assertThrows(ProfileServiceException.class, () -> userUseCase.verifyUser("user-1"));
-        verify(userRepository, never()).update(anyString(), any());
+        assertThrows(ProfileServiceException.class, () -> userUseCase.verifyUser(student.getId()));
+        verify(userRepository, never()).update(any(UUID.class), any());
     }
 
     @Test
     void givenNonExistingUser_whenVerifyUser_thenThrowsProfileServiceException() {
-        when(userRepository.findById("ghost")).thenReturn(Optional.empty());
+        UUID ghostId = UUID.randomUUID();
+        when(userRepository.findById(ghostId)).thenReturn(Optional.empty());
 
-        assertThrows(ProfileServiceException.class, () -> userUseCase.verifyUser("ghost"));
+        assertThrows(ProfileServiceException.class, () -> userUseCase.verifyUser(ghostId));
     }
 
     // ── updateGeolocation ─────────────────────────────────────────
 
     @Test
     void givenStudent_whenUpdateGeolocationEnabled_thenUpdatesFlagToTrue() {
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.updateGeolocation("user-1", true);
+        User result = userUseCase.updateGeolocation(student.getId(), true);
 
         assertTrue(((StudentProfile) result).isGeolocationEnabled());
-        verify(userRepository).update("user-1", student);
+        verify(userRepository).update(student.getId(), student);
     }
 
     @Test
     void givenStudent_whenUpdateGeolocationDisabled_thenUpdatesFlagToFalse() {
         student.setGeolocationEnabled(true);
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.updateGeolocation("user-1", false);
+        User result = userUseCase.updateGeolocation(student.getId(), false);
 
         assertFalse(((StudentProfile) result).isGeolocationEnabled());
     }
@@ -663,19 +668,20 @@ class UserUseCaseTest {
     void givenAdmin_whenUpdateGeolocation_thenThrowsProfileServiceException() {
         Admin admin = new Admin();
         admin.setId(UUID.randomUUID());
-        when(userRepository.findById("admin-1")).thenReturn(Optional.of(admin));
+        when(userRepository.findById(admin.getId())).thenReturn(Optional.of(admin));
 
         assertThrows(ProfileServiceException.class,
-                () -> userUseCase.updateGeolocation("admin-1", true));
-        verify(userRepository, never()).update(anyString(), any());
+                () -> userUseCase.updateGeolocation(admin.getId(), true));
+        verify(userRepository, never()).update(any(UUID.class), any());
     }
 
     @Test
     void givenNonExistingUser_whenUpdateGeolocation_thenThrowsProfileServiceException() {
-        when(userRepository.findById("missing")).thenReturn(Optional.empty());
+        UUID missingId = UUID.randomUUID();
+        when(userRepository.findById(missingId)).thenReturn(Optional.empty());
 
         assertThrows(ProfileServiceException.class,
-                () -> userUseCase.updateGeolocation("missing", true));
+                () -> userUseCase.updateGeolocation(missingId, true));
     }
 
     // ── updateStudentUser additional fields ───────────────────────
@@ -685,11 +691,11 @@ class UserUseCaseTest {
         StudentProfile request = new StudentProfile();
         request.setPasswordHash("NewPassword1");
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
         when(passwordHashingService.hashPassword("NewPassword1")).thenReturn("HashedNew1");
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        userUseCase.updateStudentUser("user-1", request);
+        userUseCase.updateStudentUser(student.getId(), request);
 
         assertEquals("HashedNew1", student.getPasswordHash());
         verify(passwordHashingService).hashPassword("NewPassword1");
@@ -698,19 +704,19 @@ class UserUseCaseTest {
     @Test
     void givenExistingStudent_whenUpdateWithSchedulesAndTags_thenBothAreUpdated() {
         Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Calculo", LocalTime.of(8, 0), LocalTime.of(10, 0));
-        Tag tag = new Tag("Java", "Backend");
+        UUID tagId = UUID.randomUUID();
 
         StudentProfile request = new StudentProfile();
-        request.setSchedules(List.of(schedule));
-        request.setTags(List.of(tag));
+        request.setSchedulesAvailability(List.of(schedule));
+        request.setTagsId(List.of(tagId));
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.updateStudentUser("user-1", request);
+        User result = userUseCase.updateStudentUser(student.getId(), request);
 
-        assertEquals(1, ((StudentProfile) result).getSchedules().size());
-        assertEquals(1, ((StudentProfile) result).getTags().size());
+        assertEquals(1, ((StudentProfile) result).getSchedulesAvailability().size());
+        assertEquals(1, ((StudentProfile) result).getTagsId().size());
     }
 
     @Test
@@ -718,10 +724,10 @@ class UserUseCaseTest {
         StudentProfile request = new StudentProfile();
         request.setDateOfBirth(LocalDate.of(1998, 5, 20));
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
-        when(userRepository.update("user-1", student)).thenReturn(student);
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        User result = userUseCase.updateStudentUser("user-1", request);
+        User result = userUseCase.updateStudentUser(student.getId(), request);
 
         assertEquals(LocalDate.of(1998, 5, 20), result.getDateOfBirth());
     }
@@ -737,10 +743,10 @@ class UserUseCaseTest {
         Admin request = new Admin();
         request.setGender(GenderEnum.FEMALE);
 
-        when(userRepository.findById("admin-1")).thenReturn(Optional.of(admin));
-        when(userRepository.update("admin-1", admin)).thenReturn(admin);
+        when(userRepository.findById(admin.getId())).thenReturn(Optional.of(admin));
+        when(userRepository.update(admin.getId(), admin)).thenReturn(admin);
 
-        User result = userUseCase.updateAdminUser("admin-1", request);
+        User result = userUseCase.updateAdminUser(admin.getId(), request);
 
         assertEquals(GenderEnum.FEMALE, result.getGender());
     }
@@ -753,21 +759,23 @@ class UserUseCaseTest {
         Admin request = new Admin();
         request.setPasswordHash("NewAdminPass1");
 
-        when(userRepository.findById("admin-1")).thenReturn(Optional.of(admin));
+        when(userRepository.findById(admin.getId())).thenReturn(Optional.of(admin));
         when(passwordHashingService.hashPassword("NewAdminPass1")).thenReturn("HashedAdminPass1");
-        when(userRepository.update("admin-1", admin)).thenReturn(admin);
+        when(userRepository.update(admin.getId(), admin)).thenReturn(admin);
 
-        userUseCase.updateAdminUser("admin-1", request);
+        userUseCase.updateAdminUser(admin.getId(), request);
 
         assertEquals("HashedAdminPass1", admin.getPasswordHash());
     }
 
     @Test
     void givenStudentReturnedForAdminId_whenUpdateAdmin_thenThrowsClassCastException() {
-        when(userRepository.findById("admin-1")).thenReturn(Optional.of(student));
+        Admin admin = new Admin();
+        admin.setId(UUID.randomUUID());
+        when(userRepository.findById(admin.getId())).thenReturn(Optional.of(student));
 
         assertThrows(ClassCastException.class,
-                () -> userUseCase.updateAdminUser("admin-1", new Admin()));
+                () -> userUseCase.updateAdminUser(admin.getId(), new Admin()));
     }
 
     // ── updateOrganizerUser ───────────────────────────────────────
@@ -781,10 +789,10 @@ class UserUseCaseTest {
         Organizer request = new Organizer();
         request.setContactInfo("new@contact.co");
 
-        when(userRepository.findById("org-1")).thenReturn(Optional.of(organizer));
-        when(userRepository.update("org-1", organizer)).thenReturn(organizer);
+        when(userRepository.findById(organizer.getId())).thenReturn(Optional.of(organizer));
+        when(userRepository.update(organizer.getId(), organizer)).thenReturn(organizer);
 
-        User result = userUseCase.updateOrganizerUser("org-1", request);
+        User result = userUseCase.updateOrganizerUser(organizer.getId(), request);
 
         assertEquals("new@contact.co", ((Organizer) result).getContactInfo());
     }
@@ -797,11 +805,11 @@ class UserUseCaseTest {
         Organizer request = new Organizer();
         request.setPasswordHash("NewOrgPass1");
 
-        when(userRepository.findById("org-1")).thenReturn(Optional.of(organizer));
+        when(userRepository.findById(organizer.getId())).thenReturn(Optional.of(organizer));
         when(passwordHashingService.hashPassword("NewOrgPass1")).thenReturn("HashedOrgPass1");
-        when(userRepository.update("org-1", organizer)).thenReturn(organizer);
+        when(userRepository.update(organizer.getId(), organizer)).thenReturn(organizer);
 
-        userUseCase.updateOrganizerUser("org-1", request);
+        userUseCase.updateOrganizerUser(organizer.getId(), request);
 
         assertEquals("HashedOrgPass1", organizer.getPasswordHash());
     }
@@ -811,9 +819,10 @@ class UserUseCaseTest {
     @Test
     void givenUnsupportedUserType_whenUpdateUser_thenThrowsProfileServiceException() {
         User generic = new User() {};
+        UUID userId = UUID.randomUUID();
 
         assertThrows(ProfileServiceException.class,
-                () -> userUseCase.updateUser("user-1", generic));
+                () -> userUseCase.updateUser(userId, generic));
     }
 
     // ── addScheduleToStudent non-student ─────────────────────────
@@ -824,10 +833,10 @@ class UserUseCaseTest {
         admin.setId(UUID.randomUUID());
         Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Clase", LocalTime.of(8, 0), LocalTime.of(10, 0));
 
-        when(userRepository.findById("admin-1")).thenReturn(Optional.of(admin));
+        when(userRepository.findById(admin.getId())).thenReturn(Optional.of(admin));
 
         assertThrows(ProfileServiceException.class,
-                () -> userUseCase.addScheduleToStudent("admin-1", schedule));
+                () -> userUseCase.addScheduleToStudent(admin.getId(), schedule));
     }
 
     // ── removeScheduleFromStudent non-student / null list ────────
@@ -838,21 +847,21 @@ class UserUseCaseTest {
         admin.setId(UUID.randomUUID());
         Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Clase", LocalTime.of(8, 0), LocalTime.of(10, 0));
 
-        when(userRepository.findById("admin-1")).thenReturn(Optional.of(admin));
+        when(userRepository.findById(admin.getId())).thenReturn(Optional.of(admin));
 
         assertThrows(ProfileServiceException.class,
-                () -> userUseCase.removeScheduleFromStudent("admin-1", schedule));
+                () -> userUseCase.removeScheduleFromStudent(admin.getId(), schedule));
     }
 
     @Test
     void givenStudentWithNullScheduleList_whenRemoveSchedule_thenThrowsProfileServiceException() {
-        student.setSchedules(null);
+        student.setSchedulesAvailability(null);
         Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Clase", LocalTime.of(8, 0), LocalTime.of(10, 0));
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
 
         assertThrows(ProfileServiceException.class,
-                () -> userUseCase.removeScheduleFromStudent("user-1", schedule));
+                () -> userUseCase.removeScheduleFromStudent(student.getId(), schedule));
     }
 
     // ── addTagToStudent non-student ───────────────────────────────
@@ -860,13 +869,14 @@ class UserUseCaseTest {
     @Test
     void givenAdmin_whenAddTag_thenThrowsProfileServiceException() {
         Admin admin = new Admin();
-        admin.setId(UUID.randomUUID());
-        Tag tag = new Tag("Java", "Backend");
+        UUID adminId = UUID.randomUUID();
+        admin.setId(adminId);
+        UUID tagId = UUID.randomUUID();
 
-        when(userRepository.findById("admin-1")).thenReturn(Optional.of(admin));
+        when(userRepository.findById(adminId)).thenReturn(Optional.of(admin));
 
         assertThrows(ProfileServiceException.class,
-                () -> userUseCase.addTagToStudent("admin-1", tag));
+                () -> userUseCase.addTagToStudent(adminId, tagId));
     }
 
     // ── removeTagFromStudent non-student / null list ──────────────
@@ -874,24 +884,25 @@ class UserUseCaseTest {
     @Test
     void givenAdmin_whenRemoveTag_thenThrowsProfileServiceException() {
         Admin admin = new Admin();
-        admin.setId(UUID.randomUUID());
-        Tag tag = new Tag("Java", "Backend");
+        UUID adminId = UUID.randomUUID();
+        admin.setId(adminId);
+        UUID tagId = UUID.randomUUID();
 
-        when(userRepository.findById("admin-1")).thenReturn(Optional.of(admin));
+        when(userRepository.findById(adminId)).thenReturn(Optional.of(admin));
 
         assertThrows(ProfileServiceException.class,
-                () -> userUseCase.removeTagFromStudent("admin-1", tag));
+                () -> userUseCase.removeTagFromStudent(adminId, tagId));
     }
 
     @Test
     void givenStudentWithNullTagList_whenRemoveTag_thenThrowsProfileServiceException() {
-        student.setTags(null);
-        Tag tag = new Tag("Java", "Backend");
+        student.setTagsId(null);
+        UUID tagId = UUID.randomUUID();
 
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(student));
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
 
         assertThrows(ProfileServiceException.class,
-                () -> userUseCase.removeTagFromStudent("user-1", tag));
+                () -> userUseCase.removeTagFromStudent(student.getId(), tagId));
     }
 
     // ── hashPasswordIfPresent (via createStudentUser) ─────────────

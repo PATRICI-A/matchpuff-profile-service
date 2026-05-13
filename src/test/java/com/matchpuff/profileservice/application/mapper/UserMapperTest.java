@@ -5,7 +5,6 @@ import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.domain.model.Organizer;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
-import com.matchpuff.profileservice.domain.model.Tag;
 import com.matchpuff.profileservice.domain.model.User;
 import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
 import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
@@ -64,11 +63,11 @@ class UserMapperTest {
         student.setBiography("Estudiante apasionada");
         student.setCreatedAt(LocalDateTime.of(2024, 1, 1, 0, 0));
 
-        Tag tag = new Tag("Spring Boot", "Backend");
-        student.setTags(List.of(tag));
+        UUID tagId = UUID.randomUUID();
+        student.setTagsId(List.of(tagId));
 
         Schedule schedule = new Schedule( DayOfWeekEnum.TUESDAY, "Algoritmos", LocalTime.of(9, 0), LocalTime.of(11, 0));
-        student.setSchedules(List.of(schedule));
+        student.setSchedulesAvailability(List.of(schedule));
 
         UserResponse info = mapper.toResponse(student);
         assertTrue(info instanceof StudentProfileResponse);
@@ -93,8 +92,8 @@ class UserMapperTest {
         student.setId(UUID.randomUUID());
         student.setName("Pedro Gomez");
         student.setEmail("pedro@escuelaing.edu.co");
-        student.setSchedules(null);
-        student.setTags(null);
+        student.setSchedulesAvailability(null);
+        student.setTagsId(null);
 
         UserResponse info = mapper.toResponse(student);
         assertTrue(info instanceof StudentProfileResponse);
@@ -192,25 +191,23 @@ class UserMapperTest {
 
     @Test
     void givenTagList_whenToTagResponseList_thenMapsAllFields() {
-        Tag tag = new Tag("Docker", "DevOps");
-        List<TagResponse> result = mapper.toTagResponseList(List.of(tag));
+        UUID tagId = UUID.randomUUID();
+        List<TagResponse> result = mapper.toTagResponseList(List.of(tagId));
 
         assertEquals(1, result.size());
-        assertEquals("Docker", result.get(0).getName());
-        assertEquals("DevOps", result.get(0).getCategory());
+        assertEquals(tagId, result.get(0).getTagId());
     }
 
     @Test
     void givenMultipleTags_whenToTagResponseList_thenMapsAll() {
-        Tag t1 = new Tag("Java", "Backend");
-        t1.setCategory("Backend");
+        UUID tagId1 = UUID.randomUUID();
+        UUID tagId2 = UUID.randomUUID();
 
-        Tag t2 = new Tag("React", "Frontend");
-        t2.setCategory("Frontend");
-
-        List<TagResponse> result = mapper.toTagResponseList(List.of(t1, t2));
+        List<TagResponse> result = mapper.toTagResponseList(List.of(tagId1, tagId2));
 
         assertEquals(2, result.size());
+        assertEquals(tagId1, result.get(0).getTagId());
+        assertEquals(tagId2, result.get(1).getTagId());
     }
 
     // ── toResponseProfilePhoto ───────────────────────────────────

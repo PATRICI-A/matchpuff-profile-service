@@ -33,8 +33,9 @@ class InternalUserServiceTest {
 
     @Test
     void givenStudentId_whenGetUser_thenReturnsMappedAuthResponse() {
+        UUID userId = UUID.randomUUID();
         StudentProfile student = new StudentProfile();
-        student.setId(UUID.randomUUID());
+        student.setId(userId);
 
         UserAuthResponse response = UserAuthResponse.builder()
                 .id(student.getId())
@@ -42,21 +43,22 @@ class InternalUserServiceTest {
                 .userType("STUDENT")
                 .build();
 
-        when(userUseCase.getUser("user-1")).thenReturn(student);
+        when(userUseCase.getUser(userId)).thenReturn(student);
         when(userMapper.toAuthResponse(student)).thenReturn(response);
 
-        UserAuthResponse result = internalUserService.getUser("user-1");
+        UserAuthResponse result = internalUserService.getUser(userId);
 
         assertNotNull(result);
         assertEquals("STUDENT", result.getUserType());
-        verify(userUseCase).getUser("user-1");
+        verify(userUseCase).getUser(userId);
         verify(userMapper).toAuthResponse(student);
     }
 
     @Test
     void givenAdminId_whenGetUser_thenReturnsMappedAuthResponse() {
+        UUID adminId = UUID.randomUUID();
         Admin admin = new Admin();
-        admin.setId(UUID.randomUUID());
+        admin.setId(adminId);
 
         UserAuthResponse response = UserAuthResponse.builder()
                 .id(admin.getId())
@@ -64,14 +66,14 @@ class InternalUserServiceTest {
                 .userType("ADMIN")
                 .build();
 
-        when(userUseCase.getUser("admin-1")).thenReturn(admin);
+        when(userUseCase.getUser(adminId)).thenReturn(admin);
         when(userMapper.toAuthResponse(admin)).thenReturn(response);
 
-        UserAuthResponse result = internalUserService.getUser("admin-1");
+        UserAuthResponse result = internalUserService.getUser(adminId);
 
         assertNotNull(result);
         assertEquals("ADMIN", result.getUserType());
-        verify(userUseCase).getUser("admin-1");
+        verify(userUseCase).getUser(adminId);
     }
 
     // ── getUserByEmail ────────────────────────────────────────────
@@ -121,21 +123,21 @@ class InternalUserServiceTest {
 
     @Test
     void givenUserId_whenVerifyUser_thenDelegatesToUseCase() {
-        doNothing().when(userUseCase).verifyUser("user-1");
-
-        internalUserService.verifyUser("user-1");
-
-        verify(userUseCase).verifyUser("user-1");
-    }
-
-    @Test
-    void givenDifferentUserId_whenVerifyUser_thenDelegatesToUseCaseWithCorrectId() {
-        String userId = UUID.randomUUID().toString();
+        UUID userId = UUID.randomUUID();
         doNothing().when(userUseCase).verifyUser(userId);
 
         internalUserService.verifyUser(userId);
 
         verify(userUseCase).verifyUser(userId);
-        verify(userUseCase, never()).verifyUser("user-1");
+    }
+
+    @Test
+    void givenDifferentUserId_whenVerifyUser_thenDelegatesToUseCaseWithCorrectId() {
+        UUID userId = UUID.randomUUID();
+        doNothing().when(userUseCase).verifyUser(userId);
+
+        internalUserService.verifyUser(userId);
+
+        verify(userUseCase).verifyUser(userId);
     }
 }

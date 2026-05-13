@@ -1,6 +1,8 @@
 package com.matchpuff.profileservice.application.service;
 
 import java.util.List;
+import java.util.UUID;
+
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto;
 import com.matchpuff.profileservice.application.mapper.UserMapper;
@@ -34,12 +36,12 @@ public class UserService implements UserServicePort {
     }
 
     @Override
-    public void deleteUser(String userId) {
+    public void deleteUser(UUID userId) {
         userUseCase.deleteUser(userId);
     }
 
     @Override
-    public UserResponse getUser(String userId) {
+    public UserResponse getUser(UUID userId) {
         User u = userUseCase.getUser(userId);
         return userMapper.toResponse(u);
     }
@@ -51,37 +53,37 @@ public class UserService implements UserServicePort {
     }
 
     @Override
-    public UserResponse updateUser(String userId, User user) {
+    public UserResponse updateUser(UUID userId, User user) {
         User updated = userUseCase.updateUser(userId, user);
         return userMapper.toResponse(updated);
     }
 
     @Override
-    public void changePassword(String userId, String currentPassword, String newPassword) {
+    public void changePassword(UUID userId, String currentPassword, String newPassword) {
         userUseCase.changePassword(userId, currentPassword, newPassword);
     }
 
     @Override
-    public UserResponse addSchedule(String userId, Schedule schedule) {
+    public UserResponse addSchedule(UUID userId, Schedule schedule) {
         User updated = userUseCase.addScheduleToStudent(userId, schedule);
         return userMapper.toResponse(updated);
     }
 
     @Override
-    public UserResponse removeSchedule(String userId, Schedule schedule) {
+    public UserResponse removeSchedule(UUID userId, Schedule schedule) {
         User updated = userUseCase.removeScheduleFromStudent(userId, schedule);
         return userMapper.toResponse(updated);
     }
 
     @Override
-    public UserResponse removeTag(String userId, Tag tag) {
-        User updated = userUseCase.removeTagFromStudent(userId, tag);
+    public UserResponse removeTag(UUID userId, UUID tagId) {
+        User updated = userUseCase.removeTagFromStudent(userId, tagId);
         return userMapper.toResponse(updated);
     }
 
     @Override
-    public UserResponse addTag(String userId, Tag tag) {
-        User updated = userUseCase.addTagToStudent(userId, tag);
+    public UserResponse addTag(UUID userId, UUID tagId) {
+        User updated = userUseCase.addTagToStudent(userId, tagId);
         return userMapper.toResponse(updated);
     }
 
@@ -92,7 +94,7 @@ public class UserService implements UserServicePort {
     }
 
     @Override
-    public UserResponseProfilePhoto updateProfileImage(String userId, byte[] file, String contentType) {
+    public UserResponseProfilePhoto updateProfileImage(UUID userId, byte[] file, String contentType) {
         User updated = userUseCase.updateProfileImage(userId, file, contentType);
         return userMapper.toResponseProfilePhoto(updated);
     }
@@ -104,7 +106,7 @@ public class UserService implements UserServicePort {
     }
 
     @Override
-    public UserResponse updateGeolocation(String userId, boolean geolocationEnabled) {
+    public UserResponse updateGeolocation(UUID userId, boolean geolocationEnabled) {
         User updated = userUseCase.updateGeolocation(userId, geolocationEnabled);
         return userMapper.toResponse(updated);
     }

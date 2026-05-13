@@ -13,6 +13,7 @@ import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @DisplayName("UserStudentRequest Tests")
 class UserStudentRequestTest {
@@ -111,7 +112,7 @@ class UserStudentRequestTest {
 
     private TagRequest createTagRequest(String name) {
         TagRequest tagRequest = new TagRequest();
-        tagRequest.setName(name);
+        tagRequest.setTagId(UUID.randomUUID());
         return tagRequest;
     }
 

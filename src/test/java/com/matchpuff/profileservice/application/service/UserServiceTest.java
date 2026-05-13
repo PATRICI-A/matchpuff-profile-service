@@ -4,7 +4,7 @@ import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.mapper.UserMapper;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
-import com.matchpuff.profileservice.domain.model.Tag;
+// tags are represented by UUIDs now
 import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
 import com.matchpuff.profileservice.domain.ports.in.UserUseCasePort;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,11 +91,11 @@ class UserServiceTest {
 
     @Test
     void whenDeleteUser_thenDelegatesToUseCase() {
-        doNothing().when(userUseCase).deleteUser("user-1");
+        doNothing().when(userUseCase).deleteUser(student.getId());
 
-        userService.deleteUser("user-1");
+        userService.deleteUser(student.getId());
 
-        verify(userUseCase).deleteUser("user-1");
+        verify(userUseCase).deleteUser(student.getId());
     }
 
     // ── updateProfileImage / getAllStudentProfiles ───────────────────────
@@ -103,7 +103,7 @@ class UserServiceTest {
     @Test
     void whenUpdateProfileImage_thenReturnsProfilePhotoResponse() {
         byte[] file = "bytes".getBytes();
-        when(userUseCase.updateProfileImage("user-1", file, "image/png")).thenReturn(student);
+        when(userUseCase.updateProfileImage(student.getId(), file, "image/png")).thenReturn(student);
 
         com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto photoResponse =
                 com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto.builder()
@@ -115,11 +115,11 @@ class UserServiceTest {
 
         when(userMapper.toResponseProfilePhoto(student)).thenReturn(photoResponse);
 
-        var result = userService.updateProfileImage("user-1", file, "image/png");
+        var result = userService.updateProfileImage(student.getId(), file, "image/png");
 
         assertNotNull(result);
         assertEquals("http://photo.jpg", result.getProfileImageUrl());
-        verify(userUseCase).updateProfileImage("user-1", file, "image/png");
+        verify(userUseCase).updateProfileImage(student.getId(), file, "image/png");
         verify(userMapper).toResponseProfilePhoto(student);
     }
 
@@ -157,36 +157,36 @@ class UserServiceTest {
 
     @Test
     void givenUserId_whenGetUser_thenReturnsMappedResponseInfo() {
-        when(userUseCase.getUser("user-1")).thenReturn(student);
+        when(userUseCase.getUser(student.getId())).thenReturn(student);
         when(userMapper.toResponse(student)).thenReturn(userResponse);
 
-        UserResponse result = userService.getUser("user-1");
+        UserResponse result = userService.getUser(student.getId());
 
         assertNotNull(result);
         assertEquals(student.getId(), result.getId());
-        verify(userUseCase).getUser("user-1");
+        verify(userUseCase).getUser(student.getId());
     }
 
     // ── updateUser ────────────────────────────────────────────────
 
     @Test
     void givenUserIdAndStudent_whenUpdateUser_thenReturnsMappedResponseInfo() {
-        when(userUseCase.updateUser("user-1", student)).thenReturn(student);
+        when(userUseCase.updateUser(student.getId(), student)).thenReturn(student);
         when(userMapper.toResponse(student)).thenReturn(userResponse);
 
-        UserResponse result = userService.updateUser("user-1", student);
+        UserResponse result = userService.updateUser(student.getId(), student);
 
         assertNotNull(result);
-        verify(userUseCase).updateUser("user-1", student);
+        verify(userUseCase).updateUser(student.getId(), student);
     }
 
     @Test
     void givenPasswordChangeRequest_whenChangePassword_thenDelegatesToUseCase() {
-        doNothing().when(userUseCase).changePassword("user-1", "CurrentPassword123", "NewPassword123");
+        doNothing().when(userUseCase).changePassword(student.getId(), "CurrentPassword123", "NewPassword123");
 
-        userService.changePassword("user-1", "CurrentPassword123", "NewPassword123");
+        userService.changePassword(student.getId(), "CurrentPassword123", "NewPassword123");
 
-        verify(userUseCase).changePassword("user-1", "CurrentPassword123", "NewPassword123");
+        verify(userUseCase).changePassword(student.getId(), "CurrentPassword123", "NewPassword123");
     }
 
     // ── addSchedule ───────────────────────────────────────────────
@@ -195,54 +195,54 @@ class UserServiceTest {
     void givenUserIdAndSchedule_whenAddSchedule_thenReturnsMappedResponseInfo() {
         Schedule schedule = new Schedule( DayOfWeekEnum.WEDNESDAY, "Algebra", LocalTime.of(12, 0), LocalTime.of(14, 0));
 
-        when(userUseCase.addScheduleToStudent("user-1", schedule)).thenReturn(student);
+        when(userUseCase.addScheduleToStudent(student.getId(), schedule)).thenReturn(student);
         when(userMapper.toResponse(student)).thenReturn(userResponse);
 
-        UserResponse result = userService.addSchedule("user-1", schedule);
+        UserResponse result = userService.addSchedule(student.getId(), schedule);
 
         assertNotNull(result);
-        verify(userUseCase).addScheduleToStudent("user-1", schedule);
+        verify(userUseCase).addScheduleToStudent(student.getId(), schedule);
     }
 
     // ── addTag ────────────────────────────────────────────────────
 
     @Test
     void givenUserIdAndTag_whenAddTag_thenReturnsMappedResponseInfo() {
-        Tag tag = new Tag("Python", "Programación");
+        java.util.UUID tagId = UUID.randomUUID();
 
-        when(userUseCase.addTagToStudent("user-1", tag)).thenReturn(student);
+        when(userUseCase.addTagToStudent(student.getId(), tagId)).thenReturn(student);
         when(userMapper.toResponse(student)).thenReturn(userResponse);
 
-        UserResponse result = userService.addTag("user-1", tag);
+        UserResponse result = userService.addTag(student.getId(), tagId);
 
         assertNotNull(result);
-        verify(userUseCase).addTagToStudent("user-1", tag);
+        verify(userUseCase).addTagToStudent(student.getId(), tagId);
     }
 
     @Test
     void givenUserIdAndSchedule_whenRemoveSchedule_thenReturnsMappedResponseInfo() {
         Schedule schedule = new Schedule(DayOfWeekEnum.WEDNESDAY, "Algebra", LocalTime.of(12, 0), LocalTime.of(14, 0));
 
-        when(userUseCase.removeScheduleFromStudent("user-1", schedule)).thenReturn(student);
+        when(userUseCase.removeScheduleFromStudent(student.getId(), schedule)).thenReturn(student);
         when(userMapper.toResponse(student)).thenReturn(userResponse);
 
-        UserResponse result = userService.removeSchedule("user-1", schedule);
+        UserResponse result = userService.removeSchedule(student.getId(), schedule);
 
         assertNotNull(result);
-        verify(userUseCase).removeScheduleFromStudent("user-1", schedule);
+        verify(userUseCase).removeScheduleFromStudent(student.getId(), schedule);
     }
 
     @Test
     void givenUserIdAndTag_whenRemoveTag_thenReturnsMappedResponseInfo() {
-        Tag tag = new Tag("Python", "Programación");
+        java.util.UUID tagId2 = UUID.randomUUID();
 
-        when(userUseCase.removeTagFromStudent("user-1", tag)).thenReturn(student);
+        when(userUseCase.removeTagFromStudent(student.getId(), tagId2)).thenReturn(student);
         when(userMapper.toResponse(student)).thenReturn(userResponse);
 
-        UserResponse result = userService.removeTag("user-1", tag);
+        UserResponse result = userService.removeTag(student.getId(), tagId2);
 
         assertNotNull(result);
-        verify(userUseCase).removeTagFromStudent("user-1", tag);
+        verify(userUseCase).removeTagFromStudent(student.getId(), tagId2);
     }
 
     // ── getAllUsers ────────────────────────────────────────────────
@@ -285,24 +285,24 @@ class UserServiceTest {
 
     @Test
     void givenUserIdAndGeolocationTrue_whenUpdateGeolocation_thenReturnsMappedResponse() {
-        when(userUseCase.updateGeolocation("user-1", true)).thenReturn(student);
+        when(userUseCase.updateGeolocation(student.getId(), true)).thenReturn(student);
         when(userMapper.toResponse(student)).thenReturn(userResponse);
 
-        UserResponse result = userService.updateGeolocation("user-1", true);
+        UserResponse result = userService.updateGeolocation(student.getId(), true);
 
         assertNotNull(result);
-        verify(userUseCase).updateGeolocation("user-1", true);
+        verify(userUseCase).updateGeolocation(student.getId(), true);
         verify(userMapper).toResponse(student);
     }
 
     @Test
     void givenUserIdAndGeolocationFalse_whenUpdateGeolocation_thenReturnsMappedResponse() {
-        when(userUseCase.updateGeolocation("user-1", false)).thenReturn(student);
+        when(userUseCase.updateGeolocation(student.getId(), false)).thenReturn(student);
         when(userMapper.toResponse(student)).thenReturn(userResponse);
 
-        UserResponse result = userService.updateGeolocation("user-1", false);
+        UserResponse result = userService.updateGeolocation(student.getId(), false);
 
         assertNotNull(result);
-        verify(userUseCase).updateGeolocation("user-1", false);
+        verify(userUseCase).updateGeolocation(student.getId(), false);
     }
 }

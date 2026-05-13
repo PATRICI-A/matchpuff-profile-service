@@ -72,16 +72,8 @@ class StudentProfileTest {
     @Test
     void givenSchedules_whenSet_thenGetSchedulesReturnsThem() {
         Schedule schedule = new Schedule( DayOfWeekEnum.MONDAY, "Algoritmos", LocalTime.of(8, 0), LocalTime.of(10, 0));
-        student.setSchedules(List.of(schedule));
-        assertEquals(1, student.getSchedules().size());
-    }
-
-    @Test
-    void givenTags_whenSet_thenGetTagsReturnsThem() {
-        Tag tag = new Tag( "Java", "Programming");
-        student.setTags(List.of(tag));
-        assertEquals(1, student.getTags().size());
-        assertEquals("Java", student.getTags().get(0).getName());
+        student.setSchedulesAvailability(List.of(schedule));
+        assertEquals(1, student.getSchedulesAvailability().size());
     }
 
     @Test

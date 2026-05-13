@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
 
 import java.time.LocalTime;
+import java.util.UUID;
 
 @DisplayName("ScheduleResponse and TagResponse Tests")
 class ScheduleAndTagResponseTest {
@@ -46,16 +47,13 @@ class ScheduleAndTagResponseTest {
     @Test
     void givenTagResponse_whenSetters_thenFieldsAreSet() {
         // Given
-        String name = "Java";
-        String category = "Programming";
+        UUID tagId = UUID.randomUUID();
 
         // When
-        tagResponse.setName(name);
-        tagResponse.setCategory(category);
+        tagResponse.setTagId(tagId);
 
         // Then
-        assertEquals(name, tagResponse.getName());
-        assertEquals(category, tagResponse.getCategory());
+        assertEquals(tagId, tagResponse.getTagId());
     }
 
     @Test
@@ -101,18 +99,17 @@ class ScheduleAndTagResponseTest {
     void givenTagResponse_withMultipleTags_thenEachRetainsIndependence() {
         // When
         TagResponse tag1 = new TagResponse();
-        tag1.setName("Python");
-        tag1.setCategory("Languages");
+        UUID tagId1 = UUID.randomUUID();
+        tag1.setTagId(tagId1);
 
         TagResponse tag2 = new TagResponse();
-        tag2.setName("Leadership");
-        tag2.setCategory("Skills");
+        UUID tagId2 = UUID.randomUUID();
+        tag2.setTagId(tagId2);
 
         // Then
-        assertEquals("Python", tag1.getName());
-        assertEquals("Leadership", tag2.getName());
-        assertEquals("Languages", tag1.getCategory());
-        assertEquals("Skills", tag2.getCategory());
+        assertEquals(tagId1, tag1.getTagId());
+        assertEquals(tagId2, tag2.getTagId());
+        assertNotEquals(tag1.getTagId(), tag2.getTagId());
     }
 
     @Test
@@ -154,12 +151,10 @@ class ScheduleAndTagResponseTest {
     @Test
     void givenTagResponse_withNullValues_thenNullsAreAllowed() {
         // When
-        tagResponse.setName(null);
-        tagResponse.setCategory(null);
+        tagResponse.setTagId(null);
 
         // Then
-        assertNull(tagResponse.getName());
-        assertNull(tagResponse.getCategory());
+        assertNull(tagResponse.getTagId());
     }
 
     @Test

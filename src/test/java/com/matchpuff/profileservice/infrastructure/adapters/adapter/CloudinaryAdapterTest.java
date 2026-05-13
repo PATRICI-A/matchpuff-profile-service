@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,7 +35,7 @@ class CloudinaryAdapterTest {
     @Test
     void givenValidFile_whenUploadProfileImage_thenReturnsSecureUrl() throws Exception {
         byte[] file = new byte[] {1, 2, 3};
-        String userId = "user-1";
+        java.util.UUID userId = UUID.randomUUID();
 
         when(cloudinary.uploader()).thenReturn(uploader);
         when(uploader.upload(any(), anyMap())).thenReturn(Map.of("secure_url", "https://res.cloudinary.com/test/image/upload/v1/profile.jpg"));
@@ -45,7 +46,7 @@ class CloudinaryAdapterTest {
         verify(cloudinary).uploader();
         verify(uploader).upload(any(), argThat(options ->
                 "profile_pictures".equals(options.get("folder"))
-                        && userId.equals(options.get("public_id"))
+                        && userId.toString().equals(options.get("public_id"))
                         && Boolean.TRUE.equals(options.get("overwrite"))
         ));
     }
@@ -53,7 +54,7 @@ class CloudinaryAdapterTest {
     @Test
     void givenCloudinaryFailure_whenUploadProfileImage_thenThrowsImageProfileException() throws Exception {
         byte[] file = new byte[] {1, 2, 3};
-        String userId = "user-1";
+        java.util.UUID userId = UUID.randomUUID();
 
         when(cloudinary.uploader()).thenReturn(uploader);
         when(uploader.upload(any(), anyMap())).thenThrow(new RuntimeException("boom"));
