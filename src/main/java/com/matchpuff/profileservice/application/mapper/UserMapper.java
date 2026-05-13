@@ -39,6 +39,7 @@ public interface UserMapper {
     @Mapping(target = "dateOfBirth", expression = "java(student.getDateOfBirth() != null ? student.getDateOfBirth().toString() : null)")
     @Mapping(target = "userType", constant = "STUDENT")
     @Mapping(target = "tags", source = "tagsId")
+    @Mapping(target = "schedules", source = "schedulesAvailability")
     StudentProfileResponse toStudentResponse(StudentProfile student);
 
     @Mapping(target = "userType", constant = "ORGANIZER")
@@ -55,6 +56,8 @@ public interface UserMapper {
 
     List<TagResponse> toTagResponseList(List<UUID> tagsId);
 
+    @Mapping(target = "tags", source = "tagsId")
+    @Mapping(target = "schedules", source = "schedulesAvailability")
     UserMatchProfileResponse toUserMatchProfileResponse(StudentProfile student);
 
     default UserMatchProfileResponse toUserMatchProfileResponseFromUser(User user) {

@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.UUID;
 
 import com.matchpuff.profileservice.application.dto.response.UserAuthResponse;
-import com.matchpuff.profileservice.application.dto.response.UserMatchProfileResponse;
+import com.matchpuff.profileservice.application.dto.response.UserMatchProfileDto;
 
 public interface InternalUserServicePort {
 
     UserAuthResponse getUser(UUID userId);
     UserAuthResponse getUserByEmail(String email);
     void verifyUser(UUID userId);
-    UserMatchProfileResponse getProfileForMatching(UUID id);
-    List<UserMatchProfileResponse> getAllProfilesForMatching();
+    UserMatchProfileDto getProfileForMatching(UUID id);
+    List<UserMatchProfileDto> getAllProfilesForMatching();
 }

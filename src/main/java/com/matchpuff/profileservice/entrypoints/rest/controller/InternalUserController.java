@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.matchpuff.profileservice.application.dto.response.UserAuthResponse;
-import com.matchpuff.profileservice.application.dto.response.UserMatchProfileResponse;
+import com.matchpuff.profileservice.application.dto.response.UserMatchProfileDto;
 import com.matchpuff.profileservice.application.service.InternalUserServicePort;
 
 import lombok.RequiredArgsConstructor;
@@ -48,15 +48,14 @@ public class InternalUserController {
     }
 
     @GetMapping("/matching/profiles/{id}")
-    public UserMatchProfileResponse getProfileForMatching(
+    public UserMatchProfileDto getProfileForMatching(
             @PathVariable UUID id
     ) {
         return internalUserService.getProfileForMatching(id);
     }
 
     @GetMapping("/matching/profiles")
-    public List<UserMatchProfileResponse> getAllProfilesForMatching() {
+    public List<UserMatchProfileDto> getAllProfilesForMatching() {
         return internalUserService.getAllProfilesForMatching();
     }
-
 }
