@@ -67,7 +67,7 @@ class UserMapperTest {
         student.setTagsId(List.of(tagId));
 
         Schedule schedule = new Schedule( DayOfWeekEnum.TUESDAY, "Algoritmos", LocalTime.of(9, 0), LocalTime.of(11, 0));
-        student.setSchedules(List.of(schedule));
+        student.setSchedulesAvailability(List.of(schedule));
 
         UserResponse info = mapper.toResponse(student);
         assertTrue(info instanceof StudentProfileResponse);
@@ -92,7 +92,7 @@ class UserMapperTest {
         student.setId(UUID.randomUUID());
         student.setName("Pedro Gomez");
         student.setEmail("pedro@escuelaing.edu.co");
-        student.setSchedules(null);
+        student.setSchedulesAvailability(null);
         student.setTagsId(null);
 
         UserResponse info = mapper.toResponse(student);

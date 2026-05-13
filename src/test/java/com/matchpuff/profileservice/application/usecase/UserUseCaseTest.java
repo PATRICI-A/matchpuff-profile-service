@@ -58,7 +58,7 @@ class UserUseCaseTest {
         student.setSemester(4);
         student.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         student.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
-        student.setSchedules(new ArrayList<>());
+        student.setSchedulesAvailability(new ArrayList<>());
         student.setTagsId(new ArrayList<>());
     }
 
@@ -292,13 +292,13 @@ class UserUseCaseTest {
 
         User result = userUseCase.addScheduleToStudent(student.getId(), schedule);
 
-        assertEquals(1, ((StudentProfile) result).getSchedules().size());
-        assertEquals("Cálculo I", ((StudentProfile) result).getSchedules().get(0).getName());
+        assertEquals(1, ((StudentProfile) result).getSchedulesAvailability().size());
+        assertEquals("Cálculo I", ((StudentProfile) result).getSchedulesAvailability().get(0).getName());
     }
 
     @Test
     void givenStudentWithNullSchedules_whenAddSchedule_thenListIsInitialized() {
-        student.setSchedules(null);
+        student.setSchedulesAvailability(null);
         Schedule schedule = new Schedule( DayOfWeekEnum.TUESDAY, "Física", LocalTime.of(10, 0), LocalTime.of(12, 0));
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
@@ -306,8 +306,8 @@ class UserUseCaseTest {
 
         User result = userUseCase.addScheduleToStudent(student.getId(), schedule);
 
-        assertNotNull(((StudentProfile) result).getSchedules());
-        assertEquals(1, ((StudentProfile) result).getSchedules().size());
+        assertNotNull(((StudentProfile) result).getSchedulesAvailability());
+        assertEquals(1, ((StudentProfile) result).getSchedulesAvailability().size());
     }
 
     @Test
@@ -371,7 +371,7 @@ class UserUseCaseTest {
     @Test
     void givenStudentWithImmutableSchedules_whenAddSchedule_thenListIsCopiedAndScheduleIsAdded() {
         Schedule existingSchedule = new Schedule(DayOfWeekEnum.MONDAY, "Base", LocalTime.of(8, 0), LocalTime.of(10, 0));
-        student.setSchedules(List.of(existingSchedule));
+        student.setSchedulesAvailability(List.of(existingSchedule));
 
         Schedule newSchedule = new Schedule(DayOfWeekEnum.TUESDAY, "Nuevo", LocalTime.of(10, 0), LocalTime.of(12, 0));
 
@@ -380,8 +380,8 @@ class UserUseCaseTest {
 
         User result = userUseCase.addScheduleToStudent(student.getId(), newSchedule);
 
-        assertEquals(2, ((StudentProfile) result).getSchedules().size());
-        assertEquals("Nuevo", ((StudentProfile) result).getSchedules().get(1).getName());
+        assertEquals(2, ((StudentProfile) result).getSchedulesAvailability().size());
+        assertEquals("Nuevo", ((StudentProfile) result).getSchedulesAvailability().get(1).getName());
     }
 
     @Test
@@ -402,14 +402,14 @@ class UserUseCaseTest {
     @Test
     void givenExistingSchedule_whenRemoveSchedule_thenScheduleIsRemoved() {
         Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Calculo", LocalTime.of(8, 0), LocalTime.of(10, 0));
-        student.setSchedules(new ArrayList<>(List.of(schedule)));
+        student.setSchedulesAvailability(new ArrayList<>(List.of(schedule)));
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
         when(userRepository.update(student.getId(), student)).thenReturn(student);
 
         User result = userUseCase.removeScheduleFromStudent(student.getId(), schedule);
 
-        assertTrue(((StudentProfile) result).getSchedules().isEmpty());
+        assertTrue(((StudentProfile) result).getSchedulesAvailability().isEmpty());
         verify(userRepository).update(student.getId(), student);
     }
 
@@ -417,7 +417,7 @@ class UserUseCaseTest {
     void givenMissingSchedule_whenRemoveSchedule_thenThrowsProfileServiceException() {
         Schedule existing = new Schedule(DayOfWeekEnum.MONDAY, "Calculo", LocalTime.of(8, 0), LocalTime.of(10, 0));
         Schedule toRemove = new Schedule(DayOfWeekEnum.TUESDAY, "Fisica", LocalTime.of(10, 0), LocalTime.of(12, 0));
-        student.setSchedules(new ArrayList<>(List.of(existing)));
+        student.setSchedulesAvailability(new ArrayList<>(List.of(existing)));
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
 
@@ -707,7 +707,7 @@ class UserUseCaseTest {
         UUID tagId = UUID.randomUUID();
 
         StudentProfile request = new StudentProfile();
-        request.setSchedules(List.of(schedule));
+        request.setSchedulesAvailability(List.of(schedule));
         request.setTagsId(List.of(tagId));
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
@@ -715,7 +715,7 @@ class UserUseCaseTest {
 
         User result = userUseCase.updateStudentUser(student.getId(), request);
 
-        assertEquals(1, ((StudentProfile) result).getSchedules().size());
+        assertEquals(1, ((StudentProfile) result).getSchedulesAvailability().size());
         assertEquals(1, ((StudentProfile) result).getTagsId().size());
     }
 
@@ -855,7 +855,7 @@ class UserUseCaseTest {
 
     @Test
     void givenStudentWithNullScheduleList_whenRemoveSchedule_thenThrowsProfileServiceException() {
-        student.setSchedules(null);
+        student.setSchedulesAvailability(null);
         Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Clase", LocalTime.of(8, 0), LocalTime.of(10, 0));
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));

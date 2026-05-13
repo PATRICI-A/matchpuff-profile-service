@@ -133,7 +133,7 @@ public class UserUseCase implements UserUseCasePort {
         if (request.getSemester() > 0)         student.setSemester(request.getSemester());
         if (request.getDateOfBirth() != null)  student.setDateOfBirth(request.getDateOfBirth());
         if (request.getTagsId() != null)         student.setTagsId(request.getTagsId());
-        if (request.getSchedules() != null)    student.setSchedules(request.getSchedules());
+        if (request.getSchedulesAvailability() != null)    student.setSchedulesAvailability(request.getSchedulesAvailability());
 
         return userRepository.update(userId, student);
     }
@@ -172,10 +172,10 @@ public class UserUseCase implements UserUseCasePort {
             throw new ProfileServiceException("Only STUDENT users can have schedules", HttpStatus.BAD_REQUEST);
         }
         StudentProfile student = (StudentProfile) findOrThrow(userId);
-        if (student.getSchedules() == null || student.getSchedules().getClass().getName().contains("ImmutableCollections")) {
-            student.setSchedules(student.getSchedules() == null ? new ArrayList<>() : new ArrayList<>(student.getSchedules()));
+        if (!(student.getSchedulesAvailability() instanceof java.util.ArrayList)) {
+            student.setSchedulesAvailability(student.getSchedulesAvailability() == null ? new ArrayList<>() : new ArrayList<>(student.getSchedulesAvailability()));
         }
-        student.getSchedules().add(schedule);
+        student.getSchedulesAvailability().add(schedule);
         return userRepository.update(userId, student);
     }
 
@@ -185,13 +185,13 @@ public class UserUseCase implements UserUseCasePort {
         if (!(user instanceof StudentProfile student)) {
             throw new ProfileServiceException("Only STUDENT users can have schedules", HttpStatus.BAD_REQUEST);
         }
-        if (student.getSchedules() == null) {
+        if (student.getSchedulesAvailability() == null) {
             throw new ProfileServiceException("No schedules to remove", HttpStatus.BAD_REQUEST);
         }
-        if (student.getSchedules().getClass().getName().contains("ImmutableCollections")) {
-            student.setSchedules(new ArrayList<>(student.getSchedules()));
+        if (!(student.getSchedulesAvailability() instanceof java.util.ArrayList)) {
+            student.setSchedulesAvailability(new ArrayList<>(student.getSchedulesAvailability()));
         }
-        boolean removed = student.getSchedules().removeIf(s -> s.equals(schedule));
+        boolean removed = student.getSchedulesAvailability().removeIf(s -> s.equals(schedule));
         if (!removed) {
             throw new ProfileServiceException("Schedule not found for removal", HttpStatus.BAD_REQUEST);
         }
@@ -205,7 +205,7 @@ public class UserUseCase implements UserUseCasePort {
             throw new ProfileServiceException("Only STUDENT users can have tags", HttpStatus.BAD_REQUEST);
         }
         StudentProfile student = (StudentProfile) findOrThrow(userId);
-        if (student.getTagsId() == null || student.getTagsId().getClass().getName().contains("ImmutableCollections")) {
+        if (!(student.getTagsId() instanceof java.util.ArrayList)) {
             student.setTagsId(student.getTagsId() == null ? new ArrayList<>() : new ArrayList<>(student.getTagsId()));
         }
         student.getTagsId().add(tagId);
@@ -221,7 +221,7 @@ public class UserUseCase implements UserUseCasePort {
         if (student.getTagsId() == null) {
             throw new ProfileServiceException("No tags to remove", HttpStatus.BAD_REQUEST);
         }
-        if (student.getTagsId().getClass().getName().contains("ImmutableCollections")) {
+        if (!(student.getTagsId() instanceof java.util.ArrayList)) {
             student.setTagsId(new ArrayList<>(student.getTagsId()));
         }
         boolean removed = student.getTagsId().removeIf(t -> t.equals(tagId));

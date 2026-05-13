@@ -12,8 +12,8 @@ import com.matchpuff.profileservice.application.dto.request.UserStudentUpdateReq
 import com.matchpuff.profileservice.application.dto.request.UserStudentRequest;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto;
+import com.matchpuff.profileservice.application.mapper.UserMapper;
 import com.matchpuff.profileservice.application.service.UserServicePort;
-import com.matchpuff.profileservice.entrypoints.rest.mapper.UserRestMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -38,7 +38,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class UserController {
     private final UserServicePort userService;
-    private final UserRestMapper userRestMapper;
+    private final UserMapper userRestMapper;
 
     @PostMapping("/student")
     @Tag(name = "Users - Creation", description = "Create new users")

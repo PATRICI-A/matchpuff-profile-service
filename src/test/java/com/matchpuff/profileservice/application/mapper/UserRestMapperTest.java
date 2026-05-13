@@ -1,4 +1,4 @@
-package com.matchpuff.profileservice.entrypoints.rest.mapper;
+package com.matchpuff.profileservice.application.mapper;
 
 import com.matchpuff.profileservice.application.dto.request.ScheduleRequest;
 import com.matchpuff.profileservice.application.dto.request.TagRequest;
@@ -8,6 +8,7 @@ import com.matchpuff.profileservice.application.dto.request.UserOrganizerRequest
 import com.matchpuff.profileservice.application.dto.request.UserOrganizerUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserStudentRequest;
 import com.matchpuff.profileservice.application.dto.request.UserStudentUpdateRequest;
+import com.matchpuff.profileservice.application.mapper.UserMapper;
 import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.domain.model.Organizer;
 import com.matchpuff.profileservice.domain.model.Schedule;
@@ -27,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserRestMapperTest {
 
-    private final UserRestMapper mapper = Mappers.getMapper(UserRestMapper.class);
+    private final UserMapper mapper = Mappers.getMapper(UserMapper.class);
 
     // ── toDomain(UserRequest) ─────────────────────────────────────
 
@@ -75,7 +76,7 @@ class UserRestMapperTest {
 
         assertTrue(result.getTagsId().isEmpty());
 
-        assertTrue(result.getSchedules().isEmpty());
+        assertTrue(result.getSchedulesAvailability().isEmpty());
     }
 
     @Test
@@ -124,7 +125,7 @@ class UserRestMapperTest {
 
         StudentProfile result = mapper.toDomain(request);
 
-        assertTrue(result.getSchedules().isEmpty());
+        assertTrue(result.getSchedulesAvailability().isEmpty());
     }
 
     // ── toDomain(ScheduleRequest) ─────────────────────────────────
