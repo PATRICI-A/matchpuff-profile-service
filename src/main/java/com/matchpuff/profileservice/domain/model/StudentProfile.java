@@ -14,7 +14,7 @@ import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
 @Data
 public class StudentProfile extends User {
     private CareerEnum career;
-    private int semester;
+    private Integer semester;
     private StudentCarnet studentCarnet;
     private String photoUrl;
     private Biography biography;
@@ -51,15 +51,15 @@ public class StudentProfile extends User {
         this.career = career;
     }
 
-    public void setSemester(int semester) {
-        if (semester != 0 && (semester < 1 || semester > 10)) {
+    public void setSemester(Integer semester) {
+        if (semester != null && (semester < 1 || semester > 10)) {
             throw new InvalidInputException("Semester must be between 1 and 10");
         }
         this.semester = semester;
     }
 
     public void setPhotoUrl(String photoUrl) {
-        if (photoUrl == null || photoUrl.isBlank()) {
+        if (photoUrl != null && photoUrl.isBlank()) {
             throw new InvalidInputException("Photo URL must not be blank");
         }
         this.photoUrl = photoUrl;

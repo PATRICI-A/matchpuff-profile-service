@@ -6,20 +6,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.matchpuff.profileservice.application.dto.response.ScheduleResponse;
-import com.matchpuff.profileservice.application.dto.response.TagResponse;
 import com.matchpuff.profileservice.application.dto.response.UserAuthResponse;
 import com.matchpuff.profileservice.application.dto.response.UserMatchProfileDto;
 import com.matchpuff.profileservice.application.dto.response.UserMatchProfileResponse;
+import com.matchpuff.profileservice.domain.exceptions.ProfileServiceException;
 import com.matchpuff.profileservice.domain.ports.in.UserUseCasePort;
 import com.matchpuff.profileservice.application.mapper.UserMapper;
 
 
 @Service
 @RequiredArgsConstructor
-public class InternalUserService implements InternalUserServicePort {  //IMPORTANTE el caso de uso lo deberia manejar
+public class InternalUserService implements InternalUserServicePort {
     private final UserUseCasePort userUseCase;
     private final UserMapper userMapper;
 
@@ -41,12 +42,15 @@ public class InternalUserService implements InternalUserServicePort {  //IMPORTA
     @Override
     public UserMatchProfileDto getProfileForMatching(UUID id) {
         UserMatchProfileResponse resp = userMapper.toUserMatchProfileResponseFromUser(userUseCase.getUser(id));
+        if (resp == null) {
+            throw new ProfileServiceException("Only student profiles are available for matching", HttpStatus.BAD_REQUEST);
+        }
         return convertToDto(resp);
     }
 
     @Override
     public List<UserMatchProfileDto> getAllProfilesForMatching() {
-        return userUseCase.getAllUsers().stream()
+        return userUseCase.getAllStudentProfiles().stream()
                 .map(userMapper::toUserMatchProfileResponseFromUser)
                 .map(this::convertToDto)
                 .toList();

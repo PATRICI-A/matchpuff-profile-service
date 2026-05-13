@@ -214,8 +214,13 @@ public class UserController {
             throw new InvalidInputException("This user does not have a profile image.");
         }
 
+        String photoUrl = student.getPhotoUrl();
+        if (!photoUrl.startsWith("http://") && !photoUrl.startsWith("https://")) {
+            throw new InvalidInputException("This user does not have a valid profile image.");
+        }
+
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(student.getPhotoUrl()))
+                .location(URI.create(photoUrl))
                 .build();
     }
 
