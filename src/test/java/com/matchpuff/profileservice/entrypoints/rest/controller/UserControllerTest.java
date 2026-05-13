@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.matchpuff.profileservice.application.dto.request.UserAdminUpdateRequest;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
+import com.matchpuff.profileservice.application.mapper.UserMapper;
 import com.matchpuff.profileservice.application.dto.response.StudentProfileResponse;
 import com.matchpuff.profileservice.application.service.UserServicePort;
 import com.matchpuff.profileservice.domain.model.Admin;
-import com.matchpuff.profileservice.entrypoints.rest.mapper.UserRestMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ class UserControllerTest {
     private UserServicePort userService;
 
     @MockitoBean
-    private UserRestMapper userRestMapper;
+    private UserMapper userRestMapper;
 
     @Autowired
     private ObjectMapper objectMapper;
