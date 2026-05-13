@@ -76,7 +76,7 @@ class UserRestMapperTest {
 
         assertTrue(result.getTagsId().isEmpty());
 
-        assertTrue(result.getSchedules().isEmpty());
+        assertTrue(result.getSchedulesAvailability().isEmpty());
     }
 
     @Test
@@ -125,7 +125,7 @@ class UserRestMapperTest {
 
         StudentProfile result = mapper.toDomain(request);
 
-        assertTrue(result.getSchedules().isEmpty());
+        assertTrue(result.getSchedulesAvailability().isEmpty());
     }
 
     // ── toDomain(ScheduleRequest) ─────────────────────────────────

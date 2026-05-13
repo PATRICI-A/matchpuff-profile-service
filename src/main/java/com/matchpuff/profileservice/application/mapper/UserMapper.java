@@ -79,10 +79,10 @@ public interface UserMapper {
         if (user instanceof Organizer) return "ORGANIZER";
         return null;
     }
-    
+
     @Mapping(target = "passwordHash", source = "password")
     @Mapping(target = "photoUrl", source = "photourl")
-    @Mapping(target = "schedules", expression = "java(new java.util.ArrayList<>())")
+    @Mapping(target = "schedulesAvailability", expression = "java(new java.util.ArrayList<>())")
     @Mapping(target = "tagsId", expression = "java(new java.util.ArrayList<>())")
     StudentProfile toDomain(UserStudentRequest request);
 
@@ -96,7 +96,7 @@ public interface UserMapper {
 
     Organizer toDomain(UserOrganizerUpdateRequest request);
 
-    @Mapping(target = "schedules", ignore = true)
+    @Mapping(target = "schedulesAvailability", ignore = true)
     @Mapping(target = "tagsId", ignore = true)
     @Mapping(target = "photoUrl", ignore = true)
     StudentProfile toDomain(UserStudentUpdateRequest request);

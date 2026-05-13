@@ -42,8 +42,8 @@ public class StudentProfileDocument extends UserDocument {
     @Field("geolocationEnabled")
     private boolean geolocationEnabled;
 
-    @Field("schedule")
-    private List<ScheduleDocument> schedule;
+    @Field("scheduleAvailability")
+    private List<ScheduleDocument> scheduleAvailability;
     
     @Field("tagsId")
     private List<UUID> tagsId;

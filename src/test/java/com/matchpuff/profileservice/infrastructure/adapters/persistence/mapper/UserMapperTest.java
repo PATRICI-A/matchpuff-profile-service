@@ -58,7 +58,7 @@ class UserMapperTest {
             LocalTime.of(8, 0),
             LocalTime.of(10, 0)
         );
-        s.setSchedules(List.of(schedule));
+        s.setSchedulesAvailability(List.of(schedule));
         s.setTagsId(List.of(UUID.randomUUID()));
 
         return s;
@@ -87,7 +87,7 @@ class UserMapperTest {
         sd.setStartHour(LocalTime.of(8, 0));
         sd.setFinishHour(LocalTime.of(10, 0));
 
-        doc.setSchedule(List.of(sd));
+        doc.setScheduleAvailability(List.of(sd));
         doc.setTagsId(List.of(UUID.randomUUID()));
 
         return doc;
@@ -108,7 +108,7 @@ class UserMapperTest {
         assertEquals(UserType.STUDENT, result.getUserType());
         assertEquals("Test User", result.getName());
         assertEquals("test@escuelaing.edu.co", result.getEmail());
-        assertNotNull(result.getSchedule());
+        assertNotNull(result.getScheduleAvailability());
         assertNotNull(result.getTagsId());
     }
 
@@ -127,7 +127,7 @@ class UserMapperTest {
         assertEquals("Test User", result.getName());
         assertEquals("test@escuelaing.edu.co", result.getEmail());
         assertEquals(5, result.getSemester());
-        assertNotNull(result.getSchedules());
+        assertNotNull(result.getSchedulesAvailability());
         assertNotNull(result.getTagsId());
     }
 
@@ -193,12 +193,12 @@ class UserMapperTest {
     @Test
     void givenStudentWithNullSchedules_whenToDocument_thenScheduleIsEmpty() {
         StudentProfile student = buildStudent();
-        student.setSchedules(null);
+        student.setSchedulesAvailability(null);
 
         StudentProfileDocument result = mapper.toDocument(student);
 
         assertNotNull(result);
-        assertNull(result.getSchedule());
+        assertNull(result.getScheduleAvailability());
     }
 
     @Test

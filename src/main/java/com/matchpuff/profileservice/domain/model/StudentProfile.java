@@ -20,7 +20,7 @@ public class StudentProfile extends User {
     private Biography biography;
     private PrivacyLevelEnum privacyLevel;
     private boolean geolocationEnabled;
-    private List<Schedule> schedules;
+    private List<Schedule> schedulesAvailability;
     private List<UUID> tagsId;
 
 
