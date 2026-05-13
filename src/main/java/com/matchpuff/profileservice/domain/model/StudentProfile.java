@@ -1,6 +1,7 @@
 package com.matchpuff.profileservice.domain.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import com.matchpuff.profileservice.domain.valueobjects.StudentCarnet;
 import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class StudentProfile extends User {
     private CareerEnum career;
     private Integer semester;

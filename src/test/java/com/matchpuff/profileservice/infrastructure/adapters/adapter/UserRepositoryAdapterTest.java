@@ -298,7 +298,6 @@ class UserRepositoryAdapterTest {
         savedDoc.setId(currentId);
         student.setId(UUID.randomUUID());
 
-        when(userRepository.findById(currentId)).thenReturn(Optional.of(currentDoc));
         when(userRepository.save(any())).thenReturn(savedDoc);
 
         User result = adapter.update(currentId, student);
@@ -461,7 +460,6 @@ class UserRepositoryAdapterTest {
         savedDoc.setEmail(VALID_EMAIL);
 
         when(userRepository.findByEmail(VALID_EMAIL)).thenReturn(Optional.of(currentDoc));
-        when(userRepository.findById(adminId)).thenReturn(Optional.of(currentDoc));
         when(userRepository.save(any())).thenReturn(savedDoc);
 
         User result = adapter.update(adminId, admin);
@@ -496,7 +494,6 @@ class UserRepositoryAdapterTest {
         savedDoc.setContact("new@evento.co");
 
         when(userRepository.findByEmail(VALID_EMAIL)).thenReturn(Optional.of(currentDoc));
-        when(userRepository.findById(organizerId)).thenReturn(Optional.of(currentDoc));
         when(userRepository.save(any())).thenReturn(savedDoc);
 
         User result = adapter.update(organizerId, organizer);
@@ -524,21 +521,8 @@ class UserRepositoryAdapterTest {
     }
 
     // ── update type mismatch ──────────────────────────────────────
-
-    @Test
-    void givenStudentDocumentButAdminRequest_whenUpdate_thenThrowsInvalidInputException() {
-        Admin admin = new Admin();
-        UUID adminId = UUID.randomUUID();
-        admin.setId(adminId);
-        admin.setName("Admin");
-        // email is null so findByEmail is never called
-
-        StudentProfileDocument studentDoc = buildStudentDoc();
-
-        when(userRepository.findById(adminId)).thenReturn(Optional.of(studentDoc));
-
-        assertThrows(InvalidInputException.class, () -> adapter.update(adminId, admin));
-    }
+    // Type-mismatch and not-found checks are now the responsibility of the use case layer,
+    // not the adapter, so these tests have been removed.
 
     // ── findAllStudents ───────────────────────────────────────────
 
@@ -609,54 +593,8 @@ class UserRepositoryAdapterTest {
     }
 
     // ── update edge cases ─────────────────────────────────────────
-
-    @Test
-    void givenInvalidUUID_whenUpdate_thenThrowsInvalidInputException() {
-        assertThrows(InvalidInputException.class, () -> adapter.update(UUID.randomUUID(), buildStudent()));
-    }
-
-    @Test
-    void givenNotFoundDocument_whenUpdate_thenThrowsInvalidInputException() {
-        StudentProfile student = buildStudent();
-        UUID userId = UUID.randomUUID();
-
-        StudentProfileDocument existingDoc = buildStudentDoc();
-        existingDoc.setId(userId);
-
-        when(userRepository.findByEmail(VALID_EMAIL)).thenReturn(Optional.of(existingDoc));
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        assertThrows(InvalidInputException.class, () -> adapter.update(userId, student));
-    }
-
-    @Test
-    void givenOrganizerDocumentButAdminRequest_whenUpdate_thenThrowsInvalidInputException() {
-        Admin admin = new Admin();
-        UUID adminId = UUID.randomUUID();
-        admin.setId(adminId);
-        admin.setName("Admin");
-
-        OrganizerProfileDocument orgDoc = new OrganizerProfileDocument();
-        orgDoc.setId(adminId);
-
-        when(userRepository.findById(adminId)).thenReturn(Optional.of(orgDoc));
-
-        assertThrows(InvalidInputException.class, () -> adapter.update(adminId, admin));
-    }
-
-    @Test
-    void givenStudentDocumentButOrganizerRequest_whenUpdate_thenThrowsInvalidInputException() {
-        Organizer organizer = new Organizer();
-        UUID orgId = UUID.randomUUID();
-        organizer.setId(orgId);
-
-        StudentProfileDocument studentDoc = buildStudentDoc();
-        studentDoc.setId(orgId);
-
-        when(userRepository.findById(orgId)).thenReturn(Optional.of(studentDoc));
-
-        assertThrows(InvalidInputException.class, () -> adapter.update(orgId, organizer));
-    }
+    // Not-found and type-mismatch checks belong to the use case layer; email conflict
+    // is covered by givenEmailBelongsToAnotherUser_whenUpdate_thenThrowsInvalidInputException.
 
     // ── findByEmail not found ─────────────────────────────────────
 

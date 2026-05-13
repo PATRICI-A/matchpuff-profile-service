@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
 
-    private UserMapper mapper = new UserMapperImpl();
+    private final UserMapper mapper = new UserMapperImpl();
 
     // ── resolveUserType ───────────────────────────────────────────
 

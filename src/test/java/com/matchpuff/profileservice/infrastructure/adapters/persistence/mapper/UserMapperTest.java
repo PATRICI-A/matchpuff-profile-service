@@ -235,7 +235,7 @@ class UserMapperTest {
         StudentProfile result = mapper.toDomain(doc);
 
         assertNotNull(result);
-        assertEquals(0, result.getSemester());
+        assertNull(result.getSemester());
     }
 
     // ─────────────────────────────────────────────

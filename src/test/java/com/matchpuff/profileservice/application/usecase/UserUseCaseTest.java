@@ -162,9 +162,9 @@ class UserUseCaseTest {
     }
 
     @Test
-    void givenExistingUser_whenUpdateWithSemesterZero_thenSemesterIsNotUpdated() {
+    void givenExistingUser_whenUpdateWithNullSemester_thenSemesterIsNotUpdated() {
         StudentProfile request = new StudentProfile();
-        request.setSemester(0);
+        // semester null by default — should not overwrite existing value
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
         when(userRepository.update(student.getId(), student)).thenReturn(student);
