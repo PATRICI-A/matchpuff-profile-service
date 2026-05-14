@@ -452,3 +452,4 @@ FodyWeavers.xsd
 # Otros
 /coverage/
 /.scannerwork/
+.claude/
