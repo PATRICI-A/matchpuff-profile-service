@@ -3,6 +3,7 @@ package com.matchpuff.profileservice.application.service;
 import java.util.List;
 import java.util.UUID;
 
+import com.matchpuff.profileservice.application.dto.response.CategoryWithTagsResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto;
 import com.matchpuff.profileservice.domain.model.Admin;
@@ -29,6 +30,7 @@ public interface UserServicePort {
 
     List<UserResponse> getAllUsers();
     List<UserResponse> getAllStudentProfiles();
+    List<CategoryWithTagsResponse> getTagCatalog();
 
 }
 

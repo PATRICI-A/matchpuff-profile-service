@@ -5,6 +5,7 @@ import com.matchpuff.profileservice.domain.model.*;
 import java.util.List;
 import java.util.UUID;
 
+import com.matchpuff.profileservice.domain.model.CategoryWithTags;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
 
@@ -26,6 +27,6 @@ public interface UserUseCasePort {
     User updateGeolocation(UUID userId, boolean geolocationEnabled);
     List<User> getAllUsers();
     List<StudentProfile> getAllStudentProfiles();
-
+    List<CategoryWithTags> getTagCatalog();
 
 }
