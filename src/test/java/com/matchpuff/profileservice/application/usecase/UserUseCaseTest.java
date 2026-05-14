@@ -13,6 +13,7 @@ import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
 import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
 import com.matchpuff.profileservice.application.service.PasswordHashingService;
 import com.matchpuff.profileservice.domain.ports.out.ImageStoragePort;
+import com.matchpuff.profileservice.domain.ports.out.TagCatalogPort;
 import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,9 @@ class UserUseCaseTest {
     @Mock
     private PasswordHashingService passwordHashingService;
 
+    @Mock
+    private TagCatalogPort tagCatalogPort;
+
     @InjectMocks
     private UserUseCase userUseCase;
 
@@ -60,6 +64,8 @@ class UserUseCaseTest {
         student.setPrivacyLevel(PrivacyLevelEnum.PUBLIC);
         student.setSchedulesAvailability(new ArrayList<>());
         student.setTagsId(new ArrayList<>());
+
+        lenient().when(tagCatalogPort.tagExists(any(UUID.class))).thenReturn(true);
     }
 
     // ── createStudentUser ─────────────────────────────────────────
