@@ -77,7 +77,6 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public User update(UUID id, User user) {
-
         if (user.getEmail() != null) {
             Optional<UserDocument> existing = userRepository.findByEmail(user.getEmail());
             if (existing.isPresent() && !existing.get().getId().equals(id)) {
@@ -85,87 +84,19 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
             }
         }
 
-        UserDocument storedUser = userRepository.findById(id)
-                .orElseThrow(() -> new InvalidInputException("User not found: " + id));
-
         if (user instanceof StudentProfile student) {
-            if (!(storedUser instanceof StudentProfileDocument current)) {
-                throw new InvalidInputException("Unsupported user type for update.");
-            }
-
-            StudentProfileDocument doc = mergeStudentDocument(current, student);
-            StudentProfileDocument updated = userRepository.save(doc);
-            return userMapper.toDomain(updated);
+            return userMapper.toDomain(userRepository.save(userMapper.toDocument(student)));
         }
 
         if (user instanceof Admin admin) {
-            if (!(storedUser instanceof AdminProfileDocument current)) {
-                throw new InvalidInputException("Unsupported user type for update.");
-            }
-
-            AdminProfileDocument doc = mergeAdminDocument(current, admin);
-            AdminProfileDocument updated = userRepository.save(doc);
-            return userMapper.toDomain(updated);
+            return userMapper.toDomain(userRepository.save(userMapper.toDocument(admin)));
         }
 
         if (user instanceof Organizer organizer) {
-            if (!(storedUser instanceof OrganizerProfileDocument current)) {
-                throw new InvalidInputException("Unsupported user type for update.");
-            }
-
-            OrganizerProfileDocument doc = mergeOrganizerDocument(current, organizer);
-            OrganizerProfileDocument updated = userRepository.save(doc);
-            return userMapper.toDomain(updated);
+            return userMapper.toDomain(userRepository.save(userMapper.toDocument(organizer)));
         }
 
         throw new InvalidInputException("Unsupported user type for update.");
-    }
-
-    private StudentProfileDocument mergeStudentDocument(StudentProfileDocument current, StudentProfile incoming) {
-        StudentProfileDocument merged = new StudentProfileDocument();
-        merged.setId(current.getId());
-        merged.setUserType(current.getUserType());
-        merged.setCreatedAt(current.getCreatedAt());
-        merged.setName(incoming.getName() != null ? incoming.getName() : current.getName());
-        merged.setEmail(incoming.getEmail() != null ? incoming.getEmail() : current.getEmail());
-        merged.setPasswordHash(incoming.getPasswordHash() != null ? incoming.getPasswordHash() : current.getPasswordHash());
-        merged.setGender(incoming.getGender() != null ? incoming.getGender() : current.getGender());
-        merged.setBirthdate(incoming.getDateOfBirth() != null ? incoming.getDateOfBirth().atStartOfDay() : current.getBirthdate());
-        merged.setPhotourl(incoming.getPhotoUrl() != null ? incoming.getPhotoUrl() : current.getPhotourl());
-        merged.setCareer(incoming.getCareer() != null ? incoming.getCareer() : current.getCareer());
-        merged.setSemester(incoming.getSemester() > 0 ? incoming.getSemester() : current.getSemester());
-        merged.setStudentCarnet(incoming.getStudentCarnet() != null ? incoming.getStudentCarnet() : current.getStudentCarnet());
-        merged.setBiography(incoming.getBiography() != null ? incoming.getBiography() : current.getBiography());
-        merged.setPrivacyLevel(incoming.getPrivacyLevel() != null ? incoming.getPrivacyLevel() : current.getPrivacyLevel());
-        merged.setGeolocationEnabled(incoming.isGeolocationEnabled());
-        merged.setScheduleAvailability(incoming.getSchedulesAvailability() != null ? userMapper.toDocument(incoming).getScheduleAvailability() : current.getScheduleAvailability());
-        merged.setTagsId(incoming.getTagsId() != null ? incoming.getTagsId() : current.getTagsId());
-        return merged;
-    }
-
-    private AdminProfileDocument mergeAdminDocument(AdminProfileDocument current, Admin incoming) {
-        AdminProfileDocument merged = new AdminProfileDocument();
-        merged.setId(current.getId());
-        merged.setUserType(current.getUserType());
-        merged.setCreatedAt(current.getCreatedAt());
-        merged.setName(incoming.getName() != null ? incoming.getName() : current.getName());
-        merged.setEmail(incoming.getEmail() != null ? incoming.getEmail() : current.getEmail());
-        merged.setPasswordHash(incoming.getPasswordHash() != null ? incoming.getPasswordHash() : current.getPasswordHash());
-        merged.setGender(incoming.getGender() != null ? incoming.getGender() : current.getGender());
-        return merged;
-    }
-
-    private OrganizerProfileDocument mergeOrganizerDocument(OrganizerProfileDocument current, Organizer incoming) {
-        OrganizerProfileDocument merged = new OrganizerProfileDocument();
-        merged.setId(current.getId());
-        merged.setUserType(current.getUserType());
-        merged.setCreatedAt(current.getCreatedAt());
-        merged.setName(incoming.getName() != null ? incoming.getName() : current.getName());
-        merged.setEmail(incoming.getEmail() != null ? incoming.getEmail() : current.getEmail());
-        merged.setPasswordHash(incoming.getPasswordHash() != null ? incoming.getPasswordHash() : current.getPasswordHash());
-        merged.setGender(incoming.getGender() != null ? incoming.getGender() : current.getGender());
-        merged.setContact(incoming.getContactInfo() != null ? incoming.getContactInfo() : current.getContact());
-        return merged;
     }
 
     @Override
@@ -184,11 +115,10 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 .toList();
     }
 
-    private boolean mailExistsForException(String email) {
+    private void mailExistsForException(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new InvalidInputException("The email is already in use by another user.");
         }
-        return false;
     }
 
     private void ensureCreatedAt(UserDocument userDocument) {

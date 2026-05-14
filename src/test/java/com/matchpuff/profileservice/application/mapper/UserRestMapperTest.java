@@ -8,7 +8,6 @@ import com.matchpuff.profileservice.application.dto.request.UserOrganizerRequest
 import com.matchpuff.profileservice.application.dto.request.UserOrganizerUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserStudentRequest;
 import com.matchpuff.profileservice.application.dto.request.UserStudentUpdateRequest;
-import com.matchpuff.profileservice.application.mapper.UserMapper;
 import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.domain.model.Organizer;
 import com.matchpuff.profileservice.domain.model.Schedule;
@@ -93,7 +92,7 @@ class UserRestMapperTest {
 
         StudentProfile result = mapper.toDomain(request);
 
-        assertEquals(0, result.getSemester());
+        assertNull(result.getSemester());
     }
 
     @Test
@@ -286,6 +285,6 @@ class UserRestMapperTest {
 
         StudentProfile result = mapper.toDomain(request);
 
-        assertEquals(0, result.getSemester());
+        assertNull(result.getSemester());
     }
 }

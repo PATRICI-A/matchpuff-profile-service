@@ -34,6 +34,7 @@ public interface UserMapper {
     @SubclassMapping(source = StudentProfile.class, target = StudentProfileResponse.class)
     @SubclassMapping(source = Organizer.class, target = OrganizerResponse.class)
     @SubclassMapping(source = Admin.class, target = AdminResponse.class)
+    @Mapping(target = "userType", ignore = true)
     UserResponse toResponse(User user);
 
     @Mapping(target = "dateOfBirth", expression = "java(student.getDateOfBirth() != null ? student.getDateOfBirth().toString() : null)")
@@ -87,21 +88,47 @@ public interface UserMapper {
     @Mapping(target = "photoUrl", source = "photourl")
     @Mapping(target = "schedulesAvailability", expression = "java(new java.util.ArrayList<>())")
     @Mapping(target = "tagsId", expression = "java(new java.util.ArrayList<>())")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "verified", ignore = true)
     StudentProfile toDomain(UserStudentRequest request);
 
     @Mapping(target = "passwordHash", source = "password")
+    @Mapping(target = "dateOfBirth", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "verified", ignore = true)
     Admin toDomain(UserAdminRequest request);
 
+    @Mapping(target = "passwordHash", ignore = true)
+    @Mapping(target = "dateOfBirth", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "verified", ignore = true)
     Admin toDomain(UserAdminUpdateRequest request);
 
     @Mapping(target = "passwordHash", source = "password")
+    @Mapping(target = "dateOfBirth", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "verified", ignore = true)
     Organizer toDomain(UserOrganizerRequest request);
 
+    @Mapping(target = "passwordHash", ignore = true)
+    @Mapping(target = "dateOfBirth", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "verified", ignore = true)
     Organizer toDomain(UserOrganizerUpdateRequest request);
 
     @Mapping(target = "schedulesAvailability", ignore = true)
     @Mapping(target = "tagsId", ignore = true)
     @Mapping(target = "photoUrl", ignore = true)
+    @Mapping(target = "passwordHash", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "verified", ignore = true)
+    @Mapping(target = "geolocationEnabled", ignore = true)
     StudentProfile toDomain(UserStudentUpdateRequest request);
 
     default Schedule toDomain(ScheduleRequest request) {

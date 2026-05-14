@@ -101,9 +101,9 @@ class StudentProfileTest {
 
     @Test
     void givenInvalidSemester_whenSet_thenThrowsInvalidInputException() {
-        assertDoesNotThrow(() -> student.setSemester(0));
-        assertThrows(InvalidInputException.class,
-            () -> student.setSemester(11));
+        assertDoesNotThrow(() -> student.setSemester(null));
+        assertThrows(InvalidInputException.class, () -> student.setSemester(0));
+        assertThrows(InvalidInputException.class, () -> student.setSemester(11));
     }
 
     @Test

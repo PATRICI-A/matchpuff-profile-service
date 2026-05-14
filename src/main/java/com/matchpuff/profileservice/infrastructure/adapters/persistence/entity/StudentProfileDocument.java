@@ -1,6 +1,7 @@
 package com.matchpuff.profileservice.infrastructure.adapters.persistence.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.matchpuff.profileservice.domain.model.enums.CareerEnum;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class StudentProfileDocument extends UserDocument {
     
     public StudentProfileDocument() {

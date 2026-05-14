@@ -4,6 +4,7 @@ import com.matchpuff.profileservice.application.dto.request.ScheduleRequest;
 import com.matchpuff.profileservice.application.dto.request.ChangePasswordRequest;
 import com.matchpuff.profileservice.application.dto.request.GeolocationRequest;
 import com.matchpuff.profileservice.application.dto.request.TagRequest;
+import com.matchpuff.profileservice.application.dto.response.CategoryWithTagsResponse;
 import com.matchpuff.profileservice.application.dto.request.UserAdminUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserAdminRequest;
 import com.matchpuff.profileservice.application.dto.request.UserOrganizerUpdateRequest;
@@ -195,6 +196,13 @@ public class UserController {
         }
     }
 
+    @GetMapping("/tags/catalog")
+    @Tag(name = "User Profiles", description = "Manage user profiles and content")
+    @Operation(summary = "Get all available tags grouped by category")
+    public ResponseEntity<List<CategoryWithTagsResponse>> getTagCatalog() {
+        return ResponseEntity.ok(userService.getTagCatalog());
+    }
+
     @PatchMapping("/{userId}/geolocation")
     @Tag(name = "User Profiles", description = "Manage user profiles and content")
     @Operation(summary = "Enable or disable geolocation for the user")
@@ -214,8 +222,13 @@ public class UserController {
             throw new InvalidInputException("This user does not have a profile image.");
         }
 
+        String photoUrl = student.getPhotoUrl();
+        if (!photoUrl.startsWith("http://") && !photoUrl.startsWith("https://")) {
+            throw new InvalidInputException("This user does not have a valid profile image.");
+        }
+
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(student.getPhotoUrl()))
+                .location(URI.create(photoUrl))
                 .build();
     }
 

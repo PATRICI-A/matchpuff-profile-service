@@ -3,6 +3,8 @@ package com.matchpuff.profileservice.application.service;
 import java.util.List;
 import java.util.UUID;
 
+import com.matchpuff.profileservice.application.dto.response.CategoryWithTagsResponse;
+import com.matchpuff.profileservice.application.dto.response.TagSummaryResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto;
 import com.matchpuff.profileservice.application.mapper.UserMapper;
@@ -109,5 +111,18 @@ public class UserService implements UserServicePort {
     public UserResponse updateGeolocation(UUID userId, boolean geolocationEnabled) {
         User updated = userUseCase.updateGeolocation(userId, geolocationEnabled);
         return userMapper.toResponse(updated);
+    }
+
+    @Override
+    public List<CategoryWithTagsResponse> getTagCatalog() {
+        return userUseCase.getTagCatalog().stream()
+                .map(cat -> new CategoryWithTagsResponse(
+                        cat.getId(),
+                        cat.getName(),
+                        cat.getTags().stream()
+                                .map(t -> new TagSummaryResponse(t.getId(), t.getName(), t.getCategoryId()))
+                                .toList()
+                ))
+                .toList();
     }
 }

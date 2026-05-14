@@ -2,11 +2,14 @@ package com.matchpuff.profileservice.application.usecase;
 
 import com.matchpuff.profileservice.domain.ports.in.UserUseCasePort;
 import com.matchpuff.profileservice.domain.exceptions.InvalidImageInputException;
+import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
 import com.matchpuff.profileservice.domain.exceptions.ProfileServiceException;
+import com.matchpuff.profileservice.domain.model.CategoryWithTags;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.*;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
 import com.matchpuff.profileservice.domain.ports.out.ImageStoragePort;
+import com.matchpuff.profileservice.domain.ports.out.TagCatalogPort;
 import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
 import com.matchpuff.profileservice.application.service.PasswordHashingService;
 
@@ -27,6 +30,7 @@ public class UserUseCase implements UserUseCasePort {
     private final UserRepositoryPort userRepository;
     private final ImageStoragePort imageStoragePort;
     private final PasswordHashingService passwordHashingService;
+    private final TagCatalogPort tagCatalogPort;
 
     // ── CREATE ───────────────────────────────────────────────────
 
@@ -130,7 +134,7 @@ public class UserUseCase implements UserUseCasePort {
         if (request.getStudentCarnet() != null) student.setStudentCarnet(request.getStudentCarnet());
         if (request.getPrivacyLevel() != null) student.setPrivacyLevel(request.getPrivacyLevel());
         if (request.getCareer() != null)       student.setCareer(request.getCareer());
-        if (request.getSemester() > 0)         student.setSemester(request.getSemester());
+        if (request.getSemester() != null)      student.setSemester(request.getSemester());
         if (request.getDateOfBirth() != null)  student.setDateOfBirth(request.getDateOfBirth());
         if (request.getTagsId() != null)         student.setTagsId(request.getTagsId());
         if (request.getSchedulesAvailability() != null)    student.setSchedulesAvailability(request.getSchedulesAvailability());
@@ -168,10 +172,9 @@ public class UserUseCase implements UserUseCasePort {
     @Override
     public User addScheduleToStudent(UUID userId, Schedule schedule) {
         User user = findOrThrow(userId);
-        if (!(user instanceof StudentProfile)) {
+        if (!(user instanceof StudentProfile student)) {
             throw new ProfileServiceException("Only STUDENT users can have schedules", HttpStatus.BAD_REQUEST);
         }
-        StudentProfile student = (StudentProfile) findOrThrow(userId);
         if (!(student.getSchedulesAvailability() instanceof java.util.ArrayList)) {
             student.setSchedulesAvailability(student.getSchedulesAvailability() == null ? new ArrayList<>() : new ArrayList<>(student.getSchedulesAvailability()));
         }
@@ -200,11 +203,13 @@ public class UserUseCase implements UserUseCasePort {
 
     @Override
     public User addTagToStudent(UUID userId, UUID tagId) {
+        if (!tagCatalogPort.tagExists(tagId)) {
+            throw new InvalidInputException("Tag not found in the catalog: " + tagId);
+        }
         User user = findOrThrow(userId);
-        if (!(user instanceof StudentProfile)) {
+        if (!(user instanceof StudentProfile student)) {
             throw new ProfileServiceException("Only STUDENT users can have tags", HttpStatus.BAD_REQUEST);
         }
-        StudentProfile student = (StudentProfile) findOrThrow(userId);
         if (!(student.getTagsId() instanceof java.util.ArrayList)) {
             student.setTagsId(student.getTagsId() == null ? new ArrayList<>() : new ArrayList<>(student.getTagsId()));
         }
@@ -254,6 +259,11 @@ public class UserUseCase implements UserUseCasePort {
     @Override
     public List<StudentProfile> getAllStudentProfiles() {
         return userRepository.findAllStudents();
+    }
+
+    @Override
+    public List<CategoryWithTags> getTagCatalog() {
+        return tagCatalogPort.getAllCategoriesWithTags();
     }
 
     // ── Helpers ──────────────────────────────────────────────────
