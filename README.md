@@ -1229,6 +1229,9 @@ void createStudentUser_shouldHashPasswordAndSave() {
 
 ![Captura](docs/images/Jacoco.jpeg)
 
+
+![Captura](docs/images/PruebasUnitarias.png)
+
 ---
 
 ### ✅ Criterios de aceptación de pruebas
@@ -1438,6 +1441,8 @@ El proyecto implementa un **pipeline automatizado** con **GitHub Actions** para 
 
 
 https://patricia-profile-service-gpcucxgpdub4azbw.canadacentral-01.azurewebsites.net/swagger-ui/index.html#/
+
+![captura](docs/images/Despliegue.png)
 <div align="center">
 
 | 🌍 Ambiente | 📝 Estado |
