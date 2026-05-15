@@ -27,6 +27,8 @@ public interface UserPersistenceMapper {
     @Mapping(target = "birthdate", expression = "java(profile.getDateOfBirth() == null ? null : profile.getDateOfBirth().atStartOfDay())")
     @Mapping(target = "photourl", source = "photoUrl")
     @Mapping(target = "scheduleAvailability", source = "schedulesAvailability", defaultExpression = "java(new java.util.ArrayList<>())")
+    @Mapping(target = "tagsId", source = "tagsId")
+    @Mapping(target = "friendsId", source = "friendsId")
     StudentProfileDocument toDocument(StudentProfile profile);
 
     @Mapping(target = "id", expression = "java(admin.getId() != null ? admin.getId() : java.util.UUID.randomUUID())")
@@ -44,6 +46,7 @@ public interface UserPersistenceMapper {
     @Mapping(target = "photoUrl", source = "photourl")
     @Mapping(target = "schedulesAvailability", source = "scheduleAvailability")
     @Mapping(target = "tagsId", source = "tagsId")
+    @Mapping(target = "friendsId", source = "friendsId")
     StudentProfile toDomain(StudentProfileDocument doc);
 
     Admin toDomain(AdminProfileDocument doc);

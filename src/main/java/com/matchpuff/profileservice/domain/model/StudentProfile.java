@@ -25,6 +25,8 @@ public class StudentProfile extends User {
     private List<Schedule> schedulesAvailability;
     private List<UUID> tagsId;
 
+    private List<UUID> friendsId;
+
 
     public void setBiography(String biography) {
         this.biography = new Biography(biography);

@@ -8,4 +8,6 @@ import com.matchpuff.profileservice.domain.model.CategoryWithTags;
 public interface TagCatalogPort {
     List<CategoryWithTags> getAllCategoriesWithTags();
     boolean tagExists(UUID tagId);
+
+    String getTagNameById(UUID tagId);
 }
