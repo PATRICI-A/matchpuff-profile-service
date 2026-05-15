@@ -16,6 +16,7 @@ import com.matchpuff.profileservice.application.service.PasswordHashingService;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -70,6 +71,32 @@ public class UserUseCase implements UserUseCasePort {
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ProfileServiceException("User not found with email: " + email, HttpStatus.NOT_FOUND));
+    }
+
+    @Override
+    public List<UUID> getUserTags(UUID userId) {
+        User user = findOrThrow(userId);
+        if (!(user instanceof StudentProfile student)) {
+            throw new ProfileServiceException("Only STUDENT users can have tags", HttpStatus.BAD_REQUEST);
+        }
+        return student.getTagsId() != null ? student.getTagsId() : new ArrayList<>();
+    }
+
+    @Override
+    public List<String> getUserTagsNames(UUID userId) {
+        return getUserTags(userId).stream()
+                .map(tagCatalogPort::getTagNameById)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    @Override
+    public List<UUID> getUserFriends(UUID userId) {
+        User user = findOrThrow(userId);
+        if (!(user instanceof StudentProfile student)) {
+            throw new ProfileServiceException("Only STUDENT users can have friends", HttpStatus.BAD_REQUEST);
+        }
+        return student.getFriendsId() != null ? student.getFriendsId() : new ArrayList<>();
     }
 
     // ── UPDATE ───────────────────────────────────────────────────
@@ -191,7 +218,7 @@ public class UserUseCase implements UserUseCasePort {
         if (student.getSchedulesAvailability() == null) {
             throw new ProfileServiceException("No schedules to remove", HttpStatus.BAD_REQUEST);
         }
-        if (!(student.getSchedulesAvailability() instanceof java.util.ArrayList)) {
+        if (!(student.getSchedulesAvailability() instanceof ArrayList)) {
             student.setSchedulesAvailability(new ArrayList<>(student.getSchedulesAvailability()));
         }
         boolean removed = student.getSchedulesAvailability().removeIf(s -> s.equals(schedule));
@@ -199,6 +226,87 @@ public class UserUseCase implements UserUseCasePort {
             throw new ProfileServiceException("Schedule not found for removal", HttpStatus.BAD_REQUEST);
         }
         return userRepository.update(userId, student);
+    }
+
+    @Override
+    public User addFriendToStudent(UUID userId, UUID friendId) {
+        if (userId.equals(friendId)) {
+            throw new InvalidInputException("A user cannot add themselves as a friend");
+        }
+
+        User friendUser = userRepository.findById(friendId)
+                .orElseThrow(() -> new ProfileServiceException("Friend user not found: " + friendId, HttpStatus.NOT_FOUND));
+        if (!(friendUser instanceof StudentProfile friendStudent)) {
+            throw new InvalidInputException("Only STUDENT users can be added as friends");
+        }
+
+        User user = findOrThrow(userId);
+        if (!(user instanceof StudentProfile student)) {
+            throw new ProfileServiceException("Only STUDENT users can have friends", HttpStatus.BAD_REQUEST);
+        }
+        if (student.getFriendsId() != null && student.getFriendsId().contains(friendId)) {
+            throw new InvalidInputException("This user is already a friend");
+        }
+
+        ensureMutableFriendsList(student);
+        ensureMutableFriendsList(friendStudent);
+
+        // Update userId's list first
+        student.getFriendsId().add(friendId);
+        userRepository.update(userId, student);
+
+        // Update friendId's list; compensate if it fails
+        try {
+            friendStudent.getFriendsId().add(userId);
+            userRepository.update(friendId, friendStudent);
+        } catch (Exception e) {
+            student.getFriendsId().removeIf(f -> f.equals(friendId));
+            userRepository.update(userId, student);
+            throw new ProfileServiceException("Could not add friend on the other side. Operation was reverted.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return student;
+    }
+
+    @Override
+    public User removeFriendFromStudent(UUID userId, UUID friendId) {
+        User user = findOrThrow(userId);
+        if (!(user instanceof StudentProfile student)) {
+            throw new ProfileServiceException("Only STUDENT users can have friends", HttpStatus.BAD_REQUEST);
+        }
+        if (student.getFriendsId() == null) {
+            throw new ProfileServiceException("No friends to remove", HttpStatus.BAD_REQUEST);
+        }
+        ensureMutableFriendsList(student);
+        boolean removed = student.getFriendsId().removeIf(f -> f.equals(friendId));
+        if (!removed) {
+            throw new ProfileServiceException("Friend not found for removal", HttpStatus.BAD_REQUEST);
+        }
+        userRepository.update(userId, student);
+
+        // Bidirectional: also remove userId from friend's list; compensate if it fails
+        User friendUser = userRepository.findById(friendId).orElse(null);
+        if (friendUser instanceof StudentProfile friendStudent
+                && friendStudent.getFriendsId() != null
+                && friendStudent.getFriendsId().contains(userId)) {
+            ensureMutableFriendsList(friendStudent);
+            try {
+                friendStudent.getFriendsId().removeIf(f -> f.equals(userId));
+                userRepository.update(friendId, friendStudent);
+            } catch (Exception e) {
+                student.getFriendsId().add(friendId);
+                userRepository.update(userId, student);
+                throw new ProfileServiceException("Could not remove friend on the other side. Operation was reverted.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return student;
+    }
+
+    private void ensureMutableFriendsList(StudentProfile student) {
+        if (!(student.getFriendsId() instanceof ArrayList)) {
+            student.setFriendsId(student.getFriendsId() == null ? new ArrayList<>() : new ArrayList<>(student.getFriendsId()));
+        }
     }
 
     @Override

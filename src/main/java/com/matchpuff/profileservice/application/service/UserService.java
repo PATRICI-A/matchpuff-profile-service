@@ -114,6 +114,33 @@ public class UserService implements UserServicePort {
     }
 
     @Override
+    public List<UUID> getUserTags(UUID userId) {
+        return userUseCase.getUserTags(userId);
+    }
+
+    @Override
+    public List<String> getUserTagsNames(UUID userId) {
+        return userUseCase.getUserTagsNames(userId);
+    }
+
+    @Override
+    public List<UUID> getUserFriends(UUID userId) {
+        return userUseCase.getUserFriends(userId);
+    }
+
+    @Override
+    public UserResponse addFriend(UUID userId, UUID friendId) {
+        User updated = userUseCase.addFriendToStudent(userId, friendId);
+        return userMapper.toResponse(updated);
+    }
+
+    @Override
+    public UserResponse removeFriend(UUID userId, UUID friendId) {
+        User updated = userUseCase.removeFriendFromStudent(userId, friendId);
+        return userMapper.toResponse(updated);
+    }
+
+    @Override
     public List<CategoryWithTagsResponse> getTagCatalog() {
         return userUseCase.getTagCatalog().stream()
                 .map(cat -> new CategoryWithTagsResponse(

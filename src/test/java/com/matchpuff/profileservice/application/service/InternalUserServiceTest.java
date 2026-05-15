@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -139,5 +140,95 @@ class InternalUserServiceTest {
         internalUserService.verifyUser(userId);
 
         verify(userUseCase).verifyUser(userId);
+    }
+
+    // ── getProfileForMatching ───────────────────────────────────
+
+    @Test
+    void givenStudentForMatching_whenGetProfileForMatching_thenReturnsDtoWithFormattedSchedules() {
+        UUID id = UUID.randomUUID();
+        StudentProfile student = new StudentProfile();
+        student.setId(id);
+
+        // prepare response from mapper
+        com.matchpuff.profileservice.application.dto.response.UserMatchProfileResponse resp = new com.matchpuff.profileservice.application.dto.response.UserMatchProfileResponse();
+        resp.setId(id);
+        resp.setCareer("Systems");
+        resp.setSemester(3);
+        resp.setTags(List.of("tag1","tag2"));
+
+        com.matchpuff.profileservice.application.dto.response.ScheduleResponse s = new com.matchpuff.profileservice.application.dto.response.ScheduleResponse();
+        s.setDayOfWeek(com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum.MONDAY);
+        s.setName("Clase");
+        s.setStartTime(java.time.LocalTime.of(10,0));
+        s.setEndTime(java.time.LocalTime.of(12,30));
+        resp.setSchedules(List.of(s));
+
+        when(userUseCase.getUser(id)).thenReturn(student);
+        when(userMapper.toUserMatchProfileResponseFromUser(student)).thenReturn(resp);
+
+        var dto = internalUserService.getProfileForMatching(id);
+
+        assertNotNull(dto);
+        assertEquals(id, dto.getId());
+        assertEquals(3, dto.getSemester());
+        assertEquals(2, dto.getTags().size());
+        assertNotNull(dto.getSchedulesAvailable());
+        java.time.format.DateTimeFormatter tf = java.time.format.DateTimeFormatter.ofPattern("h:mma");
+        String expectedStart = s.getStartTime().format(tf).replace(":00", "");
+        String expectedEnd = s.getEndTime().format(tf).replace(":00", "");
+        assertEquals("MONDAY_" + expectedStart + "-" + expectedEnd, dto.getSchedulesAvailable().get(0));
+    }
+
+    @Test
+    void givenNonStudentForMatching_whenMapperReturnsNull_thenThrowsProfileServiceException() {
+        UUID id = UUID.randomUUID();
+        StudentProfile student = new StudentProfile();
+        student.setId(id);
+
+        when(userUseCase.getUser(id)).thenReturn(student);
+        when(userMapper.toUserMatchProfileResponseFromUser(student)).thenReturn(null);
+
+        assertThrows(com.matchpuff.profileservice.domain.exceptions.ProfileServiceException.class, () -> internalUserService.getProfileForMatching(id));
+    }
+
+    // ── getAllProfilesForMatching ───────────────────────────────
+
+    @Test
+    void getAllProfilesForMatching_mapsListAndFormatsSchedules() {
+        StudentProfile s1 = new StudentProfile(); s1.setId(UUID.randomUUID());
+        StudentProfile s2 = new StudentProfile(); s2.setId(UUID.randomUUID());
+
+        com.matchpuff.profileservice.application.dto.response.UserMatchProfileResponse r1 = new com.matchpuff.profileservice.application.dto.response.UserMatchProfileResponse();
+        r1.setId(s1.getId());
+        r1.setCareer("C1");
+        r1.setSemester(1);
+        r1.setTags(List.of());
+        r1.setSchedules(null);
+
+        com.matchpuff.profileservice.application.dto.response.UserMatchProfileResponse r2 = new com.matchpuff.profileservice.application.dto.response.UserMatchProfileResponse();
+        r2.setId(s2.getId());
+        r2.setCareer("C2");
+        r2.setSemester(2);
+        com.matchpuff.profileservice.application.dto.response.ScheduleResponse sched = new com.matchpuff.profileservice.application.dto.response.ScheduleResponse();
+        sched.setDayOfWeek(com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum.TUESDAY);
+        sched.setStartTime(java.time.LocalTime.of(9,0));
+        sched.setEndTime(java.time.LocalTime.of(11,0));
+        r2.setSchedules(List.of(sched));
+
+        when(userUseCase.getAllStudentProfiles()).thenReturn(List.of(s1,s2));
+        when(userMapper.toUserMatchProfileResponseFromUser(s1)).thenReturn(r1);
+        when(userMapper.toUserMatchProfileResponseFromUser(s2)).thenReturn(r2);
+
+        var list = internalUserService.getAllProfilesForMatching();
+
+        assertEquals(2, list.size());
+        // first had null schedules -> dto schedulesAvailable null
+        assertNull(list.get(0).getSchedulesAvailable());
+        // second has one schedule formatted
+        java.time.format.DateTimeFormatter tf2 = java.time.format.DateTimeFormatter.ofPattern("h:mma");
+        String expStart = sched.getStartTime().format(tf2).replace(":00", "");
+        String expEnd = sched.getEndTime().format(tf2).replace(":00", "");
+        assertEquals("TUESDAY_" + expStart + "-" + expEnd, list.get(1).getSchedulesAvailable().get(0));
     }
 }
