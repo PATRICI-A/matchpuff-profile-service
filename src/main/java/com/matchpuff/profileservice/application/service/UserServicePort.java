@@ -32,5 +32,13 @@ public interface UserServicePort {
     List<UserResponse> getAllStudentProfiles();
     List<CategoryWithTagsResponse> getTagCatalog();
 
+
+    List<UUID> getUserTags(UUID userId);
+    List<String> getUserTagsNames(UUID userId);
+
+    List<UUID> getUserFriends(UUID userId);
+    UserResponse addFriend(UUID userId, UUID friendId);
+    UserResponse removeFriend(UUID userId, UUID friendId);
+
 }
 

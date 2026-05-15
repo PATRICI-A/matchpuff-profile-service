@@ -29,4 +29,11 @@ public interface UserUseCasePort {
     List<StudentProfile> getAllStudentProfiles();
     List<CategoryWithTags> getTagCatalog();
 
+    List<UUID> getUserTags(UUID userId);
+    List<String> getUserTagsNames(UUID userId);
+
+    List<UUID> getUserFriends(UUID userId);
+    User addFriendToStudent(UUID userId, UUID friendId);
+    User removeFriendFromStudent(UUID userId, UUID friendId);
+
 }

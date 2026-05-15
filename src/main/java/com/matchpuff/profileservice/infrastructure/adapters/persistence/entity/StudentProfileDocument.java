@@ -50,4 +50,7 @@ public class StudentProfileDocument extends UserDocument {
     @Field("tagsId")
     private List<UUID> tagsId;
 
+    @Field("friendsId")
+    private List<UUID> friendsId;
+
 }

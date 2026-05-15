@@ -45,6 +45,18 @@ public class MatchingServiceAdapter implements TagCatalogPort {
         }
     }
 
+    @Override
+    public String getTagNameById(UUID tagId) {
+        try {
+            TagDto tagDto = matchingFeignClient.getTagById(tagId);
+            return tagDto.getName();
+        } catch (FeignException.NotFound e) {
+            throw new IllegalArgumentException("Tag not found: " + tagId);
+        } catch (FeignException e) {
+            throw new ExternalServiceException("Matching service unavailable: " + e.getMessage());
+        }
+    }
+
     private CategoryWithTags toCategoryWithTags(CategoryWithTagsDto dto) {
         List<TagInfo> tags = dto.getTags() == null ? List.of() :
                 dto.getTags().stream().map(this::toTagInfo).toList();
