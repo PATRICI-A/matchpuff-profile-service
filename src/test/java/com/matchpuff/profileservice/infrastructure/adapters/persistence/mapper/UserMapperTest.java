@@ -56,7 +56,7 @@ class UserMapperTest {
             DayOfWeekEnum.MONDAY,
             "Class",
             LocalTime.of(8, 0),
-            LocalTime.of(10, 0)
+            LocalTime.of(9, 30)
         );
         s.setSchedulesAvailability(List.of(schedule));
         s.setTagsId(List.of(UUID.randomUUID()));
@@ -85,7 +85,7 @@ class UserMapperTest {
         sd.setDayOfWeek(DayOfWeekEnum.MONDAY);
         sd.setName("Class");
         sd.setStartHour(LocalTime.of(8, 0));
-        sd.setFinishHour(LocalTime.of(10, 0));
+        sd.setFinishHour(LocalTime.of(9, 30));
 
         doc.setScheduleAvailability(List.of(sd));
         doc.setTagsId(List.of(UUID.randomUUID()));
@@ -162,7 +162,7 @@ class UserMapperTest {
         doc.setDayOfWeek(DayOfWeekEnum.MONDAY);
         doc.setName("Class");
         doc.setStartHour(LocalTime.of(8, 0));
-        doc.setFinishHour(LocalTime.of(10, 0));
+        doc.setFinishHour(LocalTime.of(9, 30));
 
         List<Schedule> result = mapper.toScheduleList(List.of(doc));
 

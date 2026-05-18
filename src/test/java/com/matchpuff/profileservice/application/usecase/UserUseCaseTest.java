@@ -1,5 +1,6 @@
 package com.matchpuff.profileservice.application.usecase;
 
+import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
 import com.matchpuff.profileservice.domain.exceptions.ProfileServiceException;
 import com.matchpuff.profileservice.domain.exceptions.InvalidImageInputException;
 import com.matchpuff.profileservice.domain.model.Admin;
@@ -290,7 +291,7 @@ class UserUseCaseTest {
 
     @Test
     void givenExistingStudent_whenAddSchedule_thenScheduleIsAdded() {
-        Schedule schedule = new Schedule( DayOfWeekEnum.MONDAY, "Cálculo I", LocalTime.of(8, 0), LocalTime.of(10, 0));
+        Schedule schedule = new Schedule( DayOfWeekEnum.MONDAY, "Cálculo I", LocalTime.of(8, 0), LocalTime.of(9, 30));
 
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
@@ -305,7 +306,7 @@ class UserUseCaseTest {
     @Test
     void givenStudentWithNullSchedules_whenAddSchedule_thenListIsInitialized() {
         student.setSchedulesAvailability(null);
-        Schedule schedule = new Schedule( DayOfWeekEnum.TUESDAY, "Física", LocalTime.of(10, 0), LocalTime.of(12, 0));
+        Schedule schedule = new Schedule( DayOfWeekEnum.TUESDAY, "Física", LocalTime.of(10, 0), LocalTime.of(11, 30));
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
         when(userRepository.update(student.getId(), student)).thenReturn(student);
@@ -321,7 +322,7 @@ class UserUseCaseTest {
         UUID missingId = UUID.randomUUID();
         when(userRepository.findById(missingId)).thenReturn(Optional.empty());
 
-        Schedule schedule = new Schedule( DayOfWeekEnum.WEDNESDAY, "Química", LocalTime.of(12, 0), LocalTime.of(14, 0));
+        Schedule schedule = new Schedule( DayOfWeekEnum.WEDNESDAY, "Química", LocalTime.of(12, 0), LocalTime.of(13, 30));
 
         assertThrows(
                 ProfileServiceException.class,
@@ -376,10 +377,10 @@ class UserUseCaseTest {
 
     @Test
     void givenStudentWithImmutableSchedules_whenAddSchedule_thenListIsCopiedAndScheduleIsAdded() {
-        Schedule existingSchedule = new Schedule(DayOfWeekEnum.MONDAY, "Base", LocalTime.of(8, 0), LocalTime.of(10, 0));
+        Schedule existingSchedule = new Schedule(DayOfWeekEnum.MONDAY, "Base", LocalTime.of(8, 0), LocalTime.of(9, 30));
         student.setSchedulesAvailability(List.of(existingSchedule));
 
-        Schedule newSchedule = new Schedule(DayOfWeekEnum.TUESDAY, "Nuevo", LocalTime.of(10, 0), LocalTime.of(12, 0));
+        Schedule newSchedule = new Schedule(DayOfWeekEnum.TUESDAY, "Nuevo", LocalTime.of(10, 0), LocalTime.of(11, 30));
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
         when(userRepository.update(student.getId(), student)).thenReturn(student);
@@ -388,6 +389,19 @@ class UserUseCaseTest {
 
         assertEquals(2, ((StudentProfile) result).getSchedulesAvailability().size());
         assertEquals("Nuevo", ((StudentProfile) result).getSchedulesAvailability().get(1).getName());
+    }
+
+    @Test
+    void givenStudentWithExistingSchedule_whenAddOverlappingSchedule_thenThrowsInvalidInputException() {
+        Schedule existing = new Schedule(DayOfWeekEnum.MONDAY, "Calculo", LocalTime.of(8, 0), LocalTime.of(9, 30));
+        student.setSchedulesAvailability(new ArrayList<>(List.of(existing)));
+
+        Schedule overlapping = new Schedule(DayOfWeekEnum.MONDAY, "Fisica", LocalTime.of(9, 0), LocalTime.of(10, 30));
+
+        when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
+
+        assertThrows(InvalidInputException.class,
+                () -> userUseCase.addScheduleToStudent(student.getId(), overlapping));
     }
 
     @Test
@@ -403,11 +417,26 @@ class UserUseCaseTest {
         );
     }
 
+    @Test
+    void givenStudentWithExistingTag_whenAddSameTag_thenThrowsConflict() {
+        java.util.UUID tagId = UUID.randomUUID();
+        student.setTagsId(new ArrayList<>(List.of(tagId)));
+
+        UUID studentId = student.getId();
+        when(userRepository.findById(studentId)).thenReturn(Optional.of(student));
+
+        ProfileServiceException ex = assertThrows(
+                ProfileServiceException.class,
+                () -> userUseCase.addTagToStudent(studentId, tagId)
+        );
+        assertEquals(org.springframework.http.HttpStatus.CONFLICT, ex.getStatus());
+    }
+
     // ── removeScheduleFromStudent / removeTagFromStudent ─────────
 
     @Test
     void givenExistingSchedule_whenRemoveSchedule_thenScheduleIsRemoved() {
-        Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Calculo", LocalTime.of(8, 0), LocalTime.of(10, 0));
+        Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Calculo", LocalTime.of(8, 0), LocalTime.of(9, 30));
         student.setSchedulesAvailability(new ArrayList<>(List.of(schedule)));
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
@@ -421,8 +450,8 @@ class UserUseCaseTest {
 
     @Test
     void givenMissingSchedule_whenRemoveSchedule_thenThrowsProfileServiceException() {
-        Schedule existing = new Schedule(DayOfWeekEnum.MONDAY, "Calculo", LocalTime.of(8, 0), LocalTime.of(10, 0));
-        Schedule toRemove = new Schedule(DayOfWeekEnum.TUESDAY, "Fisica", LocalTime.of(10, 0), LocalTime.of(12, 0));
+        Schedule existing = new Schedule(DayOfWeekEnum.MONDAY, "Calculo", LocalTime.of(8, 0), LocalTime.of(9, 30));
+        Schedule toRemove = new Schedule(DayOfWeekEnum.TUESDAY, "Fisica", LocalTime.of(10, 0), LocalTime.of(11, 30));
         student.setSchedulesAvailability(new ArrayList<>(List.of(existing)));
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
@@ -709,7 +738,7 @@ class UserUseCaseTest {
 
     @Test
     void givenExistingStudent_whenUpdateWithSchedulesAndTags_thenBothAreUpdated() {
-        Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Calculo", LocalTime.of(8, 0), LocalTime.of(10, 0));
+        Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Calculo", LocalTime.of(8, 0), LocalTime.of(9, 30));
         UUID tagId = UUID.randomUUID();
 
         StudentProfile request = new StudentProfile();
@@ -837,7 +866,7 @@ class UserUseCaseTest {
     void givenAdmin_whenAddSchedule_thenThrowsProfileServiceException() {
         Admin admin = new Admin();
         admin.setId(UUID.randomUUID());
-        Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Clase", LocalTime.of(8, 0), LocalTime.of(10, 0));
+        Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Clase", LocalTime.of(8, 0), LocalTime.of(9, 30));
 
         when(userRepository.findById(admin.getId())).thenReturn(Optional.of(admin));
 
@@ -851,7 +880,7 @@ class UserUseCaseTest {
     void givenAdmin_whenRemoveSchedule_thenThrowsProfileServiceException() {
         Admin admin = new Admin();
         admin.setId(UUID.randomUUID());
-        Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Clase", LocalTime.of(8, 0), LocalTime.of(10, 0));
+        Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Clase", LocalTime.of(8, 0), LocalTime.of(9, 30));
 
         when(userRepository.findById(admin.getId())).thenReturn(Optional.of(admin));
 
@@ -862,7 +891,7 @@ class UserUseCaseTest {
     @Test
     void givenStudentWithNullScheduleList_whenRemoveSchedule_thenThrowsProfileServiceException() {
         student.setSchedulesAvailability(null);
-        Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Clase", LocalTime.of(8, 0), LocalTime.of(10, 0));
+        Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Clase", LocalTime.of(8, 0), LocalTime.of(9, 30));
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
 

@@ -1,5 +1,6 @@
 package com.matchpuff.profileservice.domain.model;
 
+import java.time.Duration;
 import java.time.LocalTime;
 
 import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
@@ -20,14 +21,13 @@ public class Schedule {
         if (name == null || name.isBlank()) throw new InvalidInputException("Name is required");
 
         if (!startTime.isBefore(endTime)) {
-            throw new InvalidInputException(
-                "Start time must be before end time"
-            );
+            throw new InvalidInputException("Start time must be before end time");
+        }
+        if (Duration.between(startTime, endTime).toMinutes() != 90) {
+            throw new InvalidInputException("Schedule duration must be exactly 90 minutes (e.g., 7:00–8:30)");
         }
         if (name.trim().length() > 100) {
-            throw new InvalidInputException(
-                "Name must be less than 100 characters"
-            );
+            throw new InvalidInputException("Name must be less than 100 characters");
         }
         this.dayOfWeek = dayOfWeek;
         this.name = name.trim();
