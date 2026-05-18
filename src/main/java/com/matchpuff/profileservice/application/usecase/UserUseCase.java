@@ -406,6 +406,11 @@ public class UserUseCase implements UserUseCasePort {
         return tagCatalogPort.getAllCategoriesWithTags();
     }
 
+    @Override
+    public List<User> getUsersByIds(List<UUID> ids) {
+        return userRepository.findAllByIds(ids);
+    }
+
     // ── Helpers ──────────────────────────────────────────────────
 
     private void hashPasswordIfPresent(User user) {

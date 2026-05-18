@@ -3,6 +3,7 @@ package com.matchpuff.profileservice.application.service;
 import java.util.List;
 import java.util.UUID;
 
+import com.matchpuff.profileservice.application.dto.response.BatchProfileResponse;
 import com.matchpuff.profileservice.application.dto.response.CategoryWithTagsResponse;
 import com.matchpuff.profileservice.application.dto.response.TagSummaryResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
@@ -138,6 +139,17 @@ public class UserService implements UserServicePort {
     public UserResponse removeFriend(UUID userId, UUID friendId) {
         User updated = userUseCase.removeFriendFromStudent(userId, friendId);
         return userMapper.toResponse(updated);
+    }
+
+    @Override
+    public List<BatchProfileResponse> getUsersByIds(List<UUID> ids) {
+        return userUseCase.getUsersByIds(ids).stream()
+                .map(user -> {
+                    String biography = user instanceof StudentProfile s ? s.getBiography() : null;
+                    String photoUrl = user instanceof StudentProfile s2 ? s2.getPhotoUrl() : null;
+                    return new BatchProfileResponse(user.getId(), user.getName(), user.getEmail(), biography, photoUrl);
+                })
+                .toList();
     }
 
     @Override

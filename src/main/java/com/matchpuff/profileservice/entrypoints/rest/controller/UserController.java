@@ -1,5 +1,6 @@
 package com.matchpuff.profileservice.entrypoints.rest.controller;
 
+import com.matchpuff.profileservice.application.dto.request.BatchProfileRequest;
 import com.matchpuff.profileservice.application.dto.request.ScheduleRequest;
 import com.matchpuff.profileservice.application.dto.request.ChangePasswordRequest;
 import com.matchpuff.profileservice.application.dto.request.GeolocationRequest;
@@ -12,6 +13,7 @@ import com.matchpuff.profileservice.application.dto.request.UserOrganizerUpdateR
 import com.matchpuff.profileservice.application.dto.request.UserOrganizerRequest;
 import com.matchpuff.profileservice.application.dto.request.UserStudentUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserStudentRequest;
+import com.matchpuff.profileservice.application.dto.response.BatchProfileResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto;
 import com.matchpuff.profileservice.application.mapper.UserMapper;
@@ -71,6 +73,15 @@ public class UserController {
             @Valid @RequestBody UserOrganizerRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(userService.createOrganizerUser(userRestMapper.toDomain(request)));
+    }
+
+    @PostMapping("/batch")
+    @Tag(name = "Users - Reading", description = "Obtain information about users")
+    @Operation(summary = "Obtain multiple user profiles by IDs")
+    @ApiResponse(responseCode = "200", description = "User profiles retrieved successfully")
+    public ResponseEntity<List<BatchProfileResponse>> getUsersByIds(
+            @Valid @RequestBody BatchProfileRequest request) {
+        return ResponseEntity.ok(userService.getUsersByIds(request.getIds()));
     }
 
     @GetMapping("/{userId}")

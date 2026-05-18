@@ -3,6 +3,7 @@ package com.matchpuff.profileservice.application.service;
 import java.util.List;
 import java.util.UUID;
 
+import com.matchpuff.profileservice.application.dto.response.BatchProfileResponse;
 import com.matchpuff.profileservice.application.dto.response.CategoryWithTagsResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponseProfilePhoto;
@@ -39,6 +40,8 @@ public interface UserServicePort {
     List<UUID> getUserFriends(UUID userId);
     UserResponse addFriend(UUID userId, UUID friendId);
     UserResponse removeFriend(UUID userId, UUID friendId);
+
+    List<BatchProfileResponse> getUsersByIds(List<UUID> ids);
 
 }
 
