@@ -73,7 +73,7 @@ class UserControllerTest {
         return """
                 {
                   "name": "Test User",
-                  "email": "test@escuelaing.edu.co",
+                  "email": "test@mail.escuelaing.edu.co",
                   "password": "TestPassword123",
                   "gender": "MALE",
                   "career": "SYSTEMS_ENGINEERING",

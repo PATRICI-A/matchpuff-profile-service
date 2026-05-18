@@ -19,7 +19,7 @@ public class UserAdminRequest {
 
     @Email
     @NotBlank(message = "Email is required")
-    @Pattern(regexp = ".*@(mail\\.)?escuelaing\\.edu\\.co$")
+    @Pattern(regexp = "^[^@]+@escuelaing\\.edu\\.co$", message = "Email must be a valid @escuelaing.edu.co address")
     @Schema(example = "usuario@escuelaing.edu.co")
     private String email;
 
