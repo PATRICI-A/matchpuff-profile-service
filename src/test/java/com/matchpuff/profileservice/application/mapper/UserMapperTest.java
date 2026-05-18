@@ -66,7 +66,7 @@ class UserMapperTest {
         UUID tagId = UUID.randomUUID();
         student.setTagsId(List.of(tagId));
 
-        Schedule schedule = new Schedule( DayOfWeekEnum.TUESDAY, "Algoritmos", LocalTime.of(9, 0), LocalTime.of(11, 0));
+        Schedule schedule = new Schedule( DayOfWeekEnum.TUESDAY, "Algoritmos", LocalTime.of(9, 0), LocalTime.of(10, 30));
         student.setSchedulesAvailability(List.of(schedule));
 
         UserResponse info = mapper.toResponse(student);
@@ -166,14 +166,14 @@ class UserMapperTest {
 
     @Test
     void givenScheduleList_whenToScheduleResponseList_thenMapsAllFields() {
-        Schedule s = new Schedule( DayOfWeekEnum.FRIDAY, "Seminario", LocalTime.of(14, 0), LocalTime.of(16, 0));
+        Schedule s = new Schedule( DayOfWeekEnum.FRIDAY, "Seminario", LocalTime.of(14, 0), LocalTime.of(15, 30));
         List<ScheduleResponse> result = mapper.toScheduleResponseList(List.of(s));
 
         assertEquals(1, result.size());
         assertEquals("Seminario", result.get(0).getName());
         assertEquals(DayOfWeekEnum.FRIDAY, result.get(0).getDayOfWeek());
         assertEquals(LocalTime.of(14, 0), result.get(0).getStartTime());
-        assertEquals(LocalTime.of(16, 0), result.get(0).getEndTime());
+        assertEquals(LocalTime.of(15, 30), result.get(0).getEndTime());
     }
 
     // ── toTagResponseList ─────────────────────────────────────────

@@ -93,27 +93,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # =========================================
-      # Validate required secret
-      # =========================================
-      - name: Validate SSL secret
-        env:
-          SSL_KEY_STORE_PASSWORD: ${{ secrets.SSL_KEY_STORE_PASSWORD }}
-        run: |
-          if [ -z "$SSL_KEY_STORE_PASSWORD" ]; then
-            echo "ERROR: SSL_KEY_STORE_PASSWORD is empty"
-            exit 1
-          else
-            echo "SSL secret loaded correctly"
-          fi
-
-      # =========================================
       # Validate Docker build
       # =========================================
       - name: Build Docker image
-        env:
-          SSL_KEY_STORE_PASSWORD: ${{ secrets.SSL_KEY_STORE_PASSWORD }}
         run: |
           docker build \
-            --build-arg SSL_KEY_STORE_PASSWORD="$SSL_KEY_STORE_PASSWORD" \
             -t profile-service:ci .

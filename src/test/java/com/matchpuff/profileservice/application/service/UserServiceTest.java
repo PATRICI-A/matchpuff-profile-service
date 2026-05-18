@@ -193,7 +193,7 @@ class UserServiceTest {
 
     @Test
     void givenUserIdAndSchedule_whenAddSchedule_thenReturnsMappedResponseInfo() {
-        Schedule schedule = new Schedule( DayOfWeekEnum.WEDNESDAY, "Algebra", LocalTime.of(12, 0), LocalTime.of(14, 0));
+        Schedule schedule = new Schedule( DayOfWeekEnum.WEDNESDAY, "Algebra", LocalTime.of(12, 0), LocalTime.of(13, 30));
 
         when(userUseCase.addScheduleToStudent(student.getId(), schedule)).thenReturn(student);
         when(userMapper.toResponse(student)).thenReturn(userResponse);
@@ -221,7 +221,7 @@ class UserServiceTest {
 
     @Test
     void givenUserIdAndSchedule_whenRemoveSchedule_thenReturnsMappedResponseInfo() {
-        Schedule schedule = new Schedule(DayOfWeekEnum.WEDNESDAY, "Algebra", LocalTime.of(12, 0), LocalTime.of(14, 0));
+        Schedule schedule = new Schedule(DayOfWeekEnum.WEDNESDAY, "Algebra", LocalTime.of(12, 0), LocalTime.of(13, 30));
 
         when(userUseCase.removeScheduleFromStudent(student.getId(), schedule)).thenReturn(student);
         when(userMapper.toResponse(student)).thenReturn(userResponse);

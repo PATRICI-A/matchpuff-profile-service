@@ -1031,7 +1031,7 @@ El microservicio de **Perfiles** se ejecuta como un contenedor Docker en **Azure
 - **Ejecución:** Contenedor Docker en Azure ECS con imagen almacenada en Amazon ECR.
 - **Base de datos:** **MongoDB** con URI inyectada como variable de entorno `MONGO_URI`.
 - **Almacenamiento de imágenes:** **Cloudinary** con credenciales configuradas por variables de entorno.
-- **HTTPS:** El servicio corre sobre SSL/TLS en el puerto `8443` con un keystore PKCS12.
+- **HTTP:** El servicio expone el puerto `8086` y deja el terminador TLS al ingress/plataforma.
 - **CI/CD (GitHub Actions):**
 	- Pruebas unitarias (JUnit 5) en cada PR a `develop` y `main`.
 	- Despliegue automático a Azure ECS en merges a `main`.
@@ -1404,19 +1404,17 @@ cp .env.example .env
 mvn spring-boot:run
 ```
 
-📍 **URL Local (dev):** `http://localhost:8080` (sin SSL en perfil dev)  
-📍 **URL Local (prod):** `https://localhost:8443` (con SSL habilitado)  
-📚 **Documentación API:** `https://localhost:8443/swagger-ui.html`
+📍 **URL Local:** `http://localhost:8086`  
+📚 **Documentación API:** `http://localhost:8086/swagger-ui.html`
 
 ### 🐳 Opción 2: Ejecución con Docker Compose
 
 ```bash
-# Asegúrate de tener el .env configurado con SSL_KEY_STORE_PASSWORD
 docker compose up --build
 ```
 
 Esto levanta:
-- `profile-service`: La aplicación en el puerto `8443` (HTTPS)
+- `profile-service`: La aplicación en el puerto `8086` (HTTP)
 
 ### ⚙️ Variables de Entorno
 
@@ -1427,8 +1425,7 @@ Esto levanta:
 | `CLOUDINARY_CLOUD_NAME` | *(requerido)* | Cloud name de Cloudinary |
 | `CLOUDINARY_API_KEY` | *(requerido)* | API Key de Cloudinary |
 | `CLOUDINARY_API_SECRET` | *(requerido)* | API Secret de Cloudinary |
-| `SSL_KEY_STORE_PASSWORD` | *(requerido en prod)* | Contraseña del keystore PKCS12 para HTTPS |
-| `SERVER_PORT` | `8443` | Puerto del servidor |
+| `SERVER_PORT` | `8086` | Puerto del servidor |
 | `APP_STARTUP_FAIL_FAST` | `true` | Si la app falla al iniciar cuando no hay conexión a MongoDB |
 
 ## 12. ☁️ CI/CD y Despliegue en Azure

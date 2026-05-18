@@ -140,7 +140,7 @@ class UserRestMapperTest {
         request.setDayOfWeek(DayOfWeekEnum.FRIDAY);
         request.setName("Seminario de Grado");
         request.setStartTime(LocalTime.of(15, 0));
-        request.setEndTime(LocalTime.of(17, 0));
+        request.setEndTime(LocalTime.of(16, 30));
 
         Schedule result = mapper.toDomain(request);
 
@@ -148,7 +148,7 @@ class UserRestMapperTest {
         assertEquals(DayOfWeekEnum.FRIDAY, result.getDayOfWeek());
         assertEquals("Seminario de Grado", result.getName());
         assertEquals(LocalTime.of(15, 0), result.getStartTime());
-        assertEquals(LocalTime.of(17, 0), result.getEndTime());
+        assertEquals(LocalTime.of(16, 30), result.getEndTime());
     }
     
     // ── toDomain(UserAdminRequest) ────────────────────────────────
