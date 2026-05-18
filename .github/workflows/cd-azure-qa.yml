@@ -8,8 +8,8 @@ on:
 env:
   JAVA_VERSION: '21'
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/matchpuff-profile-service
-  CONTAINER_APP_NAME: ${{ secrets.AZURE_CONTAINER_APP_NAME_QA }}
+  IMAGE_NAME: patrici-a/matchpuff-profile-service
+  CONTAINER_APP_NAME: patricia-profile-service-prod
   RESOURCE_GROUP: rg-patricia-prod
 
 jobs:
