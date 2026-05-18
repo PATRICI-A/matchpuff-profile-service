@@ -30,7 +30,13 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-@WebMvcTest(UserController.class)
+@WebMvcTest(controllers = {
+        UserCreationController.class,
+        UserQueryController.class,
+        UserUpdateController.class,
+        UserMediaController.class,
+        UserDeletionController.class
+})
 class UserControllerTest {
 
     @Autowired
