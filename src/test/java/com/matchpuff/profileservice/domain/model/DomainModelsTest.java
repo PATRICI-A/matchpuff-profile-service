@@ -62,7 +62,7 @@ class DomainModelsTest {
         DayOfWeekEnum dayOfWeek = DayOfWeekEnum.WEDNESDAY;
         String name = "Database Class";
         LocalTime startTime = LocalTime.of(10, 0);
-        LocalTime endTime = LocalTime.of(12, 0);
+        LocalTime endTime = LocalTime.of(11, 30);
 
         // When
         Schedule schedule = new Schedule(dayOfWeek, name, startTime, endTime);
@@ -77,7 +77,7 @@ class DomainModelsTest {
     @Test
     void givenSchedule_whenSetters_thenFieldsAreUpdated() {
         // Given
-        Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Class", LocalTime.of(8, 0), LocalTime.of(10, 0));
+        Schedule schedule = new Schedule(DayOfWeekEnum.MONDAY, "Class", LocalTime.of(8, 0), LocalTime.of(9, 30));
 
         // When
         schedule.setDayOfWeek(DayOfWeekEnum.FRIDAY);
@@ -153,8 +153,8 @@ class DomainModelsTest {
     @Test
     void givenScheduleWithDifferentDays_whenCreated_thenEachDayIsPreserved() {
         // When
-        Schedule monday = new Schedule(DayOfWeekEnum.MONDAY, "Class", LocalTime.of(8, 0), LocalTime.of(10, 0));
-        Schedule friday = new Schedule(DayOfWeekEnum.FRIDAY, "Class", LocalTime.of(8, 0), LocalTime.of(10, 0));
+        Schedule monday = new Schedule(DayOfWeekEnum.MONDAY, "Class", LocalTime.of(8, 0), LocalTime.of(9, 30));
+        Schedule friday = new Schedule(DayOfWeekEnum.FRIDAY, "Class", LocalTime.of(8, 0), LocalTime.of(9, 30));
 
         // Then
         assertEquals(DayOfWeekEnum.MONDAY, monday.getDayOfWeek());
@@ -163,18 +163,27 @@ class DomainModelsTest {
     }
 
     @Test
-    void givenSchedule_whenDurationIsMultipleHours_thenTimesAreCorrect() {
+    void givenSchedule_whenDurationIs90Minutes_thenTimesAreCorrect() {
         // When
         Schedule schedule = new Schedule(
             DayOfWeekEnum.TUESDAY,
-            "Long Class",
+            "Class",
             LocalTime.of(8, 30),
-            LocalTime.of(16, 45)
+            LocalTime.of(10, 0)
         );
 
         // Then
         assertTrue(schedule.getEndTime().isAfter(schedule.getStartTime()));
         assertEquals(LocalTime.of(8, 30), schedule.getStartTime());
-        assertEquals(LocalTime.of(16, 45), schedule.getEndTime());
+        assertEquals(LocalTime.of(10, 0), schedule.getEndTime());
+        assertEquals(90, java.time.Duration.between(schedule.getStartTime(), schedule.getEndTime()).toMinutes());
+    }
+
+    @Test
+    void givenSchedule_whenDurationIsNot90Minutes_thenThrowsInvalidInputException() {
+        assertThrows(
+            com.matchpuff.profileservice.domain.exceptions.InvalidInputException.class,
+            () -> new Schedule(DayOfWeekEnum.WEDNESDAY, "Bad Block", LocalTime.of(8, 0), LocalTime.of(10, 0))
+        );
     }
 }

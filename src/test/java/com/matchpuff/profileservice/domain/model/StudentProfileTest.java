@@ -71,7 +71,7 @@ class StudentProfileTest {
 
     @Test
     void givenSchedules_whenSet_thenGetSchedulesReturnsThem() {
-        Schedule schedule = new Schedule( DayOfWeekEnum.MONDAY, "Algoritmos", LocalTime.of(8, 0), LocalTime.of(10, 0));
+        Schedule schedule = new Schedule( DayOfWeekEnum.MONDAY, "Algoritmos", LocalTime.of(8, 0), LocalTime.of(9, 30));
         student.setSchedulesAvailability(List.of(schedule));
         assertEquals(1, student.getSchedulesAvailability().size());
     }

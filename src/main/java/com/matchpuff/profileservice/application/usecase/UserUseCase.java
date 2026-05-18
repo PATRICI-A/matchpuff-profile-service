@@ -164,7 +164,10 @@ public class UserUseCase implements UserUseCasePort {
         if (request.getSemester() != null)      student.setSemester(request.getSemester());
         if (request.getDateOfBirth() != null)  student.setDateOfBirth(request.getDateOfBirth());
         if (request.getTagsId() != null)         student.setTagsId(request.getTagsId());
-        if (request.getSchedulesAvailability() != null)    student.setSchedulesAvailability(request.getSchedulesAvailability());
+        if (request.getSchedulesAvailability() != null) {
+            validateNoOverlapsInList(request.getSchedulesAvailability());
+            student.setSchedulesAvailability(request.getSchedulesAvailability());
+        }
 
         return userRepository.update(userId, student);
     }
@@ -205,6 +208,7 @@ public class UserUseCase implements UserUseCasePort {
         if (!(student.getSchedulesAvailability() instanceof java.util.ArrayList)) {
             student.setSchedulesAvailability(student.getSchedulesAvailability() == null ? new ArrayList<>() : new ArrayList<>(student.getSchedulesAvailability()));
         }
+        validateNoOverlap(schedule, student.getSchedulesAvailability());
         student.getSchedulesAvailability().add(schedule);
         return userRepository.update(userId, student);
     }
@@ -303,6 +307,31 @@ public class UserUseCase implements UserUseCasePort {
         return student;
     }
 
+    private void validateNoOverlap(Schedule newSchedule, List<Schedule> existing) {
+        for (Schedule s : existing) {
+            if (s.getDayOfWeek() == newSchedule.getDayOfWeek()
+                    && s.getStartTime().isBefore(newSchedule.getEndTime())
+                    && newSchedule.getStartTime().isBefore(s.getEndTime())) {
+                throw new InvalidInputException(
+                    "Schedule overlaps with an existing schedule on " + newSchedule.getDayOfWeek());
+            }
+        }
+    }
+
+    private void validateNoOverlapsInList(List<Schedule> schedules) {
+        for (int i = 0; i < schedules.size(); i++) {
+            for (int j = i + 1; j < schedules.size(); j++) {
+                Schedule a = schedules.get(i);
+                Schedule b = schedules.get(j);
+                if (a.getDayOfWeek() == b.getDayOfWeek()
+                        && a.getStartTime().isBefore(b.getEndTime())
+                        && b.getStartTime().isBefore(a.getEndTime())) {
+                    throw new InvalidInputException("Schedules overlap on " + a.getDayOfWeek());
+                }
+            }
+        }
+    }
+
     private void ensureMutableFriendsList(StudentProfile student) {
         if (!(student.getFriendsId() instanceof ArrayList)) {
             student.setFriendsId(student.getFriendsId() == null ? new ArrayList<>() : new ArrayList<>(student.getFriendsId()));
@@ -320,6 +349,9 @@ public class UserUseCase implements UserUseCasePort {
         }
         if (!(student.getTagsId() instanceof java.util.ArrayList)) {
             student.setTagsId(student.getTagsId() == null ? new ArrayList<>() : new ArrayList<>(student.getTagsId()));
+        }
+        if (student.getTagsId().contains(tagId)) {
+            throw new ProfileServiceException("Tag already assigned to this student", HttpStatus.CONFLICT);
         }
         student.getTagsId().add(tagId);
         return userRepository.update(userId, student);
