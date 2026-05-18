@@ -26,6 +26,17 @@ jobs:
     name: "CI – Build & Test"
     runs-on: ubuntu-latest
 
+    services:
+      rabbitmq:
+        image: rabbitmq:3.13
+        ports:
+          - 5672:5672
+        options: >-
+          --health-cmd "rabbitmq-diagnostics ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
 
       # =========================================
@@ -53,6 +64,10 @@ jobs:
         env:
           SPRING_PROFILES_ACTIVE: test
           MONGO_URI: ${{ secrets.MONGO_URI_TEST }}
+          RABBITMQ_HOST: localhost
+          RABBITMQ_PORT: 5672
+          RABBITMQ_USERNAME: guest
+          RABBITMQ_PASSWORD: guest
         run: mvn clean verify -B
 
       # =========================================

@@ -75,4 +75,8 @@ jobs:
               SPRING_DATA_MONGODB_DATABASE=profileservice-qa \
               CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }} \
               CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }} \
-              CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
+              CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }} \
+              RABBITMQ_HOST=${{ secrets.RABBITMQ_HOST }} \
+              RABBITMQ_PORT=${{ secrets.RABBITMQ_PORT }} \
+              RABBITMQ_USERNAME=${{ secrets.RABBITMQ_USERNAME }} \
+              RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }}

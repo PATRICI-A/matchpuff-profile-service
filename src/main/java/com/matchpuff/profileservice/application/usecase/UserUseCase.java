@@ -8,9 +8,11 @@ import com.matchpuff.profileservice.domain.model.CategoryWithTags;
 import com.matchpuff.profileservice.domain.model.Schedule;
 import com.matchpuff.profileservice.domain.model.*;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
+import com.matchpuff.profileservice.domain.ports.out.FriendshipEventPublisherPort;
 import com.matchpuff.profileservice.domain.ports.out.ImageStoragePort;
 import com.matchpuff.profileservice.domain.ports.out.TagCatalogPort;
 import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
+import com.matchpuff.profileservice.application.dto.event.FriendshipCreatedNotificationDto;
 import com.matchpuff.profileservice.application.service.PasswordHashingService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class UserUseCase implements UserUseCasePort {
     private final ImageStoragePort imageStoragePort;
     private final PasswordHashingService passwordHashingService;
     private final TagCatalogPort tagCatalogPort;
+    private final FriendshipEventPublisherPort friendshipEventPublisher;
 
     // ── CREATE ───────────────────────────────────────────────────
 
@@ -268,6 +271,14 @@ public class UserUseCase implements UserUseCasePort {
             userRepository.update(userId, student);
             throw new ProfileServiceException("Could not add friend on the other side. Operation was reverted.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+        friendshipEventPublisher.publishFriendshipCreated(
+                FriendshipCreatedNotificationDto.builder()
+                        .userId1(userId.toString())
+                        .userId2(friendId.toString())
+                        .createdAt(java.time.LocalDateTime.now())
+                        .build()
+        );
 
         return student;
     }
