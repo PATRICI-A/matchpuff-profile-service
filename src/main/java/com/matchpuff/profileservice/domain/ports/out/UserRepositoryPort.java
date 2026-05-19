@@ -19,5 +19,7 @@ public interface UserRepositoryPort {
 
 	List<StudentProfile> findAllStudents();
 
+	List<User> findAllByIds(List<UUID> ids);
+
 }
 

@@ -36,4 +36,6 @@ public interface UserUseCasePort {
     User addFriendToStudent(UUID userId, UUID friendId);
     User removeFriendFromStudent(UUID userId, UUID friendId);
 
+    List<User> getUsersByIds(List<UUID> ids);
+
 }
