@@ -27,6 +27,10 @@ public class StudentProfile extends User {
 
     private List<UUID> friendsId;
 
+    private Integer xp = 0;
+    private Integer level = 1;
+
+    private boolean isActive = false;
 
     public void setBiography(String biography) {
         this.biography = new Biography(biography);

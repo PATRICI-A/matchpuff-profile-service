@@ -1,13 +1,16 @@
 package com.matchpuff.profileservice.entrypoints.rest.controller;
 
+import com.matchpuff.profileservice.application.dto.request.ActiveStatusRequest;
 import com.matchpuff.profileservice.application.dto.request.ChangePasswordRequest;
 import com.matchpuff.profileservice.application.dto.request.FriendRequest;
 import com.matchpuff.profileservice.application.dto.request.GeolocationRequest;
+import com.matchpuff.profileservice.application.dto.request.LevelUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.ScheduleRequest;
 import com.matchpuff.profileservice.application.dto.request.TagRequest;
 import com.matchpuff.profileservice.application.dto.request.UserAdminUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserOrganizerUpdateRequest;
 import com.matchpuff.profileservice.application.dto.request.UserStudentUpdateRequest;
+import com.matchpuff.profileservice.application.dto.request.XpUpdateRequest;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.mapper.UserMapper;
 import com.matchpuff.profileservice.application.service.UserServicePort;
@@ -141,5 +144,35 @@ public class UserUpdateController {
             @PathVariable UUID userId,
             @Valid @RequestBody GeolocationRequest request) {
         return ResponseEntity.ok(userService.updateGeolocation(userId, request.isGeolocationEnabled()));
+    }
+
+    @PatchMapping("/{userId}/xp")
+    @Tag(name = "User Profiles", description = "Manage user profiles and content")
+    @Operation(summary = "Set the XP of a student")
+    @ApiResponse(responseCode = "200", description = "XP updated successfully")
+    public ResponseEntity<UserResponse> updateXp(
+            @PathVariable UUID userId,
+            @Valid @RequestBody XpUpdateRequest request) {
+        return ResponseEntity.ok(userService.updateXp(userId, request.getXp()));
+    }
+
+    @PatchMapping("/{userId}/level")
+    @Tag(name = "User Profiles", description = "Manage user profiles and content")
+    @Operation(summary = "Set the level of a student")
+    @ApiResponse(responseCode = "200", description = "Level updated successfully")
+    public ResponseEntity<UserResponse> updateLevel(
+            @PathVariable UUID userId,
+            @Valid @RequestBody LevelUpdateRequest request) {
+        return ResponseEntity.ok(userService.updateLevel(userId, request.getLevel()));
+    }
+
+    @PatchMapping("/{userId}/active")
+    @Tag(name = "User Profiles", description = "Manage user profiles and content")
+    @Operation(summary = "Set the active status of a student")
+    @ApiResponse(responseCode = "200", description = "Active status updated successfully")
+    public ResponseEntity<UserResponse> updateActiveStatus(
+            @PathVariable UUID userId,
+            @Valid @RequestBody ActiveStatusRequest request) {
+        return ResponseEntity.ok(userService.updateActiveStatus(userId, request.getActive()));
     }
 }

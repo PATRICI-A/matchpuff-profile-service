@@ -422,6 +422,36 @@ public class UserUseCase implements UserUseCasePort {
         return userRepository.findAllByIds(ids);
     }
 
+    @Override
+    public User updateXp(UUID userId, int xp) {
+        User user = findOrThrow(userId);
+        if (!(user instanceof StudentProfile student)) {
+            throw new ProfileServiceException("Only STUDENT users have XP", HttpStatus.BAD_REQUEST);
+        }
+        student.setXp(xp);
+        return userRepository.update(userId, student);
+    }
+
+    @Override
+    public User updateLevel(UUID userId, int level) {
+        User user = findOrThrow(userId);
+        if (!(user instanceof StudentProfile student)) {
+            throw new ProfileServiceException("Only STUDENT users have levels", HttpStatus.BAD_REQUEST);
+        }
+        student.setLevel(level);
+        return userRepository.update(userId, student);
+    }
+
+    @Override
+    public User updateActiveStatus(UUID userId, boolean active) {
+        User user = findOrThrow(userId);
+        if (!(user instanceof StudentProfile student)) {
+            throw new ProfileServiceException("Only STUDENT users have active status", HttpStatus.BAD_REQUEST);
+        }
+        student.setActive(active);
+        return userRepository.update(userId, student);
+    }
+
     // ── Helpers ──────────────────────────────────────────────────
 
     private void hashPasswordIfPresent(User user) {
