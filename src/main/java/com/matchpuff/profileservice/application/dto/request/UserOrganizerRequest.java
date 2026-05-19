@@ -18,8 +18,11 @@ public class UserOrganizerRequest {
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 8, max = 100, message = "Password must be at least 8 characters long")
-    @Schema(example = "TestPassword123")
+    @Pattern(
+        regexp = "^(?=.*[A-Z])(?=.*[!@#$,.]).{8,100}$",
+        message = "Password must be at least 8 characters, contain at least one uppercase letter and one of: !@#$,."
+    )
+    @Schema(example = "TestPassword1!")
     private String password;
 
     @NotNull(message = "Gender is required")

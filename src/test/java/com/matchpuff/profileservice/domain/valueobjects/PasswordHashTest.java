@@ -9,8 +9,8 @@ class PasswordHashTest {
 
     @Test
     void givenValidPassword_whenCreated_thenGetValueReturnsIt() {
-        PasswordHash pw = new PasswordHash("TestPassword123");
-        assertEquals("TestPassword123", pw.getValue());
+        PasswordHash pw = new PasswordHash("Test.Password123");
+        assertEquals("Test.Password123", pw.getValue());
     }
 
     @Test
@@ -30,7 +30,7 @@ class PasswordHashTest {
 
     @Test
     void givenPasswordWithExactly8CharsAndUppercase_whenCreated_thenNoException() {
-        PasswordHash pw = new PasswordHash("Abcde123");
-        assertEquals("Abcde123", pw.getValue());
+        PasswordHash pw = new PasswordHash("Ab.cde123");
+        assertEquals("Ab.cde123", pw.getValue());
     }
 }

@@ -1,7 +1,7 @@
 package com.matchpuff.profileservice.application.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
@@ -11,6 +11,9 @@ public class ChangePasswordRequest {
     private String currentPassword;
 
     @NotBlank(message = "New password must not be blank")
-    @Size(min = 8, max = 100, message = "Password must be at least 8 characters long and at least one uppercase letter")
+    @Pattern(
+        regexp = "^(?=.*[A-Z])(?=.*[!@#$,.]).{8,100}$",
+        message = "Password must be at least 8 characters, contain at least one uppercase letter and one of: !@#$,."
+    )
     private String newPassword;
 }

@@ -41,7 +41,7 @@ class UserMapperTest {
         s.setId(UUID.randomUUID());
         s.setName("Test User");
         s.setEmail("test@escuelaing.edu.co");
-        s.setPasswordHash("HashedPassword123");
+        s.setPasswordHash("Hashed.Password123");
         s.setGender(GenderEnum.MALE);
         s.setDateOfBirth(LocalDate.of(2000, 1, 1));
         s.setCreatedAt(LocalDateTime.now());
@@ -69,7 +69,7 @@ class UserMapperTest {
         doc.setId(UUID.randomUUID());
         doc.setName("Test User");
         doc.setEmail("test@escuelaing.edu.co");
-        doc.setPasswordHash("HashedPassword123");
+        doc.setPasswordHash("Hashed.Password123");
         doc.setGender(GenderEnum.MALE);
         doc.setBirthdate(LocalDateTime.of(2000, 1, 1, 0, 0));
         doc.setCreatedAt(LocalDateTime.now());
@@ -264,7 +264,7 @@ class UserMapperTest {
         admin.setId(UUID.randomUUID());
         admin.setName("Admin User");
         admin.setEmail("admin@escuelaing.edu.co");
-        admin.setPasswordHash("HashedPass123");
+        admin.setPasswordHash("Hashed.Pass123");
         admin.setGender(GenderEnum.MALE);
 
         AdminProfileDocument result = mapper.toDocument(admin);
@@ -286,7 +286,7 @@ class UserMapperTest {
         doc.setId(UUID.randomUUID());
         doc.setName("Admin User");
         doc.setEmail("admin@escuelaing.edu.co");
-        doc.setPasswordHash("HashedPass123");
+        doc.setPasswordHash("Hashed.Pass123");
         doc.setGender(GenderEnum.MALE);
 
         Admin result = mapper.toDomain(doc);
@@ -312,7 +312,7 @@ class UserMapperTest {
         organizer.setId(UUID.randomUUID());
         organizer.setName("Club Org");
         organizer.setEmail("org@escuelaing.edu.co");
-        organizer.setPasswordHash("HashedPass123");
+        organizer.setPasswordHash("Hashed.Pass123");
         organizer.setGender(GenderEnum.FEMALE);
         organizer.setContactInfo("contact@evento.co");
 

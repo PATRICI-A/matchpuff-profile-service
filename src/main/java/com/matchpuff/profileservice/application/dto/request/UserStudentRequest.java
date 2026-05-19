@@ -23,9 +23,12 @@ public class UserStudentRequest {
     @Schema(example = "usuario@mail.escuelaing.edu.co")
     private String email;
 
-    @Size(min = 8, max = 100, message = "Password must be at least 8 characters long")
     @NotBlank(message = "Password is required")
-    @Schema(example = "TestPassword123")
+    @Pattern(
+        regexp = "^(?=.*[A-Z])(?=.*[!@#$,.]).{8,100}$",
+        message = "Password must be at least 8 characters, contain at least one uppercase letter and one of: !@#$,."
+    )
+    @Schema(example = "TestPassword1!")
     private String password;
 
     @NotNull(message = "Gender is required")
