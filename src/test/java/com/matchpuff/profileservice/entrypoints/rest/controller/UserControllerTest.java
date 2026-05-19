@@ -2,6 +2,7 @@ package com.matchpuff.profileservice.entrypoints.rest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.matchpuff.profileservice.application.dto.response.BatchProfileResponse;
 import com.matchpuff.profileservice.application.dto.request.UserAdminUpdateRequest;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.mapper.UserMapper;
@@ -79,7 +80,7 @@ class UserControllerTest {
         return """
                 {
                   "name": "Test User",
-                  "email": "test@escuelaing.edu.co",
+                  "email": "test@mail.escuelaing.edu.co",
                   "password": "TestPassword123",
                   "gender": "MALE",
                   "career": "SYSTEMS_ENGINEERING",
@@ -228,6 +229,29 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id").value(mockUserResponseInfo.getId().toString()));
+    }
+
+    @Test
+    @WithMockUser
+    void givenValidBatchRequest_whenGetUsersByIds_thenReturns200WithProfiles() throws Exception {
+        UUID userId = mockUserResponseInfo.getId();
+        when(userService.getUsersByIds(List.of(userId))).thenReturn(List.of(
+                new BatchProfileResponse(userId, "Test User", "test@escuelaing.edu.co", "Bio", "http://photo.jpg")
+        ));
+
+        String batchJson = String.format("""
+                {
+                  "ids": ["%s"]
+                }
+                """, userId);
+
+        mockMvc.perform(post("/api/v1/users/batch")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(batchJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(userId.toString()))
+                .andExpect(jsonPath("$[0].name").value("Test User"));
     }
 
     @Test

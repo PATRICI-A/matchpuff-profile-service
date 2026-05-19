@@ -1,15 +1,20 @@
 package com.matchpuff.profileservice.entrypoints.rest.controller;
 
+import com.matchpuff.profileservice.application.dto.request.BatchProfileRequest;
 import com.matchpuff.profileservice.application.dto.response.CategoryWithTagsResponse;
+import com.matchpuff.profileservice.application.dto.response.BatchProfileResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.service.UserServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -76,6 +81,15 @@ public class UserQueryController {
     @ApiResponse(responseCode = "200", description = "Users retrieved successfully")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @PostMapping("/batch")
+    @Tag(name = "Users - Reading", description = "Obtain information about users")
+    @Operation(summary = "Obtain multiple user profiles by IDs")
+    @ApiResponse(responseCode = "200", description = "User profiles retrieved successfully")
+    public ResponseEntity<List<BatchProfileResponse>> getUsersByIds(
+            @Valid @RequestBody BatchProfileRequest request) {
+        return ResponseEntity.ok(userService.getUsersByIds(request.getIds()));
     }
 
     @GetMapping("/tags/catalog")

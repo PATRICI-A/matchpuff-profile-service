@@ -115,6 +115,13 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 .toList();
     }
 
+    @Override
+    public List<User> findAllByIds(List<UUID> ids) {
+        return userRepository.findAllById(ids).stream()
+                .flatMap(doc -> userMapper.toDomainByType(doc).stream())
+                .toList();
+    }
+
     private void mailExistsForException(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new InvalidInputException("The email is already in use by another user.");

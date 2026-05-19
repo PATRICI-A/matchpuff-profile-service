@@ -19,8 +19,8 @@ public class UserStudentRequest {
 
     @Email
     @NotBlank(message = "Email is required")
-    @Pattern(regexp = ".*@(mail\\.)?escuelaing\\.edu\\.co$")
-    @Schema(example = "usuario@escuelaing.edu.co")
+    @Pattern(regexp = "^[^@]+@mail\\.escuelaing\\.edu\\.co$", message = "Email must be a valid @mail.escuelaing.edu.co address")
+    @Schema(example = "usuario@mail.escuelaing.edu.co")
     private String email;
 
     @Size(min = 8, max = 100, message = "Password must be at least 8 characters long")
