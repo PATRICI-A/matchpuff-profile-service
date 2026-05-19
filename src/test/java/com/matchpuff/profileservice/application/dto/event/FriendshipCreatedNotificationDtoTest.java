@@ -21,6 +21,7 @@ class FriendshipCreatedNotificationDtoTest {
         assertEquals("userA", dto.getUserId1());
         assertEquals("userB", dto.getUserId2());
         assertEquals(createdAt, dto.getCreatedAt());
+        assertNotNull(dto.toString());
     }
 
     @Test
