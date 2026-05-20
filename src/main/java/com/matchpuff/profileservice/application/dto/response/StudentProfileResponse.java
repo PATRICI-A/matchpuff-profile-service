@@ -24,5 +24,8 @@ public class StudentProfileResponse extends UserResponse {
     private boolean geolocationEnabled;
     private List<ScheduleResponse> schedules;
     private List<TagResponse> tags;
+    private Integer xp;
+    private Integer level;
+    private boolean active;
 
 }

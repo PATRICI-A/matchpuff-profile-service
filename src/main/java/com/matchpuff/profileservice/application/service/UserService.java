@@ -164,4 +164,22 @@ public class UserService implements UserServicePort {
                 ))
                 .toList();
     }
+
+    @Override
+    public UserResponse updateXp(UUID userId, int xp) {
+        User updated = userUseCase.updateXp(userId, xp);
+        return userMapper.toResponse(updated);
+    }
+
+    @Override
+    public UserResponse updateLevel(UUID userId, int level) {
+        User updated = userUseCase.updateLevel(userId, level);
+        return userMapper.toResponse(updated);
+    }
+
+    @Override
+    public UserResponse updateActiveStatus(UUID userId, boolean active) {
+        User updated = userUseCase.updateActiveStatus(userId, active);
+        return userMapper.toResponse(updated);
+    }
 }

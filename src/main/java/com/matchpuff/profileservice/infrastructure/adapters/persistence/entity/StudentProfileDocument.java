@@ -53,4 +53,13 @@ public class StudentProfileDocument extends UserDocument {
     @Field("friendsId")
     private List<UUID> friendsId;
 
+    @Field("xp")
+    private Integer xp;
+
+    @Field("level")
+    private Integer level;
+
+    @Field("isActive")
+    private boolean isActive;
+
 }

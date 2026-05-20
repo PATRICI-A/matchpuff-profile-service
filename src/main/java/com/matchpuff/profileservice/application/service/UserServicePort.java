@@ -43,5 +43,9 @@ public interface UserServicePort {
 
     List<BatchProfileResponse> getUsersByIds(List<UUID> ids);
 
+    UserResponse updateXp(UUID userId, int xp);
+    UserResponse updateLevel(UUID userId, int level);
+    UserResponse updateActiveStatus(UUID userId, boolean active);
+
 }
 

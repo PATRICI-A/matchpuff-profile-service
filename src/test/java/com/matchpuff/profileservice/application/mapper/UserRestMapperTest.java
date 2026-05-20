@@ -41,7 +41,7 @@ class UserRestMapperTest {
         UserStudentRequest request = new UserStudentRequest();
         request.setName("Juan Diaz");
         request.setEmail("juan@escuelaing.edu.co");
-        request.setPassword("TestPassword123");
+        request.setPassword("Test.Password123");
         request.setGender(GenderEnum.MALE);
         request.setCareer(CareerEnum.COMPUTER_SCIENCE);
         request.setSemester(6);
@@ -83,7 +83,7 @@ class UserRestMapperTest {
         UserStudentRequest request = new UserStudentRequest();
         request.setName("Test User");
         request.setEmail("test@escuelaing.edu.co");
-        request.setPassword("TestPassword123");
+        request.setPassword("Test.Password123");
         request.setGender(GenderEnum.MALE);
         request.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         request.setPhotourl("http://photo.jpg");
@@ -100,7 +100,7 @@ class UserRestMapperTest {
         UserStudentRequest request = new UserStudentRequest();
         request.setName("Test User");
         request.setEmail("test@escuelaing.edu.co");
-        request.setPassword("TestPassword123");
+        request.setPassword("Test.Password123");
         request.setGender(GenderEnum.MALE);
         request.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         request.setPhotourl("http://photo.jpg");
@@ -116,7 +116,7 @@ class UserRestMapperTest {
         UserStudentRequest request = new UserStudentRequest();
         request.setName("Test User");
         request.setEmail("test@escuelaing.edu.co");
-        request.setPassword("TestPassword123");
+        request.setPassword("Test.Password123");
         request.setGender(GenderEnum.MALE);
         request.setCareer(CareerEnum.SYSTEMS_ENGINEERING);
         request.setPhotourl("http://photo.jpg");
@@ -163,7 +163,7 @@ class UserRestMapperTest {
         UserAdminRequest request = new UserAdminRequest();
         request.setName("Admin User");
         request.setEmail("admin@escuelaing.edu.co");
-        request.setPassword("AdminPass123");
+        request.setPassword("Admin.Pass123");
         request.setGender(GenderEnum.MALE);
 
         Admin result = mapper.toDomain(request);
@@ -171,7 +171,7 @@ class UserRestMapperTest {
         assertNotNull(result);
         assertEquals("Admin User", result.getName());
         assertEquals("admin@escuelaing.edu.co", result.getEmail());
-        assertEquals("AdminPass123", result.getPasswordHash());
+        assertEquals("Admin.Pass123", result.getPasswordHash());
         assertEquals(GenderEnum.MALE, result.getGender());
     }
 
@@ -209,7 +209,7 @@ class UserRestMapperTest {
         UserOrganizerRequest request = new UserOrganizerRequest();
         request.setName("Event Org");
         request.setEmail("org@escuelaing.edu.co");
-        request.setPassword("OrgPass123");
+        request.setPassword("Org.Pass123");
         request.setGender(GenderEnum.FEMALE);
         request.setContactInfo("contact@evento.co");
 
@@ -218,7 +218,7 @@ class UserRestMapperTest {
         assertNotNull(result);
         assertEquals("Event Org", result.getName());
         assertEquals("org@escuelaing.edu.co", result.getEmail());
-        assertEquals("OrgPass123", result.getPasswordHash());
+        assertEquals("Org.Pass123", result.getPasswordHash());
         assertEquals("contact@evento.co", result.getContactInfo());
     }
 

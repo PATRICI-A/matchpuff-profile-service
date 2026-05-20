@@ -38,4 +38,8 @@ public interface UserUseCasePort {
 
     List<User> getUsersByIds(List<UUID> ids);
 
+    User updateXp(UUID userId, int xp);
+    User updateLevel(UUID userId, int level);
+    User updateActiveStatus(UUID userId, boolean active);
+
 }
