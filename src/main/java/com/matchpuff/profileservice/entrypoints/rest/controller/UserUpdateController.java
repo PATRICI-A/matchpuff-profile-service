@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +36,7 @@ public class UserUpdateController {
     private final UserServicePort userService;
     private final UserMapper userRestMapper;
 
-    @PatchMapping("/{userId}/friends")
+    @PostMapping("/{userId}/friends")
     @Tag(name = "User Profiles", description = "Manage user profiles and content")
     @Operation(summary = "Add a friend to the student user")
     @ApiResponse(responseCode = "200", description = "Friend added successfully")
