@@ -12,7 +12,7 @@ import com.matchpuff.profileservice.domain.ports.out.FriendshipEventPublisherPor
 import com.matchpuff.profileservice.domain.ports.out.ImageStoragePort;
 import com.matchpuff.profileservice.domain.ports.out.TagCatalogPort;
 import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
-import com.matchpuff.profileservice.application.dto.event.FriendshipCreatedNotificationDto;
+import com.matchpuff.profileservice.application.dto.event.FriendshipCreatedEventDto;
 import com.matchpuff.profileservice.application.service.PasswordHashingService;
 
 import lombok.RequiredArgsConstructor;
@@ -279,13 +279,7 @@ public class UserUseCase implements UserUseCasePort {
             throw new ProfileServiceException("Could not add friend on the other side. Operation was reverted.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        friendshipEventPublisher.publishFriendshipCreated(
-                FriendshipCreatedNotificationDto.builder()
-                        .userId1(userId.toString())
-                        .userId2(friendId.toString())
-                        .createdAt(java.time.LocalDateTime.now())
-                        .build()
-        );
+        friendshipEventPublisher.publishFriendshipCreated(userId, friendId);
 
         return student;
     }
