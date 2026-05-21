@@ -1,6 +1,5 @@
 package com.matchpuff.profileservice.application.usecase;
 
-import com.matchpuff.profileservice.application.dto.event.FriendshipCreatedEventDto;
 import com.matchpuff.profileservice.application.service.PasswordHashingService;
 import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
 import com.matchpuff.profileservice.domain.exceptions.ProfileServiceException;
@@ -171,11 +170,11 @@ class UserUseCaseFriendsAndTagsTest {
         when(userRepository.findById(a)).thenReturn(Optional.of(student));
         when(userRepository.update(any(UUID.class), any())).thenReturn(null);
 
-        User result = useCase.addFriendToStudent(a, b);
+        useCase.addFriendToStudent(a, b);
 
         assertTrue(student.getFriendsId().contains(b));
         assertTrue(friend.getFriendsId().contains(a));
-        verify(friendshipEventPublisher).publishFriendshipCreated(any(FriendshipCreatedEventDto.class));
+        verify(friendshipEventPublisher).publishFriendshipCreated(any(UUID.class), any(UUID.class));
     }
 
     @Test
@@ -203,7 +202,7 @@ class UserUseCaseFriendsAndTagsTest {
         when(userRepository.findById(b)).thenReturn(Optional.of(friend));
         when(userRepository.update(any(UUID.class), any())).thenReturn(null);
 
-        User result = useCase.removeFriendFromStudent(a, b);
+        useCase.removeFriendFromStudent(a, b);
         assertFalse(student.getFriendsId().contains(b));
     }
 }
