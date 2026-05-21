@@ -10,10 +10,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import com.matchpuff.profileservice.application.dto.request.ResetPasswordRequest;
 import com.matchpuff.profileservice.application.dto.response.UserAuthResponse;
 import com.matchpuff.profileservice.application.dto.response.UserMatchProfileDto;
 import com.matchpuff.profileservice.application.service.InternalUserServicePort;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 
@@ -51,6 +53,17 @@ public class InternalUserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/users/{userId}/password")
+    @Tag(name = "Users - Update", description = "Update user information")
+    @Operation(summary = "Reset user password (forgot password flow)")
+    @ApiResponse(responseCode = "204", description = "Password updated successfully")
+    public ResponseEntity<Void> resetPassword(
+            @PathVariable UUID userId,
+            @Valid @RequestBody ResetPasswordRequest request) {
+        internalUserService.resetPassword(userId, request.getNewPassword());
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/matching/profiles/{id}")
     @Tag(name = "Users - Reading", description = "Obtain information about users")
     @Operation(summary = "Obtain user profile for matching by ID")
@@ -64,6 +77,7 @@ public class InternalUserController {
     @GetMapping("/matching/profiles")
     @Tag(name = "Users - Reading", description = "Obtain information about users")
     @Operation(summary = "Obtain all user profiles for matching")
+    @ApiResponse(responseCode = "200", description = "User profiles retrieved successfully")
     public List<UserMatchProfileDto> getAllProfilesForMatching() {
         return internalUserService.getAllProfilesForMatching();
     }

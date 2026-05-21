@@ -141,6 +141,13 @@ public class UserUseCase implements UserUseCasePort {
     }
 
     @Override
+    public void resetPassword(UUID userId, String newPassword) {
+        User user = findOrThrow(userId);
+        user.setPasswordHash(passwordHashingService.hashPassword(newPassword));
+        userRepository.update(userId, user);
+    }
+
+    @Override
     public void changePassword(UUID userId, String currentPassword, String newPassword) {
         User user = findOrThrow(userId);
 

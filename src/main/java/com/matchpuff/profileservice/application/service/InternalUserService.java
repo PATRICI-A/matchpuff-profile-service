@@ -40,6 +40,11 @@ public class InternalUserService implements InternalUserServicePort {
     }
 
     @Override
+    public void resetPassword(UUID userId, String newPassword) {
+        userUseCase.resetPassword(userId, newPassword);
+    }
+
+    @Override
     public UserMatchProfileDto getProfileForMatching(UUID id) {
         UserMatchProfileResponse resp = userMapper.toUserMatchProfileResponseFromUser(userUseCase.getUser(id));
         if (resp == null) {
