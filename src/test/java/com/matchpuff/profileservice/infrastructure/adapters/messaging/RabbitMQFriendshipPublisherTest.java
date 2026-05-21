@@ -1,6 +1,6 @@
 package com.matchpuff.profileservice.infrastructure.adapters.messaging;
 
-import com.matchpuff.profileservice.application.dto.event.FriendshipCreatedNotificationDto;
+import com.matchpuff.profileservice.application.dto.event.FriendshipCreatedEventDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -28,7 +28,7 @@ class RabbitMQFriendshipPublisherTest {
 
     @Test
     void publishFriendshipCreated_callsRabbitTemplateWithCorrectArgs() {
-        FriendshipCreatedNotificationDto event = FriendshipCreatedNotificationDto.builder()
+        FriendshipCreatedEventDto event = FriendshipCreatedEventDto.builder()
                 .userId1("x")
                 .userId2("y")
                 .createdAt(LocalDateTime.now())

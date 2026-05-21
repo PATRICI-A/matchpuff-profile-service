@@ -1,8 +1,8 @@
 package com.matchpuff.profileservice.domain.ports.out;
 
-import com.matchpuff.profileservice.application.dto.event.FriendshipCreatedNotificationDto;
+import java.util.UUID;
 
 public interface FriendshipEventPublisherPort {
 
-    void publishFriendshipCreated(FriendshipCreatedNotificationDto event);
+    void publishFriendshipCreated(UUID userId1, UUID userId2);
 }

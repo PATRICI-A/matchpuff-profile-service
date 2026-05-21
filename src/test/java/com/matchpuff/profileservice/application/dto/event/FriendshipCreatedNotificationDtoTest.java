@@ -12,7 +12,7 @@ class FriendshipCreatedNotificationDtoTest {
     void builderAndGetters_workCorrectly() {
         LocalDateTime createdAt = LocalDateTime.of(2023, 1, 2, 3, 4, 5);
 
-        FriendshipCreatedNotificationDto dto = FriendshipCreatedNotificationDto.builder()
+        FriendshipCreatedEventDto dto = FriendshipCreatedEventDto.builder()
                 .userId1("userA")
                 .userId2("userB")
                 .createdAt(createdAt)
@@ -28,7 +28,7 @@ class FriendshipCreatedNotificationDtoTest {
     void noArgsConstructorAndSetters_workCorrectly() {
         LocalDateTime createdAt = LocalDateTime.of(2024, 6, 7, 8, 9, 10);
 
-        FriendshipCreatedNotificationDto dto = new FriendshipCreatedNotificationDto();
+        FriendshipCreatedEventDto dto = new FriendshipCreatedEventDto();
         dto.setUserId1("u1");
         dto.setUserId2("u2");
         dto.setCreatedAt(createdAt);
@@ -42,9 +42,9 @@ class FriendshipCreatedNotificationDtoTest {
     void equalsAndHashCode_considerAllFields() {
         LocalDateTime createdAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59);
 
-        FriendshipCreatedNotificationDto a = new FriendshipCreatedNotificationDto("x", "y", createdAt);
-        FriendshipCreatedNotificationDto b = new FriendshipCreatedNotificationDto("x", "y", createdAt);
-        FriendshipCreatedNotificationDto c = new FriendshipCreatedNotificationDto("x", "z", createdAt);
+        FriendshipCreatedEventDto a = new FriendshipCreatedEventDto("x", "y", createdAt);
+        FriendshipCreatedEventDto b = new FriendshipCreatedEventDto("x", "y", createdAt);
+        FriendshipCreatedEventDto c = new FriendshipCreatedEventDto("x", "z", createdAt);
 
         assertEquals(a, b);
         assertEquals(a.hashCode(), b.hashCode());
@@ -54,7 +54,7 @@ class FriendshipCreatedNotificationDtoTest {
 
     @Test
     void toString_containsFieldValues() {
-        FriendshipCreatedNotificationDto dto = FriendshipCreatedNotificationDto.builder()
+        FriendshipCreatedEventDto dto = FriendshipCreatedEventDto.builder()
                 .userId1("alpha")
                 .userId2("beta")
                 .createdAt(LocalDateTime.of(2022, 2, 2, 2, 2))

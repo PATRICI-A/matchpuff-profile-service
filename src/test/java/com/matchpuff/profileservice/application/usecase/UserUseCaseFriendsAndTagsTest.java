@@ -1,6 +1,6 @@
 package com.matchpuff.profileservice.application.usecase;
 
-import com.matchpuff.profileservice.application.dto.event.FriendshipCreatedNotificationDto;
+import com.matchpuff.profileservice.application.dto.event.FriendshipCreatedEventDto;
 import com.matchpuff.profileservice.application.service.PasswordHashingService;
 import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
 import com.matchpuff.profileservice.domain.exceptions.ProfileServiceException;
@@ -175,7 +175,7 @@ class UserUseCaseFriendsAndTagsTest {
 
         assertTrue(student.getFriendsId().contains(b));
         assertTrue(friend.getFriendsId().contains(a));
-        verify(friendshipEventPublisher).publishFriendshipCreated(any(FriendshipCreatedNotificationDto.class));
+        verify(friendshipEventPublisher).publishFriendshipCreated(any(FriendshipCreatedEventDto.class));
     }
 
     @Test
