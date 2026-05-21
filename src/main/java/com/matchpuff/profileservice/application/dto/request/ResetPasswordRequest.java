@@ -5,10 +5,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
-public class ChangePasswordRequest {
-
-    @NotBlank(message = "Current password must not be blank")
-    private String currentPassword;
+public class ResetPasswordRequest {
 
     @NotBlank(message = "New password must not be blank")
     @Pattern(

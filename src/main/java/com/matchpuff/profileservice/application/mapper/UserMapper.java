@@ -41,6 +41,7 @@ public interface UserMapper {
     @Mapping(target = "userType", constant = "STUDENT")
     @Mapping(target = "tags", source = "tagsId")
     @Mapping(target = "schedules", source = "schedulesAvailability")
+    @Mapping(target = "active", expression = "java(student.isActive())")
     StudentProfileResponse toStudentResponse(StudentProfile student);
 
     @Mapping(target = "userType", constant = "ORGANIZER")
@@ -91,6 +92,10 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "verified", ignore = true)
+    @Mapping(target = "friendsId", ignore = true)
+    @Mapping(target = "xp", ignore = true)
+    @Mapping(target = "level", ignore = true)
+    @Mapping(target = "active", ignore = true)
     StudentProfile toDomain(UserStudentRequest request);
 
     @Mapping(target = "passwordHash", source = "password")
@@ -129,6 +134,10 @@ public interface UserMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "verified", ignore = true)
     @Mapping(target = "geolocationEnabled", ignore = true)
+    @Mapping(target = "friendsId", ignore = true)
+    @Mapping(target = "xp", ignore = true)
+    @Mapping(target = "level", ignore = true)
+    @Mapping(target = "active", ignore = true)
     StudentProfile toDomain(UserStudentUpdateRequest request);
 
     default Schedule toDomain(ScheduleRequest request) {

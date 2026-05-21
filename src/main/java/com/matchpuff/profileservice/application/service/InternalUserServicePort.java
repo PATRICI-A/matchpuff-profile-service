@@ -11,6 +11,7 @@ public interface InternalUserServicePort {
     UserAuthResponse getUser(UUID userId);
     UserAuthResponse getUserByEmail(String email);
     void verifyUser(UUID userId);
+    void resetPassword(UUID userId, String newPassword);
     UserMatchProfileDto getProfileForMatching(UUID id);
     List<UserMatchProfileDto> getAllProfilesForMatching();
 }

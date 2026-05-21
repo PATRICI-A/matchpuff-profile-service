@@ -2,6 +2,7 @@ package com.matchpuff.profileservice.entrypoints.rest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.matchpuff.profileservice.application.dto.response.BatchProfileResponse;
 import com.matchpuff.profileservice.application.dto.request.UserAdminUpdateRequest;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
 import com.matchpuff.profileservice.application.mapper.UserMapper;
@@ -30,7 +31,13 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-@WebMvcTest(UserController.class)
+@WebMvcTest(controllers = {
+        UserCreationController.class,
+        UserQueryController.class,
+        UserUpdateController.class,
+        UserMediaController.class,
+        UserDeletionController.class
+})
 class UserControllerTest {
 
     @Autowired
@@ -73,8 +80,8 @@ class UserControllerTest {
         return """
                 {
                   "name": "Test User",
-                  "email": "test@escuelaing.edu.co",
-                  "password": "TestPassword123",
+                  "email": "test@mail.escuelaing.edu.co",
+                  "password": "Test@ssword123",
                   "gender": "MALE",
                   "career": "SYSTEMS_ENGINEERING",
                   "semester": 5,
@@ -200,7 +207,7 @@ class UserControllerTest {
         String passwordJson = """
                 {
                   "currentPassword": "CurrentPassword123",
-                  "newPassword": "NewPassword123"
+                  "newPassword": "New.Password123"
                 }
                 """;
 
@@ -222,6 +229,29 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id").value(mockUserResponseInfo.getId().toString()));
+    }
+
+    @Test
+    @WithMockUser
+    void givenValidBatchRequest_whenGetUsersByIds_thenReturns200WithProfiles() throws Exception {
+        UUID userId = mockUserResponseInfo.getId();
+        when(userService.getUsersByIds(List.of(userId))).thenReturn(List.of(
+                new BatchProfileResponse(userId, "Test User", "test@escuelaing.edu.co", "Bio", "http://photo.jpg")
+        ));
+
+        String batchJson = String.format("""
+                {
+                  "ids": ["%s"]
+                }
+                """, userId);
+
+        mockMvc.perform(post("/api/v1/users/batch")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(batchJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(userId.toString()))
+                .andExpect(jsonPath("$[0].name").value("Test User"));
     }
 
     @Test
@@ -358,7 +388,7 @@ class UserControllerTest {
                                                                 {
                                                                         "name": "Admin User",
                                                                         "email": "admin@escuelaing.edu.co",
-                                                                        "password": "AdminPass123",
+                                                                        "password": "AdminP@ass123",
                                                                         "gender": "MALE"
                                                                 }
                                                                 """;
@@ -382,7 +412,7 @@ class UserControllerTest {
                                                                 {
                                                                         "name": "Org User",
                                                                         "email": "org@escuelaing.edu.co",
-                                                                        "password": "OrgPass123",
+                                                                        "password": "Org@ass123",
                                                                         "gender": "MALE",
                                                                         "contactInfo": "contact"
                                                                 }

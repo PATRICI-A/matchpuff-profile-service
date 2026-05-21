@@ -34,5 +34,8 @@ public abstract class UserDocument {
     
     @Field("userType")
     private UserType userType;
+
+    @Field("verified")
+    private boolean verified = false;
     
 }

@@ -29,17 +29,20 @@ public interface UserPersistenceMapper {
     @Mapping(target = "scheduleAvailability", source = "schedulesAvailability", defaultExpression = "java(new java.util.ArrayList<>())")
     @Mapping(target = "tagsId", source = "tagsId")
     @Mapping(target = "friendsId", source = "friendsId")
+    @Mapping(target = "verified", source = "verified")
     StudentProfileDocument toDocument(StudentProfile profile);
 
     @Mapping(target = "id", expression = "java(admin.getId() != null ? admin.getId() : java.util.UUID.randomUUID())")
     @Mapping(target = "createdAt", expression = "java(admin.getCreatedAt() != null ? admin.getCreatedAt() : java.time.LocalDateTime.now())")
     @Mapping(target = "userType", constant = "ADMIN")
+    @Mapping(target = "verified", source = "verified")
     AdminProfileDocument toDocument(Admin admin);
 
     @Mapping(target = "id", expression = "java(organizer.getId() != null ? organizer.getId() : java.util.UUID.randomUUID())")
     @Mapping(target = "createdAt", expression = "java(organizer.getCreatedAt() != null ? organizer.getCreatedAt() : java.time.LocalDateTime.now())")
     @Mapping(target = "userType", constant = "ORGANIZER")
     @Mapping(target = "contact", source = "contactInfo")
+    @Mapping(target = "verified", source = "verified")
     OrganizerProfileDocument toDocument(Organizer organizer);
 
     @Mapping(target = "dateOfBirth", expression = "java(doc.getBirthdate() == null ? null : doc.getBirthdate().toLocalDate())")

@@ -3,6 +3,7 @@ package com.matchpuff.profileservice.application.service;
 import java.util.List;
 import java.util.UUID;
 
+import com.matchpuff.profileservice.application.dto.response.BatchProfileResponse;
 import com.matchpuff.profileservice.application.dto.response.CategoryWithTagsResponse;
 import com.matchpuff.profileservice.application.dto.response.TagSummaryResponse;
 import com.matchpuff.profileservice.application.dto.response.UserResponse;
@@ -141,6 +142,17 @@ public class UserService implements UserServicePort {
     }
 
     @Override
+    public List<BatchProfileResponse> getUsersByIds(List<UUID> ids) {
+        return userUseCase.getUsersByIds(ids).stream()
+                .map(user -> {
+                    String biography = user instanceof StudentProfile s ? s.getBiography() : null;
+                    String photoUrl = user instanceof StudentProfile s2 ? s2.getPhotoUrl() : null;
+                    return new BatchProfileResponse(user.getId(), user.getName(), user.getEmail(), biography, photoUrl);
+                })
+                .toList();
+    }
+
+    @Override
     public List<CategoryWithTagsResponse> getTagCatalog() {
         return userUseCase.getTagCatalog().stream()
                 .map(cat -> new CategoryWithTagsResponse(
@@ -151,5 +163,23 @@ public class UserService implements UserServicePort {
                                 .toList()
                 ))
                 .toList();
+    }
+
+    @Override
+    public UserResponse updateXp(UUID userId, int xp) {
+        User updated = userUseCase.updateXp(userId, xp);
+        return userMapper.toResponse(updated);
+    }
+
+    @Override
+    public UserResponse updateLevel(UUID userId, int level) {
+        User updated = userUseCase.updateLevel(userId, level);
+        return userMapper.toResponse(updated);
+    }
+
+    @Override
+    public UserResponse updateActiveStatus(UUID userId, boolean active) {
+        User updated = userUseCase.updateActiveStatus(userId, active);
+        return userMapper.toResponse(updated);
     }
 }

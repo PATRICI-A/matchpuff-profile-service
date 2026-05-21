@@ -5,10 +5,6 @@ import com.matchpuff.profileservice.domain.model.*;
 import java.util.List;
 import java.util.UUID;
 
-import com.matchpuff.profileservice.domain.model.CategoryWithTags;
-import com.matchpuff.profileservice.domain.model.Schedule;
-import com.matchpuff.profileservice.domain.model.StudentProfile;
-
 public interface UserUseCasePort {
     User createStudentUser(StudentProfile student);
     User createAdminUser(Admin admin);
@@ -19,6 +15,7 @@ public interface UserUseCasePort {
     User updateUser(UUID userId, User user);
     void changePassword(UUID userId, String currentPassword, String newPassword);
     void verifyUser(UUID userId);
+    void resetPassword(UUID userId, String newPassword);
     User addScheduleToStudent(UUID userId, Schedule schedule);
     User addTagToStudent(UUID userId, UUID tagId);
     User removeScheduleFromStudent(UUID userId, Schedule schedule);
@@ -35,5 +32,11 @@ public interface UserUseCasePort {
     List<UUID> getUserFriends(UUID userId);
     User addFriendToStudent(UUID userId, UUID friendId);
     User removeFriendFromStudent(UUID userId, UUID friendId);
+
+    List<User> getUsersByIds(List<UUID> ids);
+
+    User updateXp(UUID userId, int xp);
+    User updateLevel(UUID userId, int level);
+    User updateActiveStatus(UUID userId, boolean active);
 
 }

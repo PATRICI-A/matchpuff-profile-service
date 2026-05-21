@@ -259,25 +259,25 @@ class UserUseCaseTest {
 
     @Test
     void givenValidCurrentPassword_whenChangePassword_thenHashesAndUpdatesUser() {
-        student.setPasswordHash("CurrentPassword123");
+        student.setPasswordHash("Current.Password123");
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
-        when(passwordHashingService.verifyPassword("CurrentPassword123", "CurrentPassword123")).thenReturn(true);
-        when(passwordHashingService.hashPassword("NewPassword123")).thenReturn("HashedNewPassword123");
+        when(passwordHashingService.verifyPassword("Current.Password123", "Current.Password123")).thenReturn(true);
+        when(passwordHashingService.hashPassword("New.Password123")).thenReturn("HashedNew.Password123");
         when(userRepository.update(student.getId(), student)).thenReturn(student);
 
-        userUseCase.changePassword(student.getId(), "CurrentPassword123", "NewPassword123");
+        userUseCase.changePassword(student.getId(), "Current.Password123", "New.Password123");
 
-        assertEquals("HashedNewPassword123", student.getPasswordHash());
+        assertEquals("HashedNew.Password123", student.getPasswordHash());
         verify(userRepository).update(student.getId(), student);
     }
 
     @Test
     void givenWrongCurrentPassword_whenChangePassword_thenThrowsProfileServiceException() {
-        student.setPasswordHash("CurrentPassword123");
+        student.setPasswordHash("Current@Password123");
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
-        when(passwordHashingService.verifyPassword("BadPassword123", "CurrentPassword123")).thenReturn(false);
+        when(passwordHashingService.verifyPassword("BadPassword123", "Current@Password123")).thenReturn(false);
 
         assertThrows(
                 ProfileServiceException.class,
@@ -724,16 +724,16 @@ class UserUseCaseTest {
     @Test
     void givenExistingStudent_whenUpdateWithPassword_thenPasswordIsHashed() {
         StudentProfile request = new StudentProfile();
-        request.setPasswordHash("NewPassword1");
+        request.setPasswordHash("NewP@ssword1");
 
         when(userRepository.findById(student.getId())).thenReturn(Optional.of(student));
-        when(passwordHashingService.hashPassword("NewPassword1")).thenReturn("HashedNew1");
+        when(passwordHashingService.hashPassword("NewP@ssword1")).thenReturn("HashedNewP@ssword1");
         when(userRepository.update(student.getId(), student)).thenReturn(student);
 
         userUseCase.updateStudentUser(student.getId(), request);
 
-        assertEquals("HashedNew1", student.getPasswordHash());
-        verify(passwordHashingService).hashPassword("NewPassword1");
+        assertEquals("HashedNewP@ssword1", student.getPasswordHash());
+        verify(passwordHashingService).hashPassword("NewP@ssword1");
     }
 
     @Test
@@ -792,15 +792,15 @@ class UserUseCaseTest {
         admin.setId(UUID.randomUUID());
 
         Admin request = new Admin();
-        request.setPasswordHash("NewAdminPass1");
+        request.setPasswordHash("New@minPass1");
 
         when(userRepository.findById(admin.getId())).thenReturn(Optional.of(admin));
-        when(passwordHashingService.hashPassword("NewAdminPass1")).thenReturn("HashedAdminPass1");
+        when(passwordHashingService.hashPassword("New@minPass1")).thenReturn("New@minPass1");
         when(userRepository.update(admin.getId(), admin)).thenReturn(admin);
 
         userUseCase.updateAdminUser(admin.getId(), request);
 
-        assertEquals("HashedAdminPass1", admin.getPasswordHash());
+        assertEquals("New@minPass1", admin.getPasswordHash());
     }
 
     @Test
@@ -838,15 +838,15 @@ class UserUseCaseTest {
         organizer.setId(UUID.randomUUID());
 
         Organizer request = new Organizer();
-        request.setPasswordHash("NewOrgPass1");
+        request.setPasswordHash("New@rgPass1");
 
         when(userRepository.findById(organizer.getId())).thenReturn(Optional.of(organizer));
-        when(passwordHashingService.hashPassword("NewOrgPass1")).thenReturn("HashedOrgPass1");
+        when(passwordHashingService.hashPassword("New@rgPass1")).thenReturn("New@rgPass1");
         when(userRepository.update(organizer.getId(), organizer)).thenReturn(organizer);
 
         userUseCase.updateOrganizerUser(organizer.getId(), request);
 
-        assertEquals("HashedOrgPass1", organizer.getPasswordHash());
+        assertEquals("New@rgPass1", organizer.getPasswordHash());
     }
 
     // ── updateUser with unsupported type ─────────────────────────
@@ -944,14 +944,14 @@ class UserUseCaseTest {
 
     @Test
     void givenStudentWithPassword_whenCreateStudentUser_thenPasswordIsHashed() {
-        student.setPasswordHash("RawPassword1");
-        when(passwordHashingService.hashPassword("RawPassword1")).thenReturn("HashedPassword1");
+        student.setPasswordHash("Raw.Password1");
+        when(passwordHashingService.hashPassword("Raw.Password1")).thenReturn("Raw.Password1");
         when(userRepository.save(student)).thenReturn(student);
 
         userUseCase.createStudentUser(student);
 
-        assertEquals("HashedPassword1", student.getPasswordHash());
-        verify(passwordHashingService).hashPassword("RawPassword1");
+        assertEquals("Raw.Password1", student.getPasswordHash());
+        verify(passwordHashingService).hashPassword("Raw.Password1");
     }
 
     @Test
@@ -968,12 +968,12 @@ class UserUseCaseTest {
     void givenAdminWithPassword_whenCreateAdminUser_thenPasswordIsHashed() {
         Admin admin = new Admin();
         admin.setId(UUID.randomUUID());
-        admin.setPasswordHash("AdminRaw1");
-        when(passwordHashingService.hashPassword("AdminRaw1")).thenReturn("AdminHashed1");
+        admin.setPasswordHash("Admin.Raw1");
+        when(passwordHashingService.hashPassword("Admin.Raw1")).thenReturn("Admin.Raw1");
         when(userRepository.save(admin)).thenReturn(admin);
 
         userUseCase.createAdminUser(admin);
 
-        assertEquals("AdminHashed1", admin.getPasswordHash());
+        assertEquals("Admin.Raw1", admin.getPasswordHash());
     }
 }
