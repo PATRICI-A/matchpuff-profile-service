@@ -1,24 +1,5 @@
 services:
 
-  rabbitmq:
-    image: rabbitmq:3.13-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
-    networks:
-      - backend
-    restart: always
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-
   profile-service:
     build:
       context: .
@@ -40,9 +21,6 @@ services:
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
       - RABBITMQ_VHOST=${RABBITMQ_VHOST}
       - RABBITMQ_SSL_ENABLED=${RABBITMQ_SSL_ENABLED}
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
     networks:
       - backend
     restart: always
