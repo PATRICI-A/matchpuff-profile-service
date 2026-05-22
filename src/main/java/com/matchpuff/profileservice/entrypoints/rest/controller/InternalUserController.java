@@ -78,7 +78,11 @@ public class InternalUserController {
     @Tag(name = "Users - Reading", description = "Obtain information about users")
     @Operation(summary = "Obtain all user profiles for matching")
     @ApiResponse(responseCode = "200", description = "User profiles retrieved successfully")
-    public List<UserMatchProfileDto> getAllProfilesForMatching() {
+    public List<UserMatchProfileDto> getAllProfilesForMatching(
+            @RequestParam(required = false) UUID userId) {
+        if (userId != null) {
+            return internalUserService.getAllProfilesForMatching(userId);
+        }
         return internalUserService.getAllProfilesForMatching();
     }
 }

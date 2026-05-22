@@ -59,7 +59,21 @@ public class UserUseCase implements UserUseCasePort {
     // ── DELETE ───────────────────────────────────────────────────
     @Override
     public void deleteUser(UUID userId) {
-        findOrThrow(userId);
+        User user = findOrThrow(userId);
+
+        if (user instanceof StudentProfile student && student.getFriendsId() != null) {
+            for (UUID friendId : List.copyOf(student.getFriendsId())) {
+                User friendUser = userRepository.findById(friendId).orElse(null);
+                if (friendUser instanceof StudentProfile friendStudent
+                        && friendStudent.getFriendsId() != null
+                        && friendStudent.getFriendsId().contains(userId)) {
+                    ensureMutableFriendsList(friendStudent);
+                    friendStudent.getFriendsId().removeIf(f -> f.equals(userId));
+                    userRepository.update(friendId, friendStudent);
+                }
+            }
+        }
+
         userRepository.delete(userId);
     }
 
@@ -167,6 +181,7 @@ public class UserUseCase implements UserUseCasePort {
         if (request.getPasswordHash() != null && !request.getPasswordHash().isEmpty()) {
             student.setPasswordHash(passwordHashingService.hashPassword(request.getPasswordHash()));
         }
+        if (request.getGender() != null)       student.setGender(request.getGender());
         if (request.getBiography() != null)    student.setBiography(request.getBiography());
         if (request.getStudentCarnet() != null) student.setStudentCarnet(request.getStudentCarnet());
         if (request.getPrivacyLevel() != null) student.setPrivacyLevel(request.getPrivacyLevel());
