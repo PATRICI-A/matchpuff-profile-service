@@ -25,6 +25,9 @@ public class ProdSecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
+                    "/api/v1/users/student",
+                    "/api/v1/users/organizer",
+                    "/api/v1/users/admin",
                     "/actuator/health",
                     "/swagger-ui/**",
                     "/v3/api-docs/**"
