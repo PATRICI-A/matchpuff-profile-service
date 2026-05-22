@@ -28,6 +28,8 @@ public class ProdSecurityConfig {
                     "/api/v1/users/student",
                     "/api/v1/users/organizer",
                     "/api/v1/users/admin",
+                    "/api/v1/users/internal/**",
+                    "/api/v1/internal/**",
                     "/actuator/health",
                     "/swagger-ui/**",
                     "/v3/api-docs/**"

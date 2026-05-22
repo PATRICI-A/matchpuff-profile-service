@@ -99,4 +99,13 @@ public class UserQueryController {
     public ResponseEntity<List<CategoryWithTagsResponse>> getTagCatalog() {
         return ResponseEntity.ok(userService.getTagCatalog());
     }
+
+    @GetMapping("/internal/{userId}/friends-count")
+    @Tag(name = "Users - Internal", description = "Internal endpoints for inter-service communication")
+    @Operation(summary = "Get total friend count for a user (inter-service)")
+    @ApiResponse(responseCode = "200", description = "Friend count retrieved")
+    public ResponseEntity<Integer> getConnectionsCount(@PathVariable UUID userId) {
+        return ResponseEntity.ok(userService.getUserFriends(userId).size());
+    }
+
 }
