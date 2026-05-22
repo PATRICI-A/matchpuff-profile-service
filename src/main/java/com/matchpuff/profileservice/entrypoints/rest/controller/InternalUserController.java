@@ -76,13 +76,18 @@ public class InternalUserController {
 
     @GetMapping("/matching/profiles")
     @Tag(name = "Users - Reading", description = "Obtain information about users")
-    @Operation(summary = "Obtain all user profiles for matching")
+    @Operation(summary = "Obtain all user profiles for matching (unfiltered)")
     @ApiResponse(responseCode = "200", description = "User profiles retrieved successfully")
-    public List<UserMatchProfileDto> getAllProfilesForMatching(
-            @RequestParam(required = false) UUID userId) {
-        if (userId != null) {
-            return internalUserService.getAllProfilesForMatching(userId);
-        }
+    public List<UserMatchProfileDto> getAllProfilesForMatching() {
         return internalUserService.getAllProfilesForMatching();
+    }
+
+    @GetMapping("/matching/profiles/candidates/{userId}")
+    @Tag(name = "Users - Reading", description = "Obtain information about users")
+    @Operation(summary = "Obtain matching candidates for a user (excludes self, friends and private profiles)")
+    @ApiResponse(responseCode = "200", description = "User profiles retrieved successfully")
+    public List<UserMatchProfileDto> getMatchingCandidates(
+            @PathVariable UUID userId) {
+        return internalUserService.getAllProfilesForMatching(userId);
     }
 }
