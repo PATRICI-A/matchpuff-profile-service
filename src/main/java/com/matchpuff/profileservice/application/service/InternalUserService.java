@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import com.matchpuff.profileservice.application.dto.response.UserAuthResponse;
 import com.matchpuff.profileservice.application.dto.response.UserMatchProfileDto;
 import com.matchpuff.profileservice.application.dto.response.UserMatchProfileResponse;
 import com.matchpuff.profileservice.domain.exceptions.ProfileServiceException;
+import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
 import com.matchpuff.profileservice.domain.ports.in.UserUseCasePort;
 import com.matchpuff.profileservice.application.mapper.UserMapper;
 
@@ -56,6 +58,19 @@ public class InternalUserService implements InternalUserServicePort {
     @Override
     public List<UserMatchProfileDto> getAllProfilesForMatching() {
         return userUseCase.getAllStudentProfiles().stream()
+                .filter(s -> s.getPrivacyLevel() != PrivacyLevelEnum.PRIVATE)
+                .map(userMapper::toUserMatchProfileResponseFromUser)
+                .map(this::convertToDto)
+                .toList();
+    }
+
+    @Override
+    public List<UserMatchProfileDto> getAllProfilesForMatching(UUID requestingUserId) {
+        Set<UUID> friends = Set.copyOf(userUseCase.getUserFriends(requestingUserId));
+        return userUseCase.getAllStudentProfiles().stream()
+                .filter(s -> !s.getId().equals(requestingUserId))
+                .filter(s -> !friends.contains(s.getId()))
+                .filter(s -> s.getPrivacyLevel() != PrivacyLevelEnum.PRIVATE)
                 .map(userMapper::toUserMatchProfileResponseFromUser)
                 .map(this::convertToDto)
                 .toList();

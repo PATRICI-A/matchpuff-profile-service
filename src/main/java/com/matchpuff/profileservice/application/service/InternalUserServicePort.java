@@ -14,4 +14,5 @@ public interface InternalUserServicePort {
     void resetPassword(UUID userId, String newPassword);
     UserMatchProfileDto getProfileForMatching(UUID id);
     List<UserMatchProfileDto> getAllProfilesForMatching();
+    List<UserMatchProfileDto> getAllProfilesForMatching(UUID requestingUserId);
 }
