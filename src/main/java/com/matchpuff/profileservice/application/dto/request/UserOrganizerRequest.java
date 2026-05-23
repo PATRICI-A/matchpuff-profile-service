@@ -26,6 +26,7 @@ public class UserOrganizerRequest {
     private String password;
 
     @NotNull(message = "Gender is required")
+    @Schema(description = "Allowed values: MALE, FEMALE, OTHER, PREFER_NOT_TO_SAY")
     private GenderEnum gender;
 
     @NotBlank(message = "Contact information is required")

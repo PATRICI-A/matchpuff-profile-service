@@ -28,9 +28,11 @@ public class UserStudentUpdateRequest {
     private String email;
 
     @NotNull
+    @Schema(description = "Allowed values: MALE, FEMALE, OTHER, PREFER_NOT_TO_SAY")
     private GenderEnum gender;
 
     @NotNull
+    @Schema(description = "Allowed values: SYSTEMS_ENGINEERING, CIVIL_ENGINEERING, INDUSTRIAL_ENGINEERING, ELECTRONIC_ENGINEERING, ELECTRICAL_ENGINEERING, MECHANICAL_ENGINEERING, BIOMEDICAL_ENGINEERING, ENVIRONMENTAL_ENGINEERING, STATISTICAL_ENGINEERING, BIOTECHNOLOGY_ENGINEERING, ARTIFICIAL_INTELLIGENCE_ENGINEERING, CYBERSECURITY_ENGINEERING, COMPUTER_SCIENCE, MATHEMATICS, DATA_SCIENCE, BUSINESS_ADMINISTRATION, ECONOMICS, INFORMATION_TECHNOLOGY")
     private CareerEnum career;
 
     @Min(value = 1, message = "El semestre mínimo es 1")
@@ -45,6 +47,7 @@ public class UserStudentUpdateRequest {
     private String biography;
 
     @NotNull
+    @Schema(description = "Allowed values: PUBLIC, PRIVATE, MATCH_ONLY")
     private PrivacyLevelEnum privacyLevel;
 
     @NotNull
