@@ -7,10 +7,14 @@ public class Email {
     private final String value;
 
     public Email(String value) {
-        if (value == null || (!value.endsWith("@escuelaing.edu.co") && !value.endsWith("@mail.escuelaing.edu.co"))) {
+        if (value == null) {
             throw new InvalidInputException("The email must be institutional (@escuelaing.edu.co or @mail.escuelaing.edu.co)");
         }
-        this.value = value;
+        String normalized = value.trim().toLowerCase();
+        if (!normalized.endsWith("@escuelaing.edu.co") && !normalized.endsWith("@mail.escuelaing.edu.co")) {
+            throw new InvalidInputException("The email must be institutional (@escuelaing.edu.co or @mail.escuelaing.edu.co)");
+        }
+        this.value = normalized;
     }
 
     public String getValue() {
