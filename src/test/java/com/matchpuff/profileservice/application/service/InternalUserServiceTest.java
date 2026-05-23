@@ -132,16 +132,6 @@ class InternalUserServiceTest {
         verify(userUseCase).verifyUser(userId);
     }
 
-    @Test
-    void givenDifferentUserId_whenVerifyUser_thenDelegatesToUseCaseWithCorrectId() {
-        UUID userId = UUID.randomUUID();
-        doNothing().when(userUseCase).verifyUser(userId);
-
-        internalUserService.verifyUser(userId);
-
-        verify(userUseCase).verifyUser(userId);
-    }
-
     // ── getProfileForMatching ───────────────────────────────────
 
     @Test
@@ -231,4 +221,136 @@ class InternalUserServiceTest {
         String expEnd = sched.getEndTime().format(tf2).replace(":00", "");
         assertEquals("TUESDAY_" + expStart + "-" + expEnd, list.get(1).getSchedulesAvailable().get(0));
     }
+
+    // ── getAllProfilesForMatching(requestingUserId) ───────────────────────────────
+
+@Test
+void givenRequestingUser_whenGetAllProfilesForMatching_thenExcludesSelfFriendsAndPrivateProfiles() {
+    UUID requestingUserId = UUID.randomUUID();
+
+    // self
+    StudentProfile self = new StudentProfile();
+    self.setId(requestingUserId);
+    self.setPrivacyLevel(com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum.PUBLIC);
+
+    // friend
+    StudentProfile friend = new StudentProfile();
+    UUID friendId = UUID.randomUUID();
+    friend.setId(friendId);
+    friend.setPrivacyLevel(com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum.PUBLIC);
+
+    // private user
+    StudentProfile privateUser = new StudentProfile();
+    privateUser.setId(UUID.randomUUID());
+    privateUser.setPrivacyLevel(com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum.PRIVATE);
+
+    // valid user
+    StudentProfile valid = new StudentProfile();
+    UUID validId = UUID.randomUUID();
+    valid.setId(validId);
+    valid.setPrivacyLevel(com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum.PUBLIC);
+    valid.setActive(true);
+
+    // mapper response
+    com.matchpuff.profileservice.application.dto.response.UserMatchProfileResponse resp =
+            new com.matchpuff.profileservice.application.dto.response.UserMatchProfileResponse();
+
+    resp.setId(validId);
+    resp.setCareer("Systems");
+    resp.setSemester(5);
+    resp.setTags(List.of("java"));
+
+    when(userUseCase.getUserFriends(requestingUserId))
+            .thenReturn(List.of(friendId));
+
+    when(userUseCase.getAllStudentProfiles())
+            .thenReturn(List.of(self, friend, privateUser, valid));
+
+    when(userMapper.toUserMatchProfileResponseFromUser(valid))
+            .thenReturn(resp);
+
+    var result = internalUserService.getAllProfilesForMatching(requestingUserId);
+
+    assertEquals(1, result.size());
+
+    var dto = result.get(0);
+
+    assertEquals(validId, dto.getId());
+    assertEquals("Systems", dto.getCareer());
+    assertEquals(5, dto.getSemester());
+    assertTrue(dto.isActive());
+
+    verify(userUseCase).getUserFriends(requestingUserId);
+    verify(userUseCase).getAllStudentProfiles();
+    verify(userMapper).toUserMatchProfileResponseFromUser(valid);
+
+    verify(userMapper, never()).toUserMatchProfileResponseFromUser(self);
+    verify(userMapper, never()).toUserMatchProfileResponseFromUser(friend);
+    verify(userMapper, never()).toUserMatchProfileResponseFromUser(privateUser);
+}
+
+@Test
+void givenMapperReturnsNull_whenGetAllProfilesForMatching_thenNullDtosAreFiltered() {
+    UUID requestingUserId = UUID.randomUUID();
+
+    StudentProfile valid = new StudentProfile();
+    valid.setId(UUID.randomUUID());
+    valid.setPrivacyLevel(com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum.PUBLIC);
+
+    when(userUseCase.getUserFriends(requestingUserId))
+            .thenReturn(List.of());
+
+    when(userUseCase.getAllStudentProfiles())
+            .thenReturn(List.of(valid));
+
+    when(userMapper.toUserMatchProfileResponseFromUser(valid))
+            .thenReturn(null);
+
+    var result = internalUserService.getAllProfilesForMatching(requestingUserId);
+
+    assertNotNull(result);
+    assertTrue(result.isEmpty());
+
+    verify(userMapper).toUserMatchProfileResponseFromUser(valid);
+}
+
+@Test
+void givenValidProfiles_whenGetAllProfilesForMatching_thenSetsActiveFlagCorrectly() {
+    UUID requestingUserId = UUID.randomUUID();
+
+    StudentProfile activeStudent = new StudentProfile();
+    activeStudent.setId(UUID.randomUUID());
+    activeStudent.setPrivacyLevel(com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum.PUBLIC);
+    activeStudent.setActive(true);
+
+    StudentProfile inactiveStudent = new StudentProfile();
+    inactiveStudent.setId(UUID.randomUUID());
+    inactiveStudent.setPrivacyLevel(com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum.PUBLIC);
+    inactiveStudent.setActive(false);
+
+    var activeResp = new com.matchpuff.profileservice.application.dto.response.UserMatchProfileResponse();
+    activeResp.setId(activeStudent.getId());
+
+    var inactiveResp = new com.matchpuff.profileservice.application.dto.response.UserMatchProfileResponse();
+    inactiveResp.setId(inactiveStudent.getId());
+
+    when(userUseCase.getUserFriends(requestingUserId))
+            .thenReturn(List.of());
+
+    when(userUseCase.getAllStudentProfiles())
+            .thenReturn(List.of(activeStudent, inactiveStudent));
+
+    when(userMapper.toUserMatchProfileResponseFromUser(activeStudent))
+            .thenReturn(activeResp);
+
+    when(userMapper.toUserMatchProfileResponseFromUser(inactiveStudent))
+            .thenReturn(inactiveResp);
+
+    var result = internalUserService.getAllProfilesForMatching(requestingUserId);
+
+    assertEquals(2, result.size());
+
+    assertTrue(result.get(0).isActive());
+    assertFalse(result.get(1).isActive());
+}
 }

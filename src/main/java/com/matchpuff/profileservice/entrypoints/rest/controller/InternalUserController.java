@@ -64,6 +64,22 @@ public class InternalUserController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/users/{userId}/geolocation")
+    @Tag(name = "Users - Reading", description = "Obtain information about users")
+    @Operation(summary = "Check if a student has geolocation enabled")
+    @ApiResponse(responseCode = "200", description = "Geolocation status retrieved successfully")
+    public ResponseEntity<Boolean> isGeolocationEnabled(@PathVariable UUID userId) {
+        return ResponseEntity.ok(internalUserService.isGeolocationEnabled(userId));
+    }
+
+    @GetMapping("/users/{userId}/active")
+    @Tag(name = "Users - Reading", description = "Obtain information about users")
+    @Operation(summary = "Check if a student is active")
+    @ApiResponse(responseCode = "200", description = "Active status retrieved successfully")
+    public ResponseEntity<Boolean> isActive(@PathVariable UUID userId) {
+        return ResponseEntity.ok(internalUserService.isActive(userId));
+    }
+
     @GetMapping("/matching/profiles/{id}")
     @Tag(name = "Users - Reading", description = "Obtain information about users")
     @Operation(summary = "Obtain user profile for matching by ID")
