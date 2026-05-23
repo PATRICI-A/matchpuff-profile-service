@@ -48,7 +48,7 @@ public class SwaggerConfig {
                         """)
                         .version("1.0.0")
                         .contact(new Contact()
-                                .name("Contact Matchpuff Team — Escuela Colombiana de Ingeniera Julio Garavito")
+                                .name("Matchpuff Team — Escuela Colombiana de Ingeniera Julio Garavito")
                                 .email("javier.romero-d@mail.escuelaing.edu.co")
                                 .email("andres.cardozo-m@mail.escuelaing.edu.co"))
                 )
