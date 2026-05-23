@@ -13,7 +13,9 @@ import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
 import com.matchpuff.profileservice.domain.model.enums.GenderEnum;
 import com.matchpuff.profileservice.domain.model.enums.PrivacyLevelEnum;
 import com.matchpuff.profileservice.application.service.PasswordHashingService;
+import com.matchpuff.profileservice.domain.ports.out.FriendshipEventPublisherPort;
 import com.matchpuff.profileservice.domain.ports.out.ImageStoragePort;
+import com.matchpuff.profileservice.domain.ports.out.OtpNotificationPort;
 import com.matchpuff.profileservice.domain.ports.out.TagCatalogPort;
 import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +50,12 @@ class UserUseCaseTest {
 
     @Mock
     private TagCatalogPort tagCatalogPort;
+
+    @Mock
+    private FriendshipEventPublisherPort friendshipEventPublisher;
+
+    @Mock
+    private OtpNotificationPort otpNotificationPort;
 
     @InjectMocks
     private UserUseCase userUseCase;

@@ -10,9 +10,9 @@ import com.matchpuff.profileservice.domain.model.*;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
 import com.matchpuff.profileservice.domain.ports.out.FriendshipEventPublisherPort;
 import com.matchpuff.profileservice.domain.ports.out.ImageStoragePort;
+import com.matchpuff.profileservice.domain.ports.out.OtpNotificationPort;
 import com.matchpuff.profileservice.domain.ports.out.TagCatalogPort;
 import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
-import com.matchpuff.profileservice.application.dto.event.FriendshipCreatedEventDto;
 import com.matchpuff.profileservice.application.service.PasswordHashingService;
 
 import lombok.RequiredArgsConstructor;
@@ -35,25 +35,32 @@ public class UserUseCase implements UserUseCasePort {
     private final PasswordHashingService passwordHashingService;
     private final TagCatalogPort tagCatalogPort;
     private final FriendshipEventPublisherPort friendshipEventPublisher;
+    private final OtpNotificationPort otpNotificationPort;
 
     // ── CREATE ───────────────────────────────────────────────────
 
     @Override
     public User createStudentUser(StudentProfile student) {
         hashPasswordIfPresent(student);
-        return userRepository.save(student);
+        User saved = userRepository.save(student);
+        otpNotificationPort.sendOtp(saved.getEmail());
+        return saved;
     }
 
     @Override
     public User createAdminUser(Admin admin) {
         hashPasswordIfPresent(admin);
-        return userRepository.save(admin);
+        User saved = userRepository.save(admin);
+        otpNotificationPort.sendOtp(saved.getEmail());
+        return saved;
     }
 
     @Override
     public User createOrganizerUser(Organizer organizer) {
         hashPasswordIfPresent(organizer);
-        return userRepository.save(organizer);
+        User saved = userRepository.save(organizer);
+        otpNotificationPort.sendOtp(saved.getEmail());
+        return saved;
     }
 
     // ── DELETE ───────────────────────────────────────────────────
