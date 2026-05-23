@@ -122,6 +122,22 @@ public class InternalUserController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/users/{userId}/geolocation")
+    @Tag(name = "Users - Reading", description = "Obtain information about users")
+    @Operation(summary = "Check if a student has geolocation enabled")
+    @ApiResponse(responseCode = "200", description = "Geolocation status retrieved successfully")
+    public ResponseEntity<Boolean> isGeolocationEnabled(@PathVariable UUID userId) {
+        return ResponseEntity.ok(internalUserService.isGeolocationEnabled(userId));
+    }
+
+    @GetMapping("/users/{userId}/active")
+    @Tag(name = "Users - Reading", description = "Obtain information about users")
+    @Operation(summary = "Check if a student is active")
+    @ApiResponse(responseCode = "200", description = "Active status retrieved successfully")
+    public ResponseEntity<Boolean> isActive(@PathVariable UUID userId) {
+        return ResponseEntity.ok(internalUserService.isActive(userId));
+    }
+
     @GetMapping("/matching/profiles/{id}")
     @Tag(name = "Users - Reading", description = "Retrieve profiles used by the matching subsystem")
     @Operation(summary = "Obtain user profile for matching by ID",
@@ -139,19 +155,19 @@ public class InternalUserController {
     }
 
     @GetMapping("/matching/profiles")
-    @Tag(name = "Users - Reading", description = "Retrieve list of profiles for matching subsystem")
-    @Operation(summary = "Obtain all user profiles for matching",
-            description = "Returns all available profiles formatted for matching. When 'userId' query parameter is provided, the response may exclude or adjust relevance for the supplied user according to internal matching rules.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "User profiles retrieved successfully. Returns a list of UserMatchProfileDto objects."),
-            @ApiResponse(responseCode = "400", description = "Bad request: invalid query parameter value."),
-            @ApiResponse(responseCode = "500", description = "Internal server error: error while fetching profiles for matching.")
-    })
-    public List<UserMatchProfileDto> getAllProfilesForMatching(
-            @RequestParam(required = false) UUID userId) {
-        if (userId != null) {
-            return internalUserService.getAllProfilesForMatching(userId);
-        }
+    @Tag(name = "Users - Reading", description = "Obtain information about users")
+    @Operation(summary = "Obtain all user profiles for matching (unfiltered)")
+    @ApiResponse(responseCode = "200", description = "User profiles retrieved successfully")
+    public List<UserMatchProfileDto> getAllProfilesForMatching() {
         return internalUserService.getAllProfilesForMatching();
+    }
+
+    @GetMapping("/matching/profiles/candidates/{userId}")
+    @Tag(name = "Users - Reading", description = "Obtain information about users")
+    @Operation(summary = "Obtain matching candidates for a user (excludes self, friends and private profiles)")
+    @ApiResponse(responseCode = "200", description = "User profiles retrieved successfully")
+    public List<UserMatchProfileDto> getMatchingCandidates(
+            @PathVariable UUID userId) {
+        return internalUserService.getAllProfilesForMatching(userId);
     }
 }
