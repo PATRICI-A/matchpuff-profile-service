@@ -5,9 +5,9 @@ import com.matchpuff.profileservice.domain.exceptions.InvalidInputException;
 import com.matchpuff.profileservice.domain.exceptions.ProfileServiceException;
 import com.matchpuff.profileservice.domain.model.Admin;
 import com.matchpuff.profileservice.domain.model.StudentProfile;
-import com.matchpuff.profileservice.domain.model.User;
 import com.matchpuff.profileservice.domain.ports.out.FriendshipEventPublisherPort;
 import com.matchpuff.profileservice.domain.ports.out.ImageStoragePort;
+import com.matchpuff.profileservice.domain.ports.out.OtpNotificationPort;
 import com.matchpuff.profileservice.domain.ports.out.TagCatalogPort;
 import com.matchpuff.profileservice.domain.ports.out.UserRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +29,7 @@ class UserUseCaseFriendsAndTagsTest {
     PasswordHashingService passwordHashingService;
     TagCatalogPort tagCatalogPort;
     FriendshipEventPublisherPort friendshipEventPublisher;
+    OtpNotificationPort otpNotificationPort;
     UserUseCase useCase;
 
     StudentProfile student;
@@ -40,8 +41,9 @@ class UserUseCaseFriendsAndTagsTest {
         passwordHashingService = mock(PasswordHashingService.class);
         tagCatalogPort = mock(TagCatalogPort.class);
         friendshipEventPublisher = mock(FriendshipEventPublisherPort.class);
+        otpNotificationPort = mock(OtpNotificationPort.class);
 
-        useCase = new UserUseCase(userRepository, imageStoragePort, passwordHashingService, tagCatalogPort, friendshipEventPublisher);
+        useCase = new UserUseCase(userRepository, imageStoragePort, passwordHashingService, tagCatalogPort, friendshipEventPublisher, otpNotificationPort);
 
         student = new StudentProfile();
         student.setId(UUID.randomUUID());
