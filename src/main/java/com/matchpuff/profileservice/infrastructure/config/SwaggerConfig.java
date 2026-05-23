@@ -39,7 +39,7 @@ public class SwaggerConfig {
                         with the authenticated user's ID. All endpoints require a valid \
                         **JWT Bearer token** in the `Authorization` header.
 
-                        **Roles supported:** `STUDENT` · `ADMIN` · `ORGANIZER` — \
+                        **Roles supported:** `STUDENT` · `ADMIN`  — \
                         each role has its own set of fields and allowed operations.
 
                         **Internal endpoints:** Routes under `/api/v1/internal` are consumed \
