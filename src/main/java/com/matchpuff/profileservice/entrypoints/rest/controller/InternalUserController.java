@@ -155,17 +155,43 @@ public class InternalUserController {
     }
 
     @GetMapping("/matching/profiles")
-    @Tag(name = "Users - Reading", description = "Obtain information about users")
-    @Operation(summary = "Obtain all user profiles for matching (unfiltered)")
-    @ApiResponse(responseCode = "200", description = "User profiles retrieved successfully")
+    @Tag(name = "Users - Reading", description = "Retrieve list of profiles for matching subsystem. Returns lightweight profile DTOs optimized for matching services.")
+    @Operation(summary = "Obtain all user profiles for matching (unfiltered)",
+            description = "Returns all available user profiles formatted for matching. These profiles include tags, level, availability and other fields relevant to matching algorithms. Intended for internal matching services or batch processing that need the full candidate set.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "User profiles retrieved successfully. Returns a list of UserMatchProfileDto objects.",
+                    content = @io.swagger.v3.oas.annotations.media.Content(mediaType = "application/json", schema = @Schema(implementation = UserMatchProfileDto.class), examples = @ExampleObject(value = "[{\"id\": \"00000000-0000-0000-0000-000000000000\", \"name\": \"Alice\", \"tags\": [\"java\", \"spring\"], \"level\": 2}]"))),
+            @ApiResponse(responseCode = "400", description = "Bad request: invalid query or parameters.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class), examples = @ExampleObject(value = "{\"message\": \"Invalid query parameter.\", \"status\": 400, \"timestamp\": \"2026-05-22T12:00:00\"}"))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized: missing or invalid authentication token.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class), examples = @ExampleObject(value = "{\"message\": \"Unauthorized: token missing.\", \"status\": 401, \"timestamp\": \"2026-05-22T12:00:00\"}"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden: insufficient permissions to access matching profiles.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class), examples = @ExampleObject(value = "{\"message\": \"Forbidden: access denied.\", \"status\": 403, \"timestamp\": \"2026-05-22T12:00:00\"}"))),
+            @ApiResponse(responseCode = "500", description = "Internal server error: error while fetching profiles for matching.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class), examples = @ExampleObject(value = "{\"message\": \"Server error fetching matching profiles.\", \"status\": 500, \"timestamp\": \"2026-05-22T12:00:00\"}")))
+    })
     public List<UserMatchProfileDto> getAllProfilesForMatching() {
         return internalUserService.getAllProfilesForMatching();
     }
 
     @GetMapping("/matching/profiles/candidates/{userId}")
-    @Tag(name = "Users - Reading", description = "Obtain information about users")
-    @Operation(summary = "Obtain matching candidates for a user (excludes self, friends and private profiles)")
-    @ApiResponse(responseCode = "200", description = "User profiles retrieved successfully")
+    @Tag(name = "Users - Reading", description = "Retrieve matching candidates for a specific user, excluding ineligible profiles.")
+    @Operation(summary = "Obtain matching candidates for a user (excludes self, friends and private profiles)",
+            description = "Returns a filtered list of user profiles suitable as match candidates for the given userId. Excludes the user itself, confirmed friends and profiles marked as private. Useful for recommendation and matchmaking services.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Matching candidates retrieved successfully. Returns a list of UserMatchProfileDto objects.",
+                    content = @io.swagger.v3.oas.annotations.media.Content(mediaType = "application/json", schema = @Schema(implementation = UserMatchProfileDto.class), examples = @ExampleObject(value = "[{\"id\": \"11111111-1111-1111-1111-111111111111\", \"name\": \"Bob\", \"tags\": [\"python\"], \"level\": 3}]"))),
+            @ApiResponse(responseCode = "400", description = "Bad request: invalid userId format.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class), examples = @ExampleObject(value = "{\"message\": \"Invalid UUID format for userId.\", \"status\": 400, \"timestamp\": \"2026-05-22T12:00:00\"}"))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized: authentication required.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class), examples = @ExampleObject(value = "{\"message\": \"Unauthorized: token missing.\", \"status\": 401, \"timestamp\": \"2026-05-22T12:00:00\"}"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden: insufficient permissions to view candidates.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class), examples = @ExampleObject(value = "{\"message\": \"Forbidden: access denied.\", \"status\": 403, \"timestamp\": \"2026-05-22T12:00:00\"}"))),
+            @ApiResponse(responseCode = "404", description = "Not found: the user with provided id does not exist.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class), examples = @ExampleObject(value = "{\"message\": \"User not found for id: 11111111-1111-1111-1111-111111111111.\", \"status\": 404, \"timestamp\": \"2026-05-22T12:00:00\"}"))),
+            @ApiResponse(responseCode = "500", description = "Internal server error: error while fetching matching candidates.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class), examples = @ExampleObject(value = "{\"message\": \"Server error fetching matching candidates.\", \"status\": 500, \"timestamp\": \"2026-05-22T12:00:00\"}")))
+    })
     public List<UserMatchProfileDto> getMatchingCandidates(
             @PathVariable UUID userId) {
         return internalUserService.getAllProfilesForMatching(userId);
