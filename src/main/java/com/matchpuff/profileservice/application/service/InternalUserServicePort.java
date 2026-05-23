@@ -15,4 +15,6 @@ public interface InternalUserServicePort {
     UserMatchProfileDto getProfileForMatching(UUID id);
     List<UserMatchProfileDto> getAllProfilesForMatching();
     List<UserMatchProfileDto> getAllProfilesForMatching(UUID requestingUserId);
+    boolean isGeolocationEnabled(UUID userId);
+    boolean isActive(UUID userId);
 }

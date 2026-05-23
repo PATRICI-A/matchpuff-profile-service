@@ -12,4 +12,5 @@ public class UserMatchProfileDto {
     private Integer semester;
     private List<String> tags;
     private List<String> schedulesAvailable;
+    private boolean active;
 }
