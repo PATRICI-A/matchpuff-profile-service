@@ -21,6 +21,7 @@ public class UserOrganizerUpdateRequest {
     @Schema(example = "usuario@escuelaing.edu.co")
     private String email;
     @NotNull
+    @Schema(description = "Allowed values: MALE, FEMALE, OTHER, PREFER_NOT_TO_SAY")
     private GenderEnum gender;
     @NotBlank
     private String contactInfo;

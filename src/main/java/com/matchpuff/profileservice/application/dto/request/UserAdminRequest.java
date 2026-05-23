@@ -32,6 +32,7 @@ public class UserAdminRequest {
     private String password;
 
     @NotNull(message = "Gender is required")
+    @Schema(description = "Allowed values: MALE, FEMALE, OTHER, PREFER_NOT_TO_SAY")
     private GenderEnum gender;
 
 }

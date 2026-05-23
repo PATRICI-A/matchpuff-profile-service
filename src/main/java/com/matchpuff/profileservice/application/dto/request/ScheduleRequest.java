@@ -8,11 +8,13 @@ import lombok.Data;
 import java.time.LocalTime;
 
 import com.matchpuff.profileservice.domain.model.enums.DayOfWeekEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Data
 public class ScheduleRequest {
 
 	@NotNull
+	@Schema(description = "Allowed values: MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY")
 	private DayOfWeekEnum dayOfWeek;
 
 	@NotBlank(message = "Name is required")
